@@ -1,0 +1,10 @@
+{% comment %}
+Header template
+{% endcomment %}
+
+<header>
+  <nav class="nav">
+    {% include "patterns/molecules/navigation/linklist.html" with links=settings.core.NavigationSettings.primary_navigation %}
+    {% include "patterns/atoms/buttons/lightswitch.html"  %}
+  </nav>
+</header>

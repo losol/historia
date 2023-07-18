@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_class%}template-page{% endblock %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block content %}
+
+{% include 'patterns/organisms/header/header.html'%}
+<main>
+  <article>
+    <h1>{{ page.title }}</h1>
+    <p class="lead">{{ page.intro }}</p>
+    {{ page.featured_image }}
+
+    {{ page.story }}
+  </article>
+</main>
+{% include 'patterns/organisms/footer/footer.html'%}
+
+{% endblock content %}

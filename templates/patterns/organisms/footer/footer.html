@@ -1,0 +1,14 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% comment %}
+Footer template
+{% endcomment %}
+
+<footer>
+    <div>
+     {{ settings.core.NavigationSettings.footer_text|richtext }}
+    </div>
+    <nav class="nav">
+        {% include "patterns/molecules/navigation/linklist.html" with links=settings.core.NavigationSettings.footer_navigation %}
+    </nav>
+</footer>

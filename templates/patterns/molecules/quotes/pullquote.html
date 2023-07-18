@@ -1,0 +1,26 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% comment %}
+
+This template can be used in different places. In streamfield block
+or directly in a page template. To use this template pass `image` into context.
+
+Example:
+    {% include "patterns/molecules/quotes/blockquote.html" with quote="text" author="Skodde Losen" cite_url="https://asdf" %}
+
+{% endcomment %}
+
+<figure class="pullquote">
+  <blockquote {% if cite_url %} cite="{{cite_url}}" {% endif %}>
+    {{ quote}}
+  </blockquote>
+  {% if author %}
+    <figcaption>
+       {% if cite_url %}
+        <a href="{{cite_url}}">{{author}}</a>
+      {% else %}
+        {{author}}
+      {% endif %}
+    </figcaption>
+  {% endif %}
+</figure>

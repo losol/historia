@@ -1,0 +1,24 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% comment %}
+Link-list for use in navigation bar, used in header and footer
+
+This template can be used in different places. In streamfield block
+or directly in a page template. To use this template pass `image` into context.
+
+Example:
+    {% include "patterns/molecules/navigation/navbar.html" with links=settings.core.NavigationSettings.primary_navigation %}
+
+{% endcomment %}
+
+<ul class="nav-list">
+    {% for menu_item in links %}
+        <li class="nav-item">
+            {% if menu_item.value.link_page %}
+            <a href="{{ menu_item.value.link_page.get_url }}" class="nav-link">{{ menu_item.value.title }}</a>
+            {% else %}
+            <a href="{{ menu_item.value.link_url }}" class="nav-link">{{ menu_item.value.title }}</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
