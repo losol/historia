@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     "wagtailmarkdown",
     "modelcluster",
     "taggit",
+    "wagtail_localize",
+    "wagtail_localize.locales",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -77,6 +79,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
@@ -144,13 +147,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "nb-no"
+
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+    ("nb", "Norwegian Bokmål"),
+    ("en", "English"),
+]
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
 
 USE_L10N = True
+
+WAGTAIL_I18N_ENABLED = True
 
 USE_TZ = True
 

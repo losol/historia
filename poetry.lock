@@ -409,6 +409,14 @@ docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-inline
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
+name = "polib"
+version = "1.2.0"
+description = "A library to manipulate gettext files (po and mo files)."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "psycopg2-binary"
 version = "2.9.6"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
@@ -598,6 +606,25 @@ docs = ["Sphinx (>=1.5.2)", "myst-parser (==0.18.1)", "pyenchant (>=3.1.1,<4)", 
 testing = ["Jinja2 (>=3.0,<3.2)", "azure-mgmt-cdn (>=12.0,<13.0)", "azure-mgmt-frontdoor (>=1.0,<1.1)", "black (==22.3.0)", "boto3 (>=1.16,<1.17)", "coverage (>=3.7.0)", "curlylint (==0.13.1)", "django-pattern-library (>=0.7,<0.8)", "djhtml (==1.5.2)", "doc8 (==0.8.1)", "elasticsearch (>=5.0,<6.0)", "factory-boy (>=3.2)", "flake8 (>=3.6.0)", "flake8-assertive (==2.0.0)", "flake8-blind-except (==0.1.1)", "flake8-comprehensions (==3.8.0)", "flake8-print (==5.0.0)", "freezegun (>=0.3.8)", "isort (==5.6.4)", "polib (>=1.1,<2.0)", "python-dateutil (>=2.7)", "pytz (>=2014.7)", "semgrep (==1.3.0)"]
 
 [[package]]
+name = "wagtail-localize"
+version = "1.5.1"
+description = "Translation plugin for Wagtail CMS"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+Django = ">=3.2,<5.0"
+polib = ">=1.1,<2.0"
+typing_extensions = ">=4.0"
+Wagtail = ">=4.1"
+
+[package.extras]
+documentation = ["mkdocs (==1.4.3)", "mkdocs-autorefs (>=0.4.0,<0.5)", "mkdocs-include-markdown-plugin (>=4.0.4,<5)", "mkdocs-material (>=9.1,<10)", "mkdocstrings[python] (==0.22.0)", "pygments (>=2.15,<2.16)"]
+google = ["google-cloud-translate (>=3.0.0)"]
+testing = ["dj-database-url (==0.5.0)", "django-rq (>=2.5,<3.0)", "freezegun (==1.1.0)", "google-cloud-translate (>=3.0.0)", "pre-commit (>=2.21.0,<3.0)"]
+
+[[package]]
 name = "wagtail-markdown"
 version = "0.11.0"
 description = "Markdown support for Wagtail"
@@ -650,7 +677,7 @@ testing = ["Pillow (>=9.1.0,<11.0.0)", "Wand (>=0.6,<1.0)", "mock (>=3.0,<4.0)",
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "cd8b449b1823bc1eacaed3fb3afedfb64648e029c4038a1a0e1e792e5a56d249"
+content-hash = "61fbbdce082cf261714ba3cfac11e6a977263ccab3c90783c2e79cad5be1d212"
 
 [metadata.files]
 anyascii = [
@@ -990,6 +1017,10 @@ pillow = [
     {file = "Pillow-9.5.0-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:1e7723bd90ef94eda669a3c2c19d549874dd5badaeefabefd26053304abe5799"},
     {file = "Pillow-9.5.0.tar.gz", hash = "sha256:bf548479d336726d7a0eceb6e767e179fbde37833ae42794602631a070d630f1"},
 ]
+polib = [
+    {file = "polib-1.2.0-py2.py3-none-any.whl", hash = "sha256:1c77ee1b81feb31df9bca258cbc58db1bbb32d10214b173882452c73af06d62d"},
+    {file = "polib-1.2.0.tar.gz", hash = "sha256:f3ef94aefed6e183e342a8a269ae1fc4742ba193186ad76f175938621dbfc26b"},
+]
 psycopg2-binary = [
     {file = "psycopg2-binary-2.9.6.tar.gz", hash = "sha256:1f64dcfb8f6e0c014c7f55e51c9759f024f70ea572fbdef123f85318c297947c"},
     {file = "psycopg2_binary-2.9.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d26e0342183c762de3276cca7a530d574d4e25121ca7d6e4a98e4f05cb8e4df7"},
@@ -1113,6 +1144,10 @@ urllib3 = [
 wagtail = [
     {file = "wagtail-5.0.2-py3-none-any.whl", hash = "sha256:3a31ecced7b433a93c237a3cb6ca628506fa7ec147671555b9fc56e77dbd05bb"},
     {file = "wagtail-5.0.2.tar.gz", hash = "sha256:debd21df87a5db3445d65ffde12ef14e306a24f5ad490150bed556f0c8ead2bb"},
+]
+wagtail-localize = [
+    {file = "wagtail-localize-1.5.1.tar.gz", hash = "sha256:4947615f87376fcd31bf8c569426f162887c426c493083b3c231e42e7d6eaad9"},
+    {file = "wagtail_localize-1.5.1-py3-none-any.whl", hash = "sha256:34fa51be60a52a6c5fbc7100e7119bf808487ee30e9676711a5609be0806e095"},
 ]
 wagtail-markdown = [
     {file = "wagtail-markdown-0.11.0.tar.gz", hash = "sha256:417e524111954786864eb8793e5faa57e26968e02104b5d9b1e05ff9f5db449e"},
