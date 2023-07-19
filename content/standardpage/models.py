@@ -23,8 +23,17 @@ class StandardPage(Page):
 
     story = StreamField(StoryBlock(), blank=True, use_json_field=True)
 
+    license = models.ForeignKey(
+        'core.LicenseSnippet',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
     content_panels = Page.content_panels + [
         FieldPanel("intro"),
         FieldPanel("featured_image"),
         FieldPanel("story"),
+        FieldPanel('license'),
     ]
