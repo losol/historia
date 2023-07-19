@@ -33,3 +33,4 @@ known_django = "django"
 include_trailing_comma = true
 use_parentheses = true
 sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+skip=["migrations","node_modules","venv",".venv",".git"]

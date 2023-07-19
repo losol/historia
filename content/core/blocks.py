@@ -5,22 +5,13 @@
 
 from django import forms
 from django.db import models
-from wagtailmarkdown.blocks import MarkdownBlock
 
-from wagtail.blocks import (
-    CharBlock,
-    FieldBlock,
-    ListBlock,
-    PageChooserBlock,
-    RawHTMLBlock,
-    RichTextBlock,
-    StreamBlock,
-    StructBlock,
-    URLBlock
-)
+from wagtail.blocks import (CharBlock, FieldBlock, ListBlock, PageChooserBlock,
+                            RawHTMLBlock, RichTextBlock, StreamBlock,
+                            StructBlock, URLBlock,)
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
-
+from wagtailmarkdown.blocks import MarkdownBlock
 
 # Menu
 
