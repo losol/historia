@@ -1,13 +1,11 @@
 from django.db import models
+
 from modelcluster.models import ClusterableModel
-from wagtail.models import Page, TranslatableMixin
 from wagtail.admin.panels import FieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Page, TranslatableMixin
 from wagtail.snippets.models import register_snippet
-
-from wagtail.fields import StreamField
-
 
 from content.core.blocks import FeaturedImageBlock, MenuBlock, StoryBlock
 
