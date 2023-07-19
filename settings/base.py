@@ -45,6 +45,7 @@ if os.getenv('ALLOWED_HOSTS'):
 INSTALLED_APPS = [
     "content.core",
     "content.search",
+    "content.standardpage",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.contrib.settings",
