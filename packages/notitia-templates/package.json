@@ -47,9 +47,11 @@
     "handlebars": "^4.7.9"
   },
   "devDependencies": {
-    "@eventuras/typescript-config": "workspace:*",
-    "@eventuras/vite-config": "workspace:*",
+    "@eventuras/eslint-config": "^1.0.3",
+    "@eventuras/typescript-config": "^1.0.0",
+    "@eventuras/vite-config": "^0.2.2",
     "@types/handlebars": "^4.1.0",
+    "eslint": "^10.7.0",
     "tslib": "2.8.1",
     "typescript": "6.0.3",
     "vite": "8.1.5",

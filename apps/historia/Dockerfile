@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.25
-# Dockerfile for Historia (Eventuras CMS)
+# Dockerfile for Historia (knowledge CMS)
 
 #
-# Build from monorepo root using BuildKit secrets:
+# Build from repo root using BuildKit secrets:
 #   docker build -f apps/historia/Dockerfile -t historia:latest \
 #     --secret id=cms_secret,env=CMS_SECRET .
 
@@ -19,30 +19,13 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
     libstdc++6 \
-  libvips \
+    libvips \
     ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && corepack enable \
-  && corepack prepare pnpm@10.28.2 --activate \
-  && pnpm config set store-dir /pnpm/store
-
-##########################
-# Turbo Prune + Install  #
-##########################
-FROM base AS deps
-
-WORKDIR /app
-
-# Copy only what is needed for turbo to determine the dependency graph
-COPY package.json turbo.json tsconfig.json pnpm-workspace.yaml pnpm-lock.yaml ./
-
-# Copy source for relevant apps and libs only (historia and its deps)
-COPY apps/historia ./apps/historia
-COPY libs ./libs
-
-# Prune with turbo using pnpm dlx
-RUN pnpm dlx turbo prune --scope=@eventuras/historia --docker
+    && corepack prepare pnpm@11.8.0 --activate \
+    && pnpm config set store-dir /pnpm/store
 
 ##########################
 # Dependencies           #
@@ -51,16 +34,13 @@ FROM base AS install
 
 WORKDIR /app
 
-# Copy pruned files from previous stage
-COPY --from=deps /app/out/json/ ./
-COPY --from=deps /app/out/full/ ./
+# Manifests + lockfile only, so the install layer is cached until deps change
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/historia/package.json ./apps/historia/package.json
+COPY packages/vipps/package.json ./packages/vipps/package.json
+COPY packages/payload-vipps-auth/package.json ./packages/payload-vipps-auth/package.json
+COPY packages/notitia-templates/package.json ./packages/notitia-templates/package.json
 
-# Workaround: turbo prune currently produces a pnpm-lock.yaml that can be missing
-# some peer-resolution entries (seen as ERR_PNPM_LOCKFILE_MISSING_DEPENDENCY).
-# Using the repo lockfile keeps installs deterministic while avoiding the prune bug.
-COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
-
-# Install dependencies with frozen lockfile for consistent and faster builds
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
   pnpm install --frozen-lockfile --ignore-scripts
 
@@ -70,12 +50,6 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 FROM base AS builder
 
 WORKDIR /app
-
-# Accept Turborepo cache tokens from build args
-ARG TURBO_TOKEN
-ARG TURBO_TEAM
-ENV TURBO_TOKEN=${TURBO_TOKEN}
-ENV TURBO_TEAM=${TURBO_TEAM}
 
 ARG NEXT_PUBLIC_CMS_DEFAULT_LOCALE=no
 ENV NEXT_PUBLIC_CMS_DEFAULT_LOCALE=${NEXT_PUBLIC_CMS_DEFAULT_LOCALE}
@@ -103,21 +77,18 @@ ENV NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII=${NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAUL
 # Note: CMS_SENTRY_AUTH_TOKEN is mounted as BuildKit secret during build (not stored in image)
 
 COPY --from=install /app ./
+# Source lands on top of the installed tree; .dockerignore keeps node_modules
+# and build artifacts out so the symlinked install stays intact.
+COPY . .
 
-# Build dependencies first (all workspace packages that historia depends on)
-# Use turbo so remote caching (TURBO_TOKEN/TURBO_TEAM) actually applies.
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-  --mount=type=cache,id=turbo-cache,target=/app/.turbo \
-  pnpm dlx turbo run build --filter=@eventuras/historia^...
+# Build workspace packages historia depends on
+RUN pnpm --filter '@eventuras/historia^...' build
 
 WORKDIR /app/apps/historia
 
 # Build with Sentry auth token mounted as secret (not stored in image)
 # Increase Node.js heap size for large builds
-# Build with Sentry auth token mounted as secret (not stored in image)
-# Increase Node.js heap size for large builds
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-  --mount=type=cache,id=next-cache,target=/app/apps/historia/.next/cache \
+RUN --mount=type=cache,id=next-cache,target=/app/apps/historia/.next/cache \
   --mount=type=secret,id=sentry_auth_token \
   export CMS_SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token 2>/dev/null || echo "") && \
   export NODE_OPTIONS="--max-old-space-size=4096" && \

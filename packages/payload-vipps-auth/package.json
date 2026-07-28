@@ -25,14 +25,14 @@
   },
   "dependencies": {
     "@eventuras/fides-auth": "^0.9.0",
-    "@eventuras/logger": "workspace:*",
+    "@eventuras/logger": "^0.8.1",
     "@eventuras/vipps": "workspace:*",
     "openid-client": "^6.8.3",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "@eventuras/typescript-config": "workspace:*",
-    "@eventuras/vite-config": "workspace:*",
+    "@eventuras/typescript-config": "^1.0.0",
+    "@eventuras/vite-config": "^0.2.2",
     "@payloadcms/next": "3.86.0",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
