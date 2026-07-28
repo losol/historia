@@ -1,0 +1,31 @@
+packages:
+  - apps/**
+  - packages/**
+  - '!**/.next'
+  - '!**/dist'
+  - '!**/node_modules'
+
+# Allow-list of packages whose install scripts may run (pnpm 11
+# `strictDepBuilds` fails installs on any other dep with scripts).
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  aws-crt: true
+  esbuild: true
+  libsql: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+
+# Supply-chain protection: do not resolve packages published less than
+# 10 days ago. Mirrors the eventuras monorepo posture.
+minimumReleaseAge: 14400
+minimumReleaseAgeStrict: false
+minimumReleaseAgeExclude:
+  # Our own first-party packages are trusted; skip the release-age gate.
+  - '@eventuras/*'
+
+peerDependencyRules:
+  ignoreMissing:
+    - '@types/react'
+    - '@types/react-dom'

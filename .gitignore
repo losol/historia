@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.tokenstore
+
+# Logs & caches
+*.log
+.turbo/
+.cache/
+
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Payload / app artifacts
+apps/historia/src/app/(payload)/admin/importMap.js
+media/

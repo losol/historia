@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/out
+**/.turbo
+**/*.log
+.env
+.env.*
