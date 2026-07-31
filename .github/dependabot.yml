@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # npm updates for monorepo
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    allow:
+      - dependency-type: "all"
+    groups:
+      payload:
+        dependency-type: "production"
+        patterns:
+          - "payload*"
+          - "@payloadcms*"
+      major-updates:
+        dependency-type: "production"
+        update-types:
+          - "major"
+      minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-dependencies:
+        dependency-type: "development"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "/"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
