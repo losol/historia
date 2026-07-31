@@ -226,7 +226,7 @@ importers:
         specifier: ^5.0.0
         version: 5.2.0(eslint@10.7.0(jiti@2.7.0)(supports-color@5.5.0))
       eslint-plugin-simple-import-sort:
-        specifier: ^12.0.0
+        specifier: ^12.1.1
         version: 12.1.1(eslint@10.7.0(jiti@2.7.0)(supports-color@5.5.0))
       eslint-plugin-turbo:
         specifier: ^2.0.0
