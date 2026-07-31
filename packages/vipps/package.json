@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@eventuras/typescript-config": "^1.0.0",
-    "@eventuras/vite-config": "^0.2.2",
+    "@eventuras/vite-config": "^0.3.0",
     "@vitest/ui": "^4.1.10",
     "tsx": "^4.23.1",
     "typescript": "^6.0.2",

@@ -279,8 +279,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@eventuras/vite-config':
-        specifier: ^0.2.2
-        version: 0.2.2(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
+        specifier: ^0.3.0
+        version: 0.3.0(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
       '@types/handlebars':
         specifier: ^4.1.0
         version: 4.1.0
@@ -322,8 +322,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@eventuras/vite-config':
-        specifier: ^0.2.2
-        version: 0.2.2(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
+        specifier: ^0.3.0
+        version: 0.3.0(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
       '@payloadcms/next':
         specifier: 3.86.0
         version: 3.86.0(@types/react@19.2.17)(graphql@17.0.2)(monaco-editor@0.56.0)(next@16.2.10(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))(payload@3.86.0(graphql@17.0.2)(typescript@6.0.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@5.5.0)(typescript@6.0.3)
@@ -371,8 +371,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@eventuras/vite-config':
-        specifier: ^0.2.2
-        version: 0.2.2(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
+        specifier: ^0.3.0
+        version: 0.3.0(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
       '@vitest/ui':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
@@ -1271,8 +1271,8 @@ packages:
   '@eventuras/typescript-config@1.0.0':
     resolution: {integrity: sha512-aUirOkPE0ng8T/YUG1+i1HX2Rr+m7L4C1l9dEt9TNvC/wFxkzRbqjSNS3qyApiuGDr+KoWwc86gfDekfw2ebcw==}
 
-  '@eventuras/vite-config@0.2.2':
-    resolution: {integrity: sha512-E5DurF0xKamP/cCfig+tlCO/vYjHcOaQYwE1vQBfyD+qlR+G0hyyE8aywy0kiDk++4RGfQ1vSkEmvL+7ByQ+pQ==}
+  '@eventuras/vite-config@0.3.0':
+    resolution: {integrity: sha512-tQS9WVaSTUuYz6hhGWJy8V7q2digyaGFBSg/rejtY1h7eweUi9wj04tRqx5cdQZz9mMfovkceZCmKfcvGYEAtw==}
     peerDependencies:
       vite: ^7.0.0 || ^8.0.0
 
@@ -7919,14 +7919,14 @@ snapshots:
 
   '@eventuras/typescript-config@1.0.0': {}
 
-  '@eventuras/vite-config@0.2.2(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))':
+  '@eventuras/vite-config@0.3.0(@swc/helpers@0.5.23)(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))':
     dependencies:
       '@tailwindcss/vite': 4.3.3(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))
       '@vitejs/plugin-react': 6.0.3(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))
       '@vitejs/plugin-react-swc': 4.3.1(@swc/helpers@0.5.23)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))
       glob: 13.0.6
       vite: 8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1)
-      vite-plugin-dts: 5.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
+      vite-plugin-dts: 5.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
     transitivePeerDependencies:
       - '@microsoft/api-extractor'
       - '@rolldown/plugin-babel'
@@ -13909,7 +13909,7 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-dts@1.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1)):
+  unplugin-dts@1.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1)):
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
       '@volar/typescript': 2.4.28
@@ -13993,9 +13993,9 @@ snapshots:
       '@types/unist': 3.0.3
       unist-util-stringify-position: 4.0.0
 
-  vite-plugin-dts@5.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1)):
+  vite-plugin-dts@5.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1)):
     dependencies:
-      unplugin-dts: 1.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(supports-color@5.5.0)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
+      unplugin-dts: 1.0.3(esbuild@0.28.1)(rolldown@1.1.5)(rollup@4.62.2)(typescript@6.0.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1))(webpack@5.108.4(esbuild@0.28.1))
     optionalDependencies:
       rollup: 4.62.2
       vite: 8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.49.0)(tsx@4.23.1)
