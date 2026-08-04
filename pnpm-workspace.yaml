@@ -10,7 +10,7 @@ packages:
 allowBuilds:
   '@parcel/watcher': true
   '@sentry/cli': true
-  '@swc/core': set this to true or false
+  '@swc/core': false
   aws-crt: true
   esbuild: true
   libsql: true
