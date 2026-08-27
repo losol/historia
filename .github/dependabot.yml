@@ -1,23 +1,50 @@
+# 10-day cooldown mirrors `minimumReleaseAge` in pnpm-workspace.yaml.
+# Do NOT add `allow: dependency-type: all` to npm — it walks every transitive
+# package in the lockfile (~1400) and times out the job before any PR is opened.
 version: 2
+
 updates:
-  # npm updates for monorepo
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
+      time: "06:00"
+      timezone: "Europe/Oslo"
     open-pull-requests-limit: 10
-    allow:
-      - dependency-type: "all"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "/"
+    cooldown:
+      default-days: 10
+      exclude:
+        - "@eventuras/*"
     groups:
+      # First matching group wins — keep specific groups above the catch-alls.
       payload:
-        dependency-type: "production"
         patterns:
-          - "payload*"
-          - "@payloadcms*"
-      major-updates:
-        dependency-type: "production"
-        update-types:
-          - "major"
+          - "payload"
+          - "@payloadcms/*"
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+          - "next-sitemap"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vitest"
+          - "@vitest/*"
       minor-patch:
         dependency-type: "production"
         update-types:
@@ -25,14 +52,34 @@ updates:
           - "patch"
       dev-dependencies:
         dependency-type: "development"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    pull-request-branch-name:
-      separator: "/"
+        update-types:
+          - "minor"
+          - "patch"
 
-  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+      time: "06:00"
+      timezone: "Europe/Oslo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    cooldown:
+      default-days: 10
+
+  - package-ecosystem: "docker"
+    directory: "/apps/historia"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "Europe/Oslo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    cooldown:
+      default-days: 10
+    ignore:
+      # Odd node majors are never LTS — bump to the next LTS manually.
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
