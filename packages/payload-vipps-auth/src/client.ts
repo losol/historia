@@ -5,5 +5,5 @@
  * preventing server-side Payload CMS code from being bundled in client components.
  */
 
-export { VippsLoginButton } from './components/VippsLoginButton';
 export type { VippsLoginButtonProps } from './components/VippsLoginButton';
+export { VippsLoginButton } from './components/VippsLoginButton';

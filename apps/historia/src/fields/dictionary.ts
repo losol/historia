@@ -1,4 +1,4 @@
-import { Field } from "payload";
+import type { Field } from 'payload';
 
 export const dictionary: Field = {
   name: 'dictionary',
@@ -9,13 +9,13 @@ export const dictionary: Field = {
       name: 'key',
       type: 'text',
       label: 'Key',
-      required: true
+      required: true,
     },
     {
       name: 'value',
       type: 'text',
       label: 'Value',
-      required: true
-    }
-  ]
+      required: true,
+    },
+  ],
 };

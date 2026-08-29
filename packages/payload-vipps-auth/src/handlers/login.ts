@@ -2,8 +2,8 @@
  * Vipps Login Handler - Initiates OAuth flow
  */
 
+import { getVippsIssuer, VippsLoginClient } from '@eventuras/fides-auth/providers/vipps';
 import { Logger } from '@eventuras/logger';
-import { VippsLoginClient, getVippsIssuer } from '@eventuras/fides-auth/providers/vipps';
 import type { ResolvedVippsAuthConfig } from '../types';
 
 const logger = Logger.create({
@@ -21,7 +21,7 @@ const logger = Logger.create({
  */
 export async function handleVippsLogin(
   request: Request,
-  config: ResolvedVippsAuthConfig
+  config: ResolvedVippsAuthConfig,
 ): Promise<Response> {
   logger.info('Handling Vipps login request');
 
@@ -53,7 +53,7 @@ export async function handleVippsLogin(
         state: pkce.state,
         redirectUri,
       },
-      'Redirecting to Vipps authorization'
+      'Redirecting to Vipps authorization',
     );
 
     // Store PKCE code verifier in an HttpOnly cookie.
@@ -72,12 +72,12 @@ export async function handleVippsLogin(
 
     headers.append(
       'Set-Cookie',
-      `${cookieName}=${cookieValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`
+      `${cookieName}=${cookieValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`,
     );
 
     headers.append(
       'Set-Cookie',
-      `${redirectCookieName}=${redirectCookieValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`
+      `${redirectCookieName}=${redirectCookieValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`,
     );
 
     return new Response(null, { status: 302, headers });

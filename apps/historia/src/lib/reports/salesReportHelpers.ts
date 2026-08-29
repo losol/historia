@@ -1,11 +1,11 @@
-import type { Order, Transaction } from '@/payload-types';
 import {
-  toMajorUnits,
-  getProductName,
-  getProductId,
   getPriceExVatMinor,
+  getProductId,
+  getProductName,
   getVatRate,
+  toMajorUnits,
 } from '@/lib/packing/orderHelpers';
+import type { Order, Transaction } from '@/payload-types';
 
 export interface ProductSummaryLine {
   productId: string;
@@ -140,7 +140,12 @@ export function calculateTransactionSummary(orders: Order[]): TransactionSummary
 export function enrichOrdersWithTransactionSummary(orders: Order[]): OrderWithTransactions[] {
   return orders.map((order) => {
     const transactions = order.transactions?.docs ?? [];
-    const summary: OrderTransactionSummary = { authorized: 0, captured: 0, refunded: 0, pending: 0 };
+    const summary: OrderTransactionSummary = {
+      authorized: 0,
+      captured: 0,
+      refunded: 0,
+      pending: 0,
+    };
     const resolvedTransactions: ResolvedTransaction[] = [];
 
     for (const txn of transactions) {

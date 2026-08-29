@@ -22,7 +22,7 @@ export function hasTestConfig(): boolean {
 export function getTestConfig(): VippsConfig {
   if (!hasTestConfig()) {
     throw new Error(
-      'Missing required environment variables. Please configure .env file with Vipps test credentials.'
+      'Missing required environment variables. Please configure .env file with Vipps test credentials.',
     );
   }
 
@@ -76,7 +76,7 @@ export async function waitForPaymentState(
   getPaymentFn: () => Promise<{ state: string }>,
   expectedState: string,
   maxAttempts: number = 20,
-  intervalMs: number = 1000
+  intervalMs: number = 1000,
 ): Promise<void> {
   for (let i = 0; i < maxAttempts; i++) {
     const payment = await getPaymentFn();
@@ -85,7 +85,5 @@ export async function waitForPaymentState(
     }
     await sleep(intervalMs);
   }
-  throw new Error(
-    `Payment did not reach ${expectedState} state after ${maxAttempts} attempts`
-  );
+  throw new Error(`Payment did not reach ${expectedState} state after ${maxAttempts} attempts`);
 }

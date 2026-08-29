@@ -1,6 +1,5 @@
 import { revalidatePath } from 'next/cache';
 import type { CollectionAfterChangeHook } from 'payload';
-
 import type { Instruction } from '../../../payload-types';
 
 export const revalidateInstruction: CollectionAfterChangeHook<Instruction> = ({
@@ -20,7 +19,12 @@ export const revalidateInstruction: CollectionAfterChangeHook<Instruction> = ({
 
   // If the instruction was previously published, we need to revalidate the old path
   const oldSlug = previousDoc?.slug;
-  if (previousDoc?._status === 'published' && doc._status !== 'published' && typeof oldSlug === 'string' && oldSlug.length > 0) {
+  if (
+    previousDoc?._status === 'published' &&
+    doc._status !== 'published' &&
+    typeof oldSlug === 'string' &&
+    oldSlug.length > 0
+  ) {
     const oldPath = `/instructions/${oldSlug}`;
 
     payload.logger.info(`Revalidating old instruction at path: ${oldPath}`);

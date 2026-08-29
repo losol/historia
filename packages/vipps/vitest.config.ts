@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config';
-import { loadEnv } from 'vite';
 import { resolve } from 'node:path';
+import { loadEnv } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig(({ mode }) => ({
   test: {
@@ -12,13 +12,7 @@ export default defineConfig(({ mode }) => ({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'dist/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/types.ts',
-      ],
+      exclude: ['node_modules/', 'dist/', '**/*.d.ts', '**/*.config.*', '**/types.ts'],
     },
     testTimeout: 10000, // 10 seconds for API calls
     hookTimeout: 10000,

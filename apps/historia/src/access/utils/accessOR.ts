@@ -32,9 +32,7 @@ export const accessOR = (...accessFunctions: Access[]): Access => {
     }
 
     // Collect constraint objects (filter out false/undefined)
-    const constraints = results.filter(
-      (result) => typeof result === 'object' && result !== null,
-    );
+    const constraints = results.filter((result) => typeof result === 'object' && result !== null);
 
     // If no constraints, deny access
     if (constraints.length === 0) {

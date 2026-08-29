@@ -4,6 +4,7 @@
  * Centralized configuration for all Payload plugins used in Historia.
  */
 
+import { vippsAuthPlugin } from '@eventuras/payload-vipps-auth';
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder';
 import { importExportPlugin } from '@payloadcms/plugin-import-export';
 import { mcpPlugin } from '@payloadcms/plugin-mcp';
@@ -13,13 +14,10 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects';
 import { searchPlugin } from '@payloadcms/plugin-search';
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { s3Storage } from '@payloadcms/storage-s3';
-import { Plugin } from 'payload';
-
-import { vippsAuthPlugin } from '@eventuras/payload-vipps-auth';
-
+import type { Plugin } from 'payload';
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
-import { Config } from '@/payload-types';
+import type { Config } from '@/payload-types';
 import { beforeSyncWithSearch } from '@/search/beforeSync';
 import { searchFields } from '@/search/fieldOverrides';
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';

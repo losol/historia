@@ -5,6 +5,8 @@
  * and utilities used throughout the Historia CMS.
  */
 
+// Order permissions (Payload access control)
+export { ordersUpdateAccess } from './orderPermissions';
 // Order status business rules
 export {
   EDITABLE_ORDER_STATUSES,
@@ -14,6 +16,3 @@ export {
   LOCKED_ORDER_STATUSES,
   type OrderStatus,
 } from './orderStatusRules';
-
-// Order permissions (Payload access control)
-export { ordersUpdateAccess } from './orderPermissions';

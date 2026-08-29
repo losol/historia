@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-
 import { Logger } from '@eventuras/logger';
 import { ErrorBlock } from '@eventuras/ratio-ui/blocks/Error';
 import { Card } from '@eventuras/ratio-ui/core/Card';
@@ -8,7 +7,6 @@ import { Loading } from '@eventuras/ratio-ui/core/Loading';
 import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { Link } from '@eventuras/ratio-ui-next';
-
 import { checkExistingOrder, processPaymentAndCreateOrder } from './actions';
 import VippsCheckoutPage from './page.client';
 
@@ -52,9 +50,7 @@ export default async function VippsCheckoutPageWrapper({
                 Betalingsreferansen mangler eller er ugyldig.
               </ErrorBlock.Description>
               <ErrorBlock.Actions>
-                <Link href="/no">
-                  Tilbake til forsiden
-                </Link>
+                <Link href="/no">Tilbake til forsiden</Link>
               </ErrorBlock.Actions>
             </ErrorBlock>
           </Card>
@@ -73,7 +69,7 @@ export default async function VippsCheckoutPageWrapper({
     if (existingOrderResult.success && existingOrderResult.data.exists) {
       logger.info(
         { reference, orderId: existingOrderResult.data.orderId },
-        '✅ Order already exists - showing success page (server-side)'
+        '✅ Order already exists - showing success page (server-side)',
       );
 
       return (
@@ -87,16 +83,15 @@ export default async function VippsCheckoutPageWrapper({
               <div className="mb-8">
                 <Text>
                   Ordrenummer:{' '}
-                  <span className="font-mono font-medium">
-                    {existingOrderResult.data.orderId}
-                  </span>
+                  <span className="font-mono font-medium">{existingOrderResult.data.orderId}</span>
                 </Text>
               </div>
 
               <div className="mb-8 text-left">
                 <Heading as="h2">Hva skjer nå?</Heading>
                 <Text>
-                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er bekreftet.
+                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er
+                  bekreftet.
                 </Text>
               </div>
             </Card>
@@ -113,7 +108,7 @@ export default async function VippsCheckoutPageWrapper({
     if (createResult.success) {
       logger.info(
         { reference, orderId: createResult.data.orderId },
-        '✅ Order created successfully (server-side) - showing success page'
+        '✅ Order created successfully (server-side) - showing success page',
       );
 
       return (
@@ -127,16 +122,15 @@ export default async function VippsCheckoutPageWrapper({
               <div className="mb-8">
                 <Text>
                   Ordrenummer:{' '}
-                  <span className="font-mono font-medium">
-                    {createResult.data.orderId}
-                  </span>
+                  <span className="font-mono font-medium">{createResult.data.orderId}</span>
                 </Text>
               </div>
 
               <div className="mb-8 text-left">
                 <Heading as="h2">Hva skjer nå?</Heading>
                 <Text>
-                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er bekreftet.
+                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er
+                  bekreftet.
                 </Text>
               </div>
             </Card>
@@ -149,14 +143,10 @@ export default async function VippsCheckoutPageWrapper({
     // Fall back to client-side SSE polling
     logger.info(
       { reference, error: createResult.error },
-      '⏳ Payment not ready yet - showing client component with SSE'
+      '⏳ Payment not ready yet - showing client component with SSE',
     );
-
   } catch (error) {
-    logger.error(
-      { reference, error },
-      '⚠️ Server-side check failed - falling back to client-side'
-    );
+    logger.error({ reference, error }, '⚠️ Server-side check failed - falling back to client-side');
   }
 
   // FALLBACK: Show client component with SSE polling

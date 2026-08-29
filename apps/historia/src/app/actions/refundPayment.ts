@@ -1,8 +1,5 @@
 'use server';
 
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
@@ -10,7 +7,8 @@ import {
 } from '@eventuras/core-nextjs/actions';
 import { Logger } from '@eventuras/logger';
 import { refundPayment } from '@eventuras/vipps/epayment-v1';
-
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import { getVippsConfig } from '@/lib/vipps/config';
 import type { Transaction } from '@/payload-types';
 
@@ -79,13 +77,13 @@ export async function refundOrderPayment(
     // 3. Check if payment can be refunded
     if (transaction.status !== 'captured') {
       return actionError(
-        `Cannot refund payment with status "${transaction.status}". Only captured payments can be refunded.`
+        `Cannot refund payment with status "${transaction.status}". Only captured payments can be refunded.`,
       );
     }
 
     logger.info(
       { orderId, transactionId: transaction.id, paymentReference, status: transaction.status },
-      'Found captured transaction'
+      'Found captured transaction',
     );
 
     // 4. Refund payment via Vipps
@@ -94,13 +92,20 @@ export async function refundOrderPayment(
 
       // Validate currency before making the API call
       const supportedCurrencies = ['NOK', 'USD', 'EUR', 'GBP', 'SEK', 'DKK'] as const;
-      if (!supportedCurrencies.includes(transaction.currency as typeof supportedCurrencies[number])) {
+      if (
+        !supportedCurrencies.includes(transaction.currency as (typeof supportedCurrencies)[number])
+      ) {
         logger.error(
-          { orderId, transactionId: transaction.id, paymentReference, currency: transaction.currency },
-          `Unsupported currency "${transaction.currency}" for refund.`
+          {
+            orderId,
+            transactionId: transaction.id,
+            paymentReference,
+            currency: transaction.currency,
+          },
+          `Unsupported currency "${transaction.currency}" for refund.`,
         );
         return actionError(
-          `Cannot refund payment: Unsupported currency "${transaction.currency}". Supported currencies are: ${supportedCurrencies.join(', ')}.`
+          `Cannot refund payment: Unsupported currency "${transaction.currency}". Supported currencies are: ${supportedCurrencies.join(', ')}.`,
         );
       }
 
@@ -113,25 +118,25 @@ export async function refundOrderPayment(
         {
           modificationAmount: {
             value: transaction.amount,
-            currency: transaction.currency as typeof supportedCurrencies[number],
+            currency: transaction.currency as (typeof supportedCurrencies)[number],
           },
         },
-        idempotencyKey
+        idempotencyKey,
       );
 
       logger.info(
         { orderId, transactionId: transaction.id, paymentReference, amount: transaction.amount },
-        'Payment refunded successfully via Vipps'
+        'Payment refunded successfully via Vipps',
       );
     } catch (error) {
       logger.error(
         { error, orderId, transactionId: transaction.id, paymentReference },
-        'Failed to refund payment via Vipps'
+        'Failed to refund payment via Vipps',
       );
       return actionError(
         error instanceof Error
           ? `Failed to refund payment: ${error.message}`
-          : 'Failed to refund payment'
+          : 'Failed to refund payment',
       );
     }
 
@@ -175,8 +180,6 @@ export async function refundOrderPayment(
     return actionSuccess(undefined, 'Payment refunded successfully!');
   } catch (error) {
     logger.error({ error, orderId }, 'Error refunding payment');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to refund payment'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to refund payment');
   }
 }

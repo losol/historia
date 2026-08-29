@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+
 /**
  * Vipps Webhook Management Script
  *
@@ -15,8 +16,8 @@
  *   VIPPS_USE_TEST_MODE (optional, defaults to true)
  */
 
-import { listWebhooks } from '../src/webhooks-v1/client';
 import type { VippsConfig } from '../src/vipps-core';
+import { listWebhooks } from '../src/webhooks-v1/client';
 
 async function main() {
   console.log('🔍 Listing Vipps Webhooks\n');

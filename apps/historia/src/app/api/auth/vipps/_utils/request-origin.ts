@@ -8,12 +8,12 @@ function firstForwardedValue(value: string | null): string | undefined {
   if (!value) return undefined;
   return value
     .split(',')
-    .map(v => v.trim())
+    .map((v) => v.trim())
     .filter(Boolean)[0];
 }
 
 function normalizeAllowedDomains(domains: string[]): Set<string> {
-  return new Set(domains.map(d => d.trim().toLowerCase()).filter(Boolean));
+  return new Set(domains.map((d) => d.trim().toLowerCase()).filter(Boolean));
 }
 
 function isAllowedHost(host: string, allowed: Set<string>): boolean {
@@ -33,14 +33,17 @@ export function getPublicRequestOrigin(request: Request, options: Options = {}):
   const forwardedHost = firstForwardedValue(request.headers.get('x-forwarded-host'));
   const host = request.headers.get('host') || url.host;
 
-  const allowed = options.allowedDomains?.length ? normalizeAllowedDomains(options.allowedDomains) : undefined;
+  const allowed = options.allowedDomains?.length
+    ? normalizeAllowedDomains(options.allowedDomains)
+    : undefined;
 
   // Only trust forwarded host when we have an allowlist.
   const candidateHost = allowed ? forwardedHost || host : host;
   const selectedHost = allowed && !isAllowedHost(candidateHost, allowed) ? host : candidateHost;
 
   const forwardedProto = firstForwardedValue(request.headers.get('x-forwarded-proto'));
-  const proto = forwardedProto === 'http' || forwardedProto === 'https' ? forwardedProto : undefined;
+  const proto =
+    forwardedProto === 'http' || forwardedProto === 'https' ? forwardedProto : undefined;
 
   const protocol = proto || (selectedHost.includes('localhost') ? 'http' : 'https');
 

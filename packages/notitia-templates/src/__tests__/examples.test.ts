@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NotitiaTemplates, createNotitiaTemplates } from '../NotitiaTemplates';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
 
 describe('NotitiaTemplates - Order Confirmation Examples', () => {
   let templates: NotitiaTemplates;
@@ -66,13 +66,13 @@ Best regards,
           name: 'Wireless Headphones',
           quantity: 2,
           price: '599.00',
-          subtotal: '1198.00'
+          subtotal: '1198.00',
         },
         {
           name: 'USB-C Cable',
           quantity: 3,
           price: '99.00',
-          subtotal: '297.00'
+          subtotal: '297.00',
         },
       ],
       subtotal: '1495.00',
@@ -83,9 +83,9 @@ Best regards,
         street: 'Storgata 15',
         postalCode: '0155',
         city: 'Oslo',
-        country: 'Norway'
+        country: 'Norway',
       },
-      trackingNumber: 'NO-TRACK-2025-001'
+      trackingNumber: 'NO-TRACK-2025-001',
     });
 
     expect(result.subject).toBe('Order Confirmation - #ORD-98765');
@@ -126,7 +126,7 @@ We'll email you when it ships.
         { name: 'Book', quantity: 1, subtotal: '299.00' },
         { name: 'Pen', quantity: 2, subtotal: '50.00' },
       ],
-      total: '349.00'
+      total: '349.00',
     });
 
     expect(result.subject).toBe('✓ Order ORD-555 Confirmed');

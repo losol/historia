@@ -6,4 +6,4 @@
 
 export type { GenerateMetaOptions } from './generateMeta';
 export { generateMeta } from './generateMeta';
-export { extractImage,getImageURL, isMediaObject } from './utils';
+export { extractImage, getImageURL, isMediaObject } from './utils';

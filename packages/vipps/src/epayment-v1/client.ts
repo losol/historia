@@ -6,10 +6,8 @@
  */
 
 import { Logger } from '@eventuras/logger';
-
 import type { VippsConfig } from '../vipps-core';
 import { buildHeaders, getAccessToken } from '../vipps-core';
-
 import type {
   CapturePaymentRequest,
   CreatePaymentRequest,
@@ -31,7 +29,7 @@ const logger = Logger.create({
 export async function createPayment(
   config: VippsConfig,
   request: CreatePaymentRequest,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Promise<CreatePaymentResponse> {
   const startTime = Date.now();
 
@@ -42,7 +40,7 @@ export async function createPayment(
         amount: request.amount,
         userFlow: request.userFlow,
       },
-      'Creating Vipps ePayment'
+      'Creating Vipps ePayment',
     );
 
     const accessToken = await getAccessToken(config);
@@ -66,7 +64,7 @@ export async function createPayment(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to create ePayment'
+        'Failed to create ePayment',
       );
       throw new Error(`Failed to create payment: ${response.status} - ${errorText}`);
     }
@@ -80,7 +78,7 @@ export async function createPayment(
         hasRedirectUrl: !!data.redirectUrl,
         responseTimeMs: responseTime,
       },
-      'Successfully created ePayment'
+      'Successfully created ePayment',
     );
 
     return data;
@@ -93,7 +91,7 @@ export async function createPayment(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error creating ePayment'
+      'Error creating ePayment',
     );
     throw error;
   }
@@ -105,7 +103,7 @@ export async function createPayment(
  */
 export async function getPaymentDetails(
   config: VippsConfig,
-  reference: string
+  reference: string,
 ): Promise<PaymentDetails> {
   const startTime = Date.now();
 
@@ -132,7 +130,7 @@ export async function getPaymentDetails(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to get payment details'
+        'Failed to get payment details',
       );
       throw new Error(`Failed to get payment: ${response.status} - ${errorText}`);
     }
@@ -145,7 +143,7 @@ export async function getPaymentDetails(
         state: data.state,
         responseTimeMs: responseTime,
       },
-      'Successfully retrieved payment details'
+      'Successfully retrieved payment details',
     );
 
     return data;
@@ -158,7 +156,7 @@ export async function getPaymentDetails(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error getting payment details'
+      'Error getting payment details',
     );
     throw error;
   }
@@ -172,7 +170,7 @@ export async function capturePayment(
   config: VippsConfig,
   reference: string,
   captureRequest: CapturePaymentRequest,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -182,7 +180,7 @@ export async function capturePayment(
         reference,
         amount: captureRequest.modificationAmount,
       },
-      'Capturing payment'
+      'Capturing payment',
     );
 
     const accessToken = await getAccessToken(config);
@@ -206,7 +204,7 @@ export async function capturePayment(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to capture payment'
+        'Failed to capture payment',
       );
       throw new Error(`Failed to capture payment: ${response.status} - ${errorText}`);
     }
@@ -217,7 +215,7 @@ export async function capturePayment(
         amount: captureRequest.modificationAmount,
         responseTimeMs: responseTime,
       },
-      'Successfully captured payment'
+      'Successfully captured payment',
     );
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -228,7 +226,7 @@ export async function capturePayment(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error capturing payment'
+      'Error capturing payment',
     );
     throw error;
   }
@@ -241,7 +239,7 @@ export async function capturePayment(
 export async function cancelPayment(
   config: VippsConfig,
   reference: string,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -268,7 +266,7 @@ export async function cancelPayment(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to cancel payment'
+        'Failed to cancel payment',
       );
       throw new Error(`Failed to cancel payment: ${response.status} - ${errorText}`);
     }
@@ -278,7 +276,7 @@ export async function cancelPayment(
         reference,
         responseTimeMs: responseTime,
       },
-      'Successfully cancelled payment'
+      'Successfully cancelled payment',
     );
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -289,7 +287,7 @@ export async function cancelPayment(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error cancelling payment'
+      'Error cancelling payment',
     );
     throw error;
   }
@@ -303,7 +301,7 @@ export async function refundPayment(
   config: VippsConfig,
   reference: string,
   refundRequest: RefundPaymentRequest,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -313,7 +311,7 @@ export async function refundPayment(
         reference,
         amount: refundRequest.modificationAmount,
       },
-      'Refunding payment'
+      'Refunding payment',
     );
 
     const accessToken = await getAccessToken(config);
@@ -337,7 +335,7 @@ export async function refundPayment(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to refund payment'
+        'Failed to refund payment',
       );
       throw new Error(`Failed to refund payment: ${response.status} - ${errorText}`);
     }
@@ -348,7 +346,7 @@ export async function refundPayment(
         amount: refundRequest.modificationAmount,
         responseTimeMs: responseTime,
       },
-      'Successfully refunded payment'
+      'Successfully refunded payment',
     );
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -359,7 +357,7 @@ export async function refundPayment(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error refunding payment'
+      'Error refunding payment',
     );
     throw error;
   }
@@ -380,7 +378,7 @@ export async function refundPayment(
  */
 export async function getPaymentEvents(
   config: VippsConfig,
-  reference: string
+  reference: string,
 ): Promise<PaymentEvent[]> {
   const startTime = Date.now();
 
@@ -407,7 +405,7 @@ export async function getPaymentEvents(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to get payment events'
+        'Failed to get payment events',
       );
       throw new Error(`Failed to get payment events: ${response.status} - ${errorText}`);
     }
@@ -421,7 +419,7 @@ export async function getPaymentEvents(
         events: data.map((e) => e.name),
         responseTimeMs: responseTime,
       },
-      'Successfully retrieved payment events'
+      'Successfully retrieved payment events',
     );
 
     return data;
@@ -434,7 +432,7 @@ export async function getPaymentEvents(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error getting payment events'
+      'Error getting payment events',
     );
     throw error;
   }
@@ -465,7 +463,7 @@ export async function forceApprovePayment(
   config: VippsConfig,
   reference: string,
   customerPhoneNumber: string,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -475,17 +473,20 @@ export async function forceApprovePayment(
         reference,
         phoneNumber: customerPhoneNumber,
       },
-      'Force approving payment (TEST ONLY)'
+      'Force approving payment (TEST ONLY)',
     );
 
     const accessToken = await getAccessToken(config);
     const headers = buildHeaders(config, accessToken, idempotencyKey);
 
-    const response = await fetch(`${config.apiUrl}/epayment/v1/test/payments/${reference}/approve`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ customer: { phoneNumber: customerPhoneNumber } }),
-    });
+    const response = await fetch(
+      `${config.apiUrl}/epayment/v1/test/payments/${reference}/approve`,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ customer: { phoneNumber: customerPhoneNumber } }),
+      },
+    );
 
     const responseTime = Date.now() - startTime;
 
@@ -499,7 +500,7 @@ export async function forceApprovePayment(
           error: errorText,
           responseTimeMs: responseTime,
         },
-        'Failed to force approve payment'
+        'Failed to force approve payment',
       );
       throw new Error(`Failed to force approve payment: ${response.status} - ${errorText}`);
     }
@@ -509,7 +510,7 @@ export async function forceApprovePayment(
         reference,
         responseTimeMs: responseTime,
       },
-      'Successfully force approved payment'
+      'Successfully force approved payment',
     );
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -520,9 +521,8 @@ export async function forceApprovePayment(
         errorMessage: error instanceof Error ? error.message : String(error),
         responseTimeMs: responseTime,
       },
-      'Error force approving payment'
+      'Error force approving payment',
     );
     throw error;
   }
 }
-

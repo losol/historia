@@ -22,7 +22,6 @@
  */
 
 import crypto from 'node:crypto';
-
 import type { Payload } from 'payload';
 import { generatePayloadCookie, jwtSign } from 'payload';
 

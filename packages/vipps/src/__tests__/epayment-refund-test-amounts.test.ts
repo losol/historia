@@ -14,10 +14,15 @@
  * 3. Manual completion in the MT test app
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { createPayment } from '../epayment-v1/client';
 import type { CreatePaymentRequest } from '../epayment-v1/types';
-import { hasTestConfig, getTestConfig, generateTestReference, getTestPhoneNumber } from './test-utils';
+import {
+  generateTestReference,
+  getTestConfig,
+  getTestPhoneNumber,
+  hasTestConfig,
+} from './test-utils';
 
 const runTests = hasTestConfig();
 const describeIf = runTests ? describe : describe.skip;

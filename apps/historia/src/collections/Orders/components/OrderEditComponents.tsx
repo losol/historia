@@ -1,14 +1,13 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { Button, useDocumentInfo, useForm, useFormFields } from '@payloadcms/ui';
-
 import { CancelPaymentButton } from './CancelPaymentButton';
 import { PrintReceiptButton } from './PrintReceiptButton';
 import { RefundPaymentButton } from './RefundPaymentButton';
 import { ShipCompleteOrderButton } from './ShipCompleteOrderButton';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: Payload admin component without an exposed props type
 export const OrderSaveButton: React.FC<any> = () => {
   const { id } = useDocumentInfo();
   const status = useFormFields(([fields]) => fields.status);

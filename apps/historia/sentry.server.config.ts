@@ -2,11 +2,10 @@
 // The config you add here will be used whenever the server handles a request.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+import { setupOpenTelemetryLogger } from '@eventuras/logger/opentelemetry';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import * as Sentry from '@sentry/nextjs';
-
-import { setupOpenTelemetryLogger } from '@eventuras/logger/opentelemetry';
 
 const isSentryEnabled = process.env.NEXT_PUBLIC_FEATURE_SENTRY === 'true';
 const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -28,7 +27,7 @@ if (isSentryEnabled && sentryDsn) {
   console.log('[Sentry] Server-side initialized successfully');
 } else {
   console.log(
-    `[Sentry] Server-side disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!sentryDsn})`
+    `[Sentry] Server-side disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!sentryDsn})`,
   );
 }
 
@@ -42,7 +41,7 @@ if (otlpLogsEndpoint) {
 
   // Parse headers from environment variable (format: "key1=value1,key2=value2")
   if (otlpLogsHeaders) {
-    otlpLogsHeaders.split(',').forEach(header => {
+    otlpLogsHeaders.split(',').forEach((header) => {
       const [key, value] = header.split('=');
       if (key && value) {
         headers[key.trim()] = value.trim();
@@ -55,7 +54,7 @@ if (otlpLogsEndpoint) {
       new OTLPLogExporter({
         url: otlpLogsEndpoint,
         headers,
-      })
+      }),
     ),
   });
 

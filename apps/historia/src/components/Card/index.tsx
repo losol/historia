@@ -1,31 +1,29 @@
-'use client'
-import React from 'react'
-import Link from 'next/link'
-import { usePathname } from "next/navigation";
-
+'use client';
+import type React from 'react';
 import { Card as RatioCard } from '@eventuras/ratio-ui/core/Card';
-
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { getDocUrl } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
-import { Media } from '@/components/Media'
-import type { Article, Case,Happening, Note, Organization, Page, Person } from '@/payload-types'
-import useClickableCard from '@/utilities/useClickableCard'
+import { Media } from '@/components/Media';
+import type { Article, Case, Happening, Note, Organization, Page, Person } from '@/payload-types';
+import useClickableCard from '@/utilities/useClickableCard';
 
 export const Card: React.FC<{
-  className?: string
-  doc?: Article | Happening | Page | Person | Organization | Case | Note
-  relationTo?: 'articles' | 'happenings' | 'pages' | 'persons' | 'cases' | 'notes'
-  showTopics?: boolean
-  showImages?: boolean
-  title?: string
+  className?: string;
+  doc?: Article | Happening | Page | Person | Organization | Case | Note;
+  relationTo?: 'articles' | 'happenings' | 'pages' | 'persons' | 'cases' | 'notes';
+  showTopics?: boolean;
+  showImages?: boolean;
+  title?: string;
 }> = (props) => {
-  const { card, link } = useClickableCard({})
-  const { className,doc, relationTo, showImages = true } = props
+  const { card, link } = useClickableCard({});
+  const { className, doc, relationTo, showImages = true } = props;
 
   // the first part of the pathname is the locale
-  const locale = usePathname().split('/')[1]
+  const locale = usePathname().split('/')[1];
 
   if (!doc?.slug) {
-    return null
+    return null;
   }
 
   const href = getDocUrl({
@@ -38,11 +36,11 @@ export const Card: React.FC<{
   return (
     <RatioCard className={className}>
       <div ref={card.ref as React.RefObject<HTMLDivElement>} className="h-full flex flex-col">
-        {showImages && doc?.image && typeof doc.image === 'object' && doc.image.media &&
-        <div className="relative w-full">
-          <Media resource={doc.image.media} size="33vw" />
-        </div>
-        }
+        {showImages && doc?.image && typeof doc.image === 'object' && doc.image.media && (
+          <div className="relative w-full">
+            <Media resource={doc.image.media} size="33vw" />
+          </div>
+        )}
 
         <div className="p-4 flex-1">
           <div className="prose">
@@ -57,5 +55,5 @@ export const Card: React.FC<{
         </div>
       </div>
     </RatioCard>
-  )
-}
+  );
+};

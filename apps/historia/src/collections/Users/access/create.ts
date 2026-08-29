@@ -1,5 +1,4 @@
 import type { Access } from 'payload';
-
 import { isSystemAdmin } from '../../../access/isSystemAdmin';
 import type { User } from '../../../payload-types';
 import { getUserTenantIDs } from '../../../utilities/getUserTenantIDs';

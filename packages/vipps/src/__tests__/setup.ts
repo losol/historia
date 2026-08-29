@@ -19,11 +19,8 @@ const requiredEnvVars = [
 const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 
 if (missingVars.length > 0) {
+  console.warn('⚠️  Warning: Missing required environment variables:', missingVars.join(', '));
   console.warn(
-    '⚠️  Warning: Missing required environment variables:',
-    missingVars.join(', ')
-  );
-  console.warn(
-    '   Tests requiring real API calls will be skipped. Copy .env.example to .env to enable them.'
+    '   Tests requiring real API calls will be skipped. Copy .env.example to .env to enable them.',
   );
 }

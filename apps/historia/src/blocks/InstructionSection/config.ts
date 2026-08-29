@@ -1,8 +1,7 @@
 import type { Block } from 'payload';
-
-import { richText } from '@/fields/richText';
 import { InstructionBlock } from '@/blocks/InstructionBlock/config';
 import { ResourcesBlock } from '@/blocks/ResourcesBlock/config';
+import { richText } from '@/fields/richText';
 
 export const InstructionSection: Block = {
   slug: 'instructionSection',

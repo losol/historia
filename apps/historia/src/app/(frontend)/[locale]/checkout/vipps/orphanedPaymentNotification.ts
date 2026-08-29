@@ -1,15 +1,13 @@
 'use server';
 
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
-  ServerActionResult,
+  type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
-
+import { getPayload } from 'payload';
 import { getCurrentWebsiteId } from '@/lib/website';
 import config from '@/payload.config';
 import type { Website } from '@/payload-types';
@@ -40,14 +38,21 @@ interface OrphanedPaymentDetails {
  * @returns Success or error result
  */
 export async function notifyOrphanedPayment(
-  details: OrphanedPaymentDetails
+  details: OrphanedPaymentDetails,
 ): Promise<ServerActionResult<void>> {
   try {
-    const { websiteId: providedWebsiteId, paymentReference, customerEmail, amount, currency, paymentState } = details;
+    const {
+      websiteId: providedWebsiteId,
+      paymentReference,
+      customerEmail,
+      amount,
+      currency,
+      paymentState,
+    } = details;
 
     logger.info(
       { paymentReference, customerEmail, amount },
-      'Creating orphaned payment notification'
+      'Creating orphaned payment notification',
     );
 
     const payload = await getPayload({ config });
@@ -78,21 +83,15 @@ export async function notifyOrphanedPayment(
     let websiteId: string | null = providedWebsiteId ?? null;
     if (!websiteId) {
       websiteId = await getCurrentWebsiteId();
-      logger.info(
-        { paymentReference, websiteId },
-        'Detected website ID from request headers'
-      );
+      logger.info({ paymentReference, websiteId }, 'Detected website ID from request headers');
     } else {
-      logger.info(
-        { paymentReference, websiteId },
-        'Using provided website ID (webhook context)'
-      );
+      logger.info({ paymentReference, websiteId }, 'Using provided website ID (webhook context)');
     }
 
     if (!websiteId) {
       logger.error(
         { paymentReference },
-        'CRITICAL: No website context found - cannot send orphaned payment notification to sales team'
+        'CRITICAL: No website context found - cannot send orphaned payment notification to sales team',
       );
       return actionError('Cannot determine website/tenant - notification not sent');
     }
@@ -106,27 +105,28 @@ export async function notifyOrphanedPayment(
     // Get sales contact emails
     const salesEmails: string[] = [];
     if (website.contactPoints) {
-      const salesContacts = website.contactPoints.filter(
-        (cp) => cp.contactType === 'sales'
-      );
+      const salesContacts = website.contactPoints.filter((cp) => cp.contactType === 'sales');
 
       for (const contact of salesContacts) {
-        if (contact.user && typeof contact.user === 'object' && 'email' in contact.user && contact.user.email) {
+        if (
+          contact.user &&
+          typeof contact.user === 'object' &&
+          'email' in contact.user &&
+          contact.user.email
+        ) {
           salesEmails.push(contact.user.email);
         }
       }
     }
 
     if (salesEmails.length === 0) {
-      logger.warn(
-        { paymentReference, websiteId },
-        'No sales contact emails found for website'
-      );
+      logger.warn({ paymentReference, websiteId }, 'No sales contact emails found for website');
       return actionSuccess(undefined);
     }
 
     // Prepare email template data
-    const locale = (process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no') === 'no' ? 'nb-NO' : 'en-US';
+    const locale =
+      (process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no') === 'no' ? 'nb-NO' : 'en-US';
     const amountFormatted = (amount / 100).toFixed(2);
     const timestamp = new Date().toLocaleString(locale);
 
@@ -143,12 +143,9 @@ export async function notifyOrphanedPayment(
     };
 
     // Render email using template
-    const emailHtml = notitiaTemplates.render(
-      'email',
-      'orphaned-payment-alert',
-      templateData,
-      { locale }
-    );
+    const emailHtml = notitiaTemplates.render('email', 'orphaned-payment-alert', templateData, {
+      locale,
+    });
 
     // Send email to all sales contacts
     for (const email of salesEmails) {
@@ -161,30 +158,28 @@ export async function notifyOrphanedPayment(
 
         logger.info(
           { paymentReference, recipient: email },
-          'Orphaned payment notification sent to sales contact'
+          'Orphaned payment notification sent to sales contact',
         );
       } catch (emailError) {
         logger.error(
           { paymentReference, recipient: email, error: emailError },
-          'Failed to send orphaned payment notification email'
+          'Failed to send orphaned payment notification email',
         );
       }
     }
 
     logger.info(
       { paymentReference, recipientCount: salesEmails.length },
-      'Orphaned payment notifications sent successfully'
+      'Orphaned payment notifications sent successfully',
     );
 
     return actionSuccess(undefined);
   } catch (error) {
     logger.error(
       { paymentReference: details.paymentReference, error },
-      'Failed to create orphaned payment notification'
+      'Failed to create orphaned payment notification',
     );
 
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to create notification'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to create notification');
   }
 }

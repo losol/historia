@@ -7,7 +7,7 @@
  * Vipps still reports (state, aggregate) follows the fresh response.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { isExpiredValue, mergeExpiredPaymentDetails } from '../epayment-v1/redaction';
 import type { PaymentDetails } from '../epayment-v1/types';
 

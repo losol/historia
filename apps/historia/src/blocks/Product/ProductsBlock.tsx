@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-
 import { formatPrice } from '@eventuras/core/currency';
 import { Logger } from '@eventuras/logger';
 import { Button } from '@eventuras/ratio-ui/core/Button';
@@ -13,7 +11,7 @@ import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Stack } from '@eventuras/ratio-ui/layout/Stack';
 import { useToast } from '@eventuras/ratio-ui/toast';
 import { Link } from '@eventuras/ratio-ui-next';
-
+import { useRouter } from 'next/navigation';
 import RichText from '@/components/RichText';
 import { useLocale } from '@/hooks/useLocale';
 import { useSessionCart } from '@/lib/cart/use-session-cart';
@@ -45,11 +43,14 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
 
   // Filter out string IDs and keep only populated products
   const products = props.products.filter(
-    (p): p is ProductType => typeof p === 'object' && p !== null
+    (p): p is ProductType => typeof p === 'object' && p !== null,
   );
 
   if (products.length === 0) {
-    logger.warn({ rawProducts: props.products }, 'No valid products to display - all are string IDs');
+    logger.warn(
+      { rawProducts: props.products },
+      'No valid products to display - all are string IDs',
+    );
     return null;
   }
 
@@ -69,7 +70,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
       if (result.success) {
         logger.info(
           { productId: product.id, cartItemCount: result.data.items.length },
-          'Product added to cart successfully'
+          'Product added to cart successfully',
         );
         toast.success('Product added to cart!');
 
@@ -78,7 +79,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
       } else {
         logger.error(
           { error: result.error, productId: product.id },
-          'Failed to add product to cart'
+          'Failed to add product to cart',
         );
         toast.error(result.error?.message || 'Failed to add product to cart');
       }
@@ -99,14 +100,14 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
         const isAdding = addingProductId === product.id;
 
         return (
-          <Card key={product.id} gap="md" className={showImage ? 'grid grid-cols-1 md:grid-cols-2' : undefined}>
-            {showImage && (
-              <Image src={imageUrl} alt={product.title || 'Product image'} />
-            )}
+          <Card
+            key={product.id}
+            gap="md"
+            className={showImage ? 'grid grid-cols-1 md:grid-cols-2' : undefined}
+          >
+            {showImage && <Image src={imageUrl} alt={product.title || 'Product image'} />}
             <div>
-              <Heading as="h3">
-                {product.title}
-              </Heading>
+              <Heading as="h3">{product.title}</Heading>
 
               {product.lead && <Text marginTop="xs">{product.lead}</Text>}
 
@@ -119,12 +120,9 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
               {product.price?.amountIncVat != null && (
                 <Text className="text-3xl font-bold">
                   {formatPrice(
-                    fromMinorUnits(
-                      product.price.amountIncVat,
-                      product.price.currency || 'NOK'
-                    ),
+                    fromMinorUnits(product.price.amountIncVat, product.price.currency || 'NOK'),
                     product.price.currency || 'NOK',
-                    locale
+                    locale,
                   )}
                 </Text>
               )}
@@ -132,9 +130,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
               {/* Action Buttons */}
               <div className="mt-6 flex flex-col gap-3">
                 {product.slug && product.resourceId && (
-                  <Link
-                    href={`/${locale}/c/produkter/${product.slug}--${product.resourceId}`}
-                  >
+                  <Link href={`/${locale}/c/produkter/${product.slug}--${product.resourceId}`}>
                     Les mer
                   </Link>
                 )}

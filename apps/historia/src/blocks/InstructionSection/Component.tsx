@@ -1,5 +1,4 @@
-import React from 'react';
-
+import type React from 'react';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import RichText from '@/components/RichText';
 import type { InstructionSectionBlock as InstructionSectionBlockProps } from '@/payload-types';

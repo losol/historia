@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NotitiaTemplates, createNotitiaTemplates } from '../NotitiaTemplates';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
 
 describe('NotitiaTemplates - Helpers', () => {
   let templates: NotitiaTemplates;
@@ -65,9 +65,7 @@ describe('NotitiaTemplates - Helpers', () => {
 
   describe('Custom Helpers', () => {
     it('should register and use custom helper', () => {
-      templates.registerHelper('multiply', function (a: number, b: number) {
-        return a * b;
-      });
+      templates.registerHelper('multiply', (a: number, b: number) => a * b);
 
       templates.registerTemplate('email', 'custom', {
         content: 'Result: {{multiply num1 num2}}',
@@ -94,11 +92,9 @@ describe('NotitiaTemplates - Helpers', () => {
         },
         {
           helpers: {
-            reverse: function (str: string) {
-              return str.split('').reverse().join('');
-            },
+            reverse: (str: string) => str.split('').reverse().join(''),
           },
-        }
+        },
       );
 
       expect(result.content).toBe('Reversed: olleh');

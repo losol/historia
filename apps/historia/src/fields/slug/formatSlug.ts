@@ -6,7 +6,7 @@ export const formatSlug = (val: string): string => {
   val = val.toLowerCase();
 
   // Define character conversions
-  const conversions: { [key: string]: string; } = {
+  const conversions: { [key: string]: string } = {
     e: 'æ|ä',
     o: 'ø|ö',
     a: 'å',
@@ -31,19 +31,19 @@ export const formatSlug = (val: string): string => {
 
 export const formatSlugHook =
   (fallback: string): FieldHook =>
-    ({ data, operation, originalDoc, value }) => {
-      if (typeof value === 'string') {
-        return formatSlug(value);
+  ({ data, operation, originalDoc, value }) => {
+    if (typeof value === 'string') {
+      return formatSlug(value);
+    }
+
+    // If creating or no existing slug, fallback to another field
+    if (operation === 'create' || !data?.slug) {
+      const fallbackData = data?.[fallback];
+
+      if (fallbackData && typeof fallbackData === 'string') {
+        return formatSlug(fallbackData);
       }
+    }
 
-      // If creating or no existing slug, fallback to another field
-      if (operation === 'create' || !data?.slug) {
-        const fallbackData = data?.[fallback];
-
-        if (fallbackData && typeof fallbackData === 'string') {
-          return formatSlug(fallbackData);
-        }
-      }
-
-      return value;
-    };
+    return value;
+  };

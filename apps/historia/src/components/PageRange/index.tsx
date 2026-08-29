@@ -1,9 +1,9 @@
-import React from 'react'
+import type React from 'react';
 
 const defaultLabels = {
   plural: 'Docs',
   singular: 'Doc',
-}
+};
 
 const defaultCollectionLabels: Record<string, { plural: string; singular: string }> = {
   articles: {
@@ -13,15 +13,15 @@ const defaultCollectionLabels: Record<string, { plural: string; singular: string
 };
 
 export const PageRange: React.FC<{
-  className?: string
-  collection?: string
+  className?: string;
+  collection?: string;
   collectionLabels?: {
-    plural?: string
-    singular?: string
-  }
-  currentPage?: number
-  limit?: number
-  totalDocs?: number
+    plural?: string;
+    singular?: string;
+  };
+  currentPage?: number;
+  limit?: number;
+  totalDocs?: number;
 }> = (props) => {
   const {
     className,
@@ -30,17 +30,19 @@ export const PageRange: React.FC<{
     currentPage,
     limit,
     totalDocs,
-  } = props
+  } = props;
 
-  let indexStart = (currentPage ? currentPage - 1 : 1) * (limit || 1) + 1
-  if (totalDocs && indexStart > totalDocs) indexStart = 0
+  let indexStart = (currentPage ? currentPage - 1 : 1) * (limit || 1) + 1;
+  if (totalDocs && indexStart > totalDocs) indexStart = 0;
 
-  let indexEnd = (currentPage || 1) * (limit || 1)
-  if (totalDocs && indexEnd > totalDocs) indexEnd = totalDocs
+  let indexEnd = (currentPage || 1) * (limit || 1);
+  if (totalDocs && indexEnd > totalDocs) indexEnd = totalDocs;
 
   const { plural, singular } =
     collectionLabelsFromProps ||
-    (collection && defaultCollectionLabels[collection] ? defaultCollectionLabels[collection] : defaultLabels) ||
+    (collection && defaultCollectionLabels[collection]
+      ? defaultCollectionLabels[collection]
+      : defaultLabels) ||
     defaultLabels;
 
   const rangeEnd = indexStart > 0 ? ` - ${indexEnd}` : '';
@@ -53,5 +55,5 @@ export const PageRange: React.FC<{
         totalDocs > 0 &&
         `Showing ${indexStart}${rangeEnd} of ${totalDocs} ${labelText}`}
     </div>
-  )
-}
+  );
+};

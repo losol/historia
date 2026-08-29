@@ -5,7 +5,6 @@
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 import { generateTypes } from '@eventuras/app-config/generator';
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,5 +1,4 @@
 import type { FieldHook } from 'payload';
-
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 
 /**

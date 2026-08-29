@@ -7,9 +7,9 @@
  * @see https://developer.vippsmobilepay.com/docs/APIs/login-api/
  */
 
-export * from './types';
-export * from './plugin';
+export * from './components';
 export * from './config';
 export * from './handlers';
+export * from './plugin';
 export * from './strategy';
-export * from './components';
+export * from './types';

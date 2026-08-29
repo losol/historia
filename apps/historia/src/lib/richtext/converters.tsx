@@ -1,9 +1,7 @@
 import React from 'react';
-import type { SerializedLinkNode } from '@payloadcms/richtext-lexical';
-import type { SerializedHeadingNode } from '@payloadcms/richtext-lexical';
-import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
-
 import { extractTextFromChildren, textToId } from '@eventuras/ratio-ui/blocks/Story';
+import type { SerializedHeadingNode, SerializedLinkNode } from '@payloadcms/richtext-lexical';
+import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
 /**
  * Converts internal Payload document links to proper href paths

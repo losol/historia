@@ -1,7 +1,6 @@
 import type { Access } from 'payload';
-
-import { isSystemAdmin } from './isSystemAdmin';
 import { getUserTenantIDs } from '../utilities/getUserTenantIDs';
+import { isSystemAdmin } from './isSystemAdmin';
 
 /**
  * Site editors only.
@@ -19,9 +18,7 @@ export const siteEditors: Access = ({ req }) => {
 
   const editorTenantIDs = getUserTenantIDs(req.user, 'editor');
 
-  return editorTenantIDs.length > 0
-    ? { tenant: { in: editorTenantIDs } }
-    : false;
+  return editorTenantIDs.length > 0 ? { tenant: { in: editorTenantIDs } } : false;
 };
 
 /**
@@ -40,9 +37,7 @@ export const siteCommerceManagers: Access = ({ req }) => {
 
   const commerceTenantIDs = getUserTenantIDs(req.user, 'commerce');
 
-  return commerceTenantIDs.length > 0
-    ? { tenant: { in: commerceTenantIDs } }
-    : false;
+  return commerceTenantIDs.length > 0 ? { tenant: { in: commerceTenantIDs } } : false;
 };
 
 /**
@@ -61,7 +56,5 @@ export const siteMembers: Access = ({ req }) => {
 
   const memberTenantIDs = getUserTenantIDs(req.user, 'member');
 
-  return memberTenantIDs.length > 0
-    ? { tenant: { in: memberTenantIDs } }
-    : false;
+  return memberTenantIDs.length > 0 ? { tenant: { in: memberTenantIDs } } : false;
 };

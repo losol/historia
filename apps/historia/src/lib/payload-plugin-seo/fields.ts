@@ -1,4 +1,4 @@
-import { Field } from 'payload';
+import type { Field } from 'payload';
 
 /**
  * SEO meta fields for Open Graph and social sharing
@@ -17,7 +17,8 @@ export const metaField: Field = {
       localized: true,
       maxLength: 60,
       admin: {
-        description: '50-60 characters recommended for optimal display in search results. Leave empty to auto-generate from title.',
+        description:
+          '50-60 characters recommended for optimal display in search results. Leave empty to auto-generate from title.',
       },
     },
     {
@@ -27,7 +28,8 @@ export const metaField: Field = {
       localized: true,
       maxLength: 160,
       admin: {
-        description: '150-160 characters recommended for search result snippets. Leave empty to use excerpt or lead text.',
+        description:
+          '150-160 characters recommended for search result snippets. Leave empty to use excerpt or lead text.',
       },
     },
     {
@@ -36,7 +38,8 @@ export const metaField: Field = {
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Image used when sharing on social media (Facebook, LinkedIn, Twitter). Recommended: Use the "socialShare" format (1200×630px) for best results. Leave empty to use featured image.',
+        description:
+          'Image used when sharing on social media (Facebook, LinkedIn, Twitter). Recommended: Use the "socialShare" format (1200×630px) for best results. Leave empty to use featured image.',
       },
     },
   ],

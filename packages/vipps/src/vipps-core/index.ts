@@ -59,8 +59,8 @@ export async function getAccessToken(config: VippsConfig): Promise<string> {
   const response = await fetch(`${config.apiUrl}/accesstoken/get`, {
     method: 'POST',
     headers: {
-      'client_id': config.clientId,
-      'client_secret': config.clientSecret,
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
       'Ocp-Apim-Subscription-Key': config.subscriptionKey,
       'Merchant-Serial-Number': config.merchantSerialNumber,
     },
@@ -81,10 +81,10 @@ export async function getAccessToken(config: VippsConfig): Promise<string> {
 export function buildHeaders(
   config: VippsConfig,
   accessToken: string,
-  idempotencyKey?: string
+  idempotencyKey?: string,
 ): Record<string, string> {
   const headers: Record<string, string> = {
-    'Authorization': `Bearer ${accessToken}`,
+    Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
     'Ocp-Apim-Subscription-Key': config.subscriptionKey,
     'Merchant-Serial-Number': config.merchantSerialNumber,

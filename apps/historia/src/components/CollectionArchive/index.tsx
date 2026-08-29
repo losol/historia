@@ -1,7 +1,5 @@
 import React from 'react';
-
 import { Grid } from '@eventuras/ratio-ui/layout/Grid';
-
 import { Card } from '@/components/Card';
 import type { Article, Case, Happening, Note, Page } from '@/payload-types';
 
@@ -13,7 +11,11 @@ type CollectionArchiveProps<T extends { slug: string }> = {
   showImages?: boolean;
 };
 
-export const CollectionArchive = <T extends { slug: string }>({ docs, relationTo, showImages = true }: CollectionArchiveProps<T>) => {
+export const CollectionArchive = <T extends { slug: string }>({
+  docs,
+  relationTo,
+  showImages = true,
+}: CollectionArchiveProps<T>) => {
   return (
     <Grid cols={{ sm: 1, md: 2, lg: 3 }} paddingClassName="gap-4 lg:gap-8">
       {docs?.map((doc) => (

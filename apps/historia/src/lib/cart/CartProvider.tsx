@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
-
+import type React from 'react';
+import { createContext, useContext } from 'react';
 import type { Cart } from './types';
 import { useSessionCart } from './use-session-cart';
 

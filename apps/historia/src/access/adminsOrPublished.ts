@@ -1,5 +1,4 @@
 import type { Access } from 'payload';
-
 import { isSystemAdmin } from './isSystemAdmin';
 
 export const adminsOrPublished: Access = ({ req: { user } }) => {

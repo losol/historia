@@ -1,7 +1,6 @@
 import type { Field } from 'payload';
 
 export const image: Field = {
-
   name: 'image',
   type: 'group',
   interfaceName: 'Image',
@@ -11,14 +10,14 @@ export const image: Field = {
       label: 'Media',
       type: 'upload',
       required: false,
-      relationTo: 'media'
+      relationTo: 'media',
     },
     {
       name: 'caption',
       label: 'Caption',
       type: 'richText',
       required: false,
-      localized: true
-    }
-  ]
+      localized: true,
+    },
+  ],
 };

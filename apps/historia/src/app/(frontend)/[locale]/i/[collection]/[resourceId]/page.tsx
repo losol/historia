@@ -1,16 +1,14 @@
 import React from 'react';
-import configPromise from '@payload-config';
-import type { Metadata } from 'next';
-import { draftMode } from 'next/headers';
-import { notFound } from 'next/navigation';
-import { CollectionSlug, getPayload } from 'payload';
-
 import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
-
+import configPromise from '@payload-config';
+import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
+import { notFound } from 'next/navigation';
+import { type CollectionSlug, getPayload } from 'payload';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
@@ -151,47 +149,43 @@ function QuotePage({ quote }: Readonly<{ quote: Quote }>) {
       <Container>
         <Story>
           <StoryHeader>
-            <Heading as="h1">
-              {extractPlainText(quote.quote)}
-            </Heading>
+            <Heading as="h1">{extractPlainText(quote.quote)}</Heading>
             <Lead>— {authorName}</Lead>
           </StoryHeader>
 
-        <StoryBody>
-          {quote.quote && typeof quote.quote === 'object' && (
-            <Section>
-              <RichText data={quote.quote} />
-            </Section>
-          )}
+          <StoryBody>
+            {quote.quote && typeof quote.quote === 'object' && (
+              <Section>
+                <RichText data={quote.quote} />
+              </Section>
+            )}
 
-          {source && (
-            <Section>
-              <Heading as="h2">Source</Heading>
-              <p>
-                {'title' in source && source.title}
-                {quote.locator && ` (${quote.locator})`}
-              </p>
-            </Section>
-          )}
+            {source && (
+              <Section>
+                <Heading as="h2">Source</Heading>
+                <p>
+                  {'title' in source && source.title}
+                  {quote.locator && ` (${quote.locator})`}
+                </p>
+              </Section>
+            )}
 
-          {quote.context && (
-            <Section>
-              <Heading as="h2">Context</Heading>
-              <p>{quote.context}</p>
-            </Section>
-          )}
-        </StoryBody>
-      </Story>
-    </Container>
+            {quote.context && (
+              <Section>
+                <Heading as="h2">Context</Heading>
+                <p>{quote.context}</p>
+              </Section>
+            )}
+          </StoryBody>
+        </Story>
+      </Container>
     </>
   );
 }
 
 function SourcePage({ source, locale }: Readonly<{ source: Source; locale: string }>) {
   const contributors =
-    Array.isArray(source.contributors) && source.contributors.length > 0
-      ? source.contributors
-      : [];
+    Array.isArray(source.contributors) && source.contributors.length > 0 ? source.contributors : [];
 
   return (
     <>
@@ -204,126 +198,121 @@ function SourcePage({ source, locale }: Readonly<{ source: Source; locale: strin
       <Container>
         <Story>
           <StoryHeader>
-            <Heading as="h1">
-              {source.title}
-            </Heading>
-          {contributors.length > 0 && (
-            <Lead>
-              {contributors
-                .map((c) => {
-                  let entityValue: unknown = null;
+            <Heading as="h1">{source.title}</Heading>
+            {contributors.length > 0 && (
+              <Lead>
+                {contributors
+                  .map((c) => {
+                    let entityValue: unknown = null;
 
-                  if (c && typeof c.entity === 'object' && c.entity !== null) {
-                    const entity = c.entity as Record<string, unknown>;
-                    entityValue =
-                      'value' in entity && entity.value !== undefined ? entity.value : entity;
-                  }
+                    if (c && typeof c.entity === 'object' && c.entity !== null) {
+                      const entity = c.entity as Record<string, unknown>;
+                      entityValue =
+                        'value' in entity && entity.value !== undefined ? entity.value : entity;
+                    }
 
-                  if (typeof entityValue === 'string' || entityValue === null) {
-                    // Unresolved relation (ID only) or missing entity; skip this contributor
-                    return '';
-                  }
+                    if (typeof entityValue === 'string' || entityValue === null) {
+                      // Unresolved relation (ID only) or missing entity; skip this contributor
+                      return '';
+                    }
 
-                  let name = '';
-                  if (
-                    entityValue &&
-                    typeof entityValue === 'object' &&
-                    'name' in entityValue &&
-                    typeof entityValue.name === 'string'
-                  ) {
-                    name = entityValue.name;
-                  }
+                    let name = '';
+                    if (
+                      entityValue &&
+                      typeof entityValue === 'object' &&
+                      'name' in entityValue &&
+                      typeof entityValue.name === 'string'
+                    ) {
+                      name = entityValue.name;
+                    }
 
-                  if (!name) {
-                    return '';
-                  }
+                    if (!name) {
+                      return '';
+                    }
 
-                  const role = c.role || 'contributor';
-                  return `${name} (${role})`;
-                })
-                .filter(Boolean)
-                .join(', ')}
-            </Lead>
-          )}
+                    const role = c.role || 'contributor';
+                    return `${name} (${role})`;
+                  })
+                  .filter(Boolean)
+                  .join(', ')}
+              </Lead>
+            )}
+          </StoryHeader>
 
-        </StoryHeader>
+          <StoryBody>
+            {source.publisher && (
+              <Section>
+                <Heading as="h2">Publisher</Heading>
+                <p>{source.publisher}</p>
+              </Section>
+            )}
 
-        <StoryBody>
-          {source.publisher && (
-            <Section>
-              <Heading as="h2">Publisher</Heading>
-              <p>{source.publisher}</p>
-            </Section>
-          )}
+            {source.publishedDate && (
+              <Section>
+                <Heading as="h2">Published</Heading>
+                <p>{new Date(source.publishedDate).toLocaleDateString(locale)}</p>
+              </Section>
+            )}
 
-          {source.publishedDate && (
-            <Section>
-              <Heading as="h2">Published</Heading>
-              <p>{new Date(source.publishedDate).toLocaleDateString(locale)}</p>
-            </Section>
-          )}
-
-          {source.url && (
-            <Section>
-              <Heading as="h2">
-                URL
-              </Heading>
-              <p>
-                <a href={source.url} target="_blank" rel="noopener noreferrer">
-                  {source.url}
-                </a>
-              </p>
-            </Section>
-          )}
-
-          {source.publicationPlace && (
-            <Section>
-              <Heading as="h2">Publication Place</Heading>
-              <p>{source.publicationPlace}</p>
-            </Section>
-          )}
-
-          {source.publicationContext && (
-            <Section>
-              <Heading as="h2">Publication Context</Heading>
-              {source.publicationContext.containerTitle && (
+            {source.url && (
+              <Section>
+                <Heading as="h2">URL</Heading>
                 <p>
-                  <strong>In:</strong> {source.publicationContext.containerTitle}
+                  <a href={source.url} target="_blank" rel="noopener noreferrer">
+                    {source.url}
+                  </a>
                 </p>
-              )}
-              {source.publicationContext.volume && (
-                <p>
-                  <strong>Volume:</strong> {source.publicationContext.volume}
-                </p>
-              )}
-              {source.publicationContext.issue && (
-                <p>
-                  <strong>Issue:</strong> {source.publicationContext.issue}
-                </p>
-              )}
-              {source.publicationContext.page && (
-                <p>
-                  <strong>Pages:</strong> {source.publicationContext.page}
-                </p>
-              )}
-            </Section>
-          )}
+              </Section>
+            )}
 
-          {Array.isArray(source.identifiers) && source.identifiers.length > 0 && (
-            <Section>
-              <Heading as="h2">Identifiers</Heading>
-              <ul>
-                {source.identifiers.map((id, index) => (
-                  <li key={index}>
-                    <strong>{id.type?.toUpperCase()}:</strong> {id.value}
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
-        </StoryBody>
-      </Story>
-    </Container>
+            {source.publicationPlace && (
+              <Section>
+                <Heading as="h2">Publication Place</Heading>
+                <p>{source.publicationPlace}</p>
+              </Section>
+            )}
+
+            {source.publicationContext && (
+              <Section>
+                <Heading as="h2">Publication Context</Heading>
+                {source.publicationContext.containerTitle && (
+                  <p>
+                    <strong>In:</strong> {source.publicationContext.containerTitle}
+                  </p>
+                )}
+                {source.publicationContext.volume && (
+                  <p>
+                    <strong>Volume:</strong> {source.publicationContext.volume}
+                  </p>
+                )}
+                {source.publicationContext.issue && (
+                  <p>
+                    <strong>Issue:</strong> {source.publicationContext.issue}
+                  </p>
+                )}
+                {source.publicationContext.page && (
+                  <p>
+                    <strong>Pages:</strong> {source.publicationContext.page}
+                  </p>
+                )}
+              </Section>
+            )}
+
+            {Array.isArray(source.identifiers) && source.identifiers.length > 0 && (
+              <Section>
+                <Heading as="h2">Identifiers</Heading>
+                <ul>
+                  {source.identifiers.map((id, index) => (
+                    <li key={index}>
+                      <strong>{id.type?.toUpperCase()}:</strong> {id.value}
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            )}
+          </StoryBody>
+        </Story>
+      </Container>
     </>
   );
 }

@@ -6,10 +6,8 @@
  */
 
 import type { Access } from 'payload';
-
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';
-
 import { isOrderEditableByCommerce } from './orderStatusRules';
 
 /**

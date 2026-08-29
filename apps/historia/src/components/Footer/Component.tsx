@@ -1,11 +1,8 @@
 import React from 'react';
+import { Footer as FooterUI } from '@eventuras/ratio-ui/core/Footer';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
-
-import { Footer as FooterUI } from '@eventuras/ratio-ui/core/Footer';
-
 import { getCurrentWebsiteId } from '@/lib/website';
-
 import { FooterClient } from './Component.client';
 
 // Force dynamic rendering to ensure headers are available
@@ -35,10 +32,7 @@ export async function Footer() {
       ? {
           name: website.publisher.name,
           organizationNumber: website.publisher.organizationNumber || undefined,
-          address:
-            website.publisher.address?.addressLine1 ||
-            website.publisher.address?.city ||
-            '',
+          address: website.publisher.address?.addressLine1 || website.publisher.address?.city || '',
           phone: website.publisher.phone || '',
           email: website.publisher.email || '',
         }

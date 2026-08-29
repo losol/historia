@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NotitiaTemplates, createNotitiaTemplates } from '../NotitiaTemplates';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
 
 describe('NotitiaTemplates - Multi-language Support', () => {
   describe('American English (en-US)', () => {
@@ -133,7 +133,7 @@ describe('NotitiaTemplates - Multi-language Support', () => {
           name: 'Ola',
           organizationName: 'Eventuras',
         },
-        { locale: 'nb-NO' }
+        { locale: 'nb-NO' },
       );
 
       expect(result.subject).toBe('Velkommen til Eventuras');
@@ -148,7 +148,7 @@ describe('NotitiaTemplates - Multi-language Support', () => {
           name: 'Ola',
           organizationName: 'Eventuras',
         },
-        { locale: 'nn-NO' }
+        { locale: 'nn-NO' },
       );
 
       expect(result.subject).toBe('Velkomen til Eventuras');

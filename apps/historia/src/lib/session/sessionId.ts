@@ -1,7 +1,6 @@
 'use server';
 
 import crypto from 'node:crypto';
-
 import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 
@@ -104,7 +103,8 @@ export async function getSessionContext(): Promise<{
 
     // Extract userId from user object - it may be stored as 'sub' in some auth systems
     // or as a custom field in session.data
-    const userId = (session.user as any)?.sub || (session.user as any)?.id || (sessionData as any)?.userId;
+    const userId =
+      (session.user as any)?.sub || (session.user as any)?.id || (sessionData as any)?.userId;
 
     return {
       sessionId: sessionData.sessionId,

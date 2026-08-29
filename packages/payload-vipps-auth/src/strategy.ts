@@ -126,11 +126,14 @@ export function createVippsAuthStrategy(collection = 'users'): AuthStrategy {
       const userCollection = payload.collections[collection];
       const authConfig = userCollection?.config.auth;
 
-      logger.info({
-        hasAuthConfig: !!authConfig,
-        useSessions: authConfig?.useSessions,
-        tokenExpiration: authConfig?.tokenExpiration
-      }, 'SESSION CONFIG CHECK');
+      logger.info(
+        {
+          hasAuthConfig: !!authConfig,
+          useSessions: authConfig?.useSessions,
+          tokenExpiration: authConfig?.tokenExpiration,
+        },
+        'SESSION CONFIG CHECK',
+      );
 
       let sid: string | undefined;
 
@@ -149,10 +152,10 @@ export function createVippsAuthStrategy(collection = 'users'): AuthStrategy {
         };
 
         // Remove expired sessions and add new session
-        const existingSessions = Array.isArray((user as any).sessions) ? (user as any).sessions : [];
-        const activeSessions = existingSessions.filter((s: any) =>
-          new Date(s.expiresAt) > now
-        );
+        const existingSessions = Array.isArray((user as any).sessions)
+          ? (user as any).sessions
+          : [];
+        const activeSessions = existingSessions.filter((s: any) => new Date(s.expiresAt) > now);
 
         // Update user with new session
         await payload.update({
@@ -171,7 +174,7 @@ export function createVippsAuthStrategy(collection = 'users'): AuthStrategy {
       const responseHeaders = new Headers();
       responseHeaders.append(
         'Set-Cookie',
-        `${VIPPS_SESSION_PENDING_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`
+        `${VIPPS_SESSION_PENDING_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
       );
 
       return {
@@ -186,4 +189,3 @@ export function createVippsAuthStrategy(collection = 'users'): AuthStrategy {
     },
   };
 }
-

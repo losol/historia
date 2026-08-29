@@ -108,7 +108,7 @@ export async function pollPaymentStatus(
   config: VippsConfig,
   reference: string,
   desiredStates: PaymentState | PaymentState[],
-  options: PollingOptions = {}
+  options: PollingOptions = {},
 ): Promise<PollingResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const states = Array.isArray(desiredStates) ? desiredStates : [desiredStates];
@@ -126,7 +126,7 @@ export async function pollPaymentStatus(
     // Check timeout
     if (elapsed >= opts.timeout) {
       throw new Error(
-        `Polling timeout after ${elapsed}ms (${attempts} attempts). Payment state: ${payment?.state || 'unknown'}`
+        `Polling timeout after ${elapsed}ms (${attempts} attempts). Payment state: ${payment?.state || 'unknown'}`,
       );
     }
 
@@ -166,7 +166,7 @@ export async function pollPaymentStatus(
   }
 
   throw new Error(
-    `Max polling attempts (${opts.maxAttempts}) reached. Payment state: ${payment?.state || 'unknown'}`
+    `Max polling attempts (${opts.maxAttempts}) reached. Payment state: ${payment?.state || 'unknown'}`,
   );
 }
 
@@ -191,7 +191,7 @@ export async function pollPaymentStatus(
 export async function pollUntilAuthorized(
   config: VippsConfig,
   reference: string,
-  options?: PollingOptions
+  options?: PollingOptions,
 ): Promise<PollingResult> {
   return pollPaymentStatus(config, reference, 'AUTHORIZED', options);
 }
@@ -215,12 +215,12 @@ export async function pollUntilAuthorized(
 export async function pollUntilTerminal(
   config: VippsConfig,
   reference: string,
-  options?: PollingOptions
+  options?: PollingOptions,
 ): Promise<PollingResult> {
   return pollPaymentStatus(
     config,
     reference,
     ['AUTHORIZED', 'TERMINATED', 'ABORTED', 'EXPIRED'],
-    options
+    options,
   );
 }

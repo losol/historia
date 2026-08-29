@@ -1,7 +1,6 @@
 import type { Access, FieldAccess } from 'payload';
-
-import { isSystemAdmin } from './isSystemAdmin';
 import { getUserTenantIDs } from '../utilities/getUserTenantIDs';
+import { isSystemAdmin } from './isSystemAdmin';
 
 /**
  * Grants access to system-admins (globally) and site admins (tenant-scoped).
@@ -28,9 +27,7 @@ export const admins: Access = ({ req: { user } }) => {
   // Site admins have access to their assigned tenants
   const adminTenantIDs = getUserTenantIDs(user, 'admin');
 
-  return adminTenantIDs.length > 0
-    ? { tenant: { in: adminTenantIDs } }
-    : false;
+  return adminTenantIDs.length > 0 ? { tenant: { in: adminTenantIDs } } : false;
 };
 
 /**

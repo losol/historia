@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useDocumentInfo } from '@payloadcms/ui';
-
 import { updateTransactionDetails } from '../actions';
 
 export const UpdateDetailsButton: React.FC = () => {

@@ -1,4 +1,4 @@
-import { Field } from "payload";
+import type { Field } from 'payload';
 
 export const topics: Field = {
   name: 'topics',
@@ -6,6 +6,6 @@ export const topics: Field = {
   relationTo: 'topics',
   hasMany: true,
   admin: {
-    description: 'What is this about?.'
+    description: 'What is this about?.',
   },
 };

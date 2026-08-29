@@ -1,6 +1,5 @@
 import type { Access } from 'payload';
-
-import { User } from '../payload-types';
+import type { User } from '../payload-types';
 
 export const isSystemAdminAccess: Access = ({ req }): boolean => {
   // Check if user is from 'users' collection before passing to isSystemAdmin

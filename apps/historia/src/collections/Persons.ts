@@ -1,13 +1,11 @@
 import type { CollectionConfig } from 'payload';
-
 import { bio } from '@/fields/bio';
 import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
-
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { image } from '../fields/image';
-import { storyField} from '../fields/story';
+import { storyField } from '../fields/story';
 
 export const Persons: CollectionConfig = {
   slug: 'persons',
@@ -30,10 +28,7 @@ export const Persons: CollectionConfig = {
         const middleName = data.middle_name || '';
         const familyName = data.family_name || '';
 
-        const fullName = [givenName, middleName, familyName]
-          .filter(Boolean)
-          .join(' ')
-          .trim();
+        const fullName = [givenName, middleName, familyName].filter(Boolean).join(' ').trim();
 
         if (fullName) {
           data.name = fullName;
@@ -83,7 +78,7 @@ export const Persons: CollectionConfig = {
     image,
     bio,
     storyField(),
-    ...slugField("name"),
-    resourceId
+    ...slugField('name'),
+    resourceId,
   ],
 };

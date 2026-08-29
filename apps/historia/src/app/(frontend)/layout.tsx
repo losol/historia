@@ -1,16 +1,15 @@
-import React from 'react'
-import type { Metadata } from 'next'
-import { draftMode } from 'next/headers'
+import type React from 'react';
+import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
+import { AdminBar } from '@/components/AdminBar';
+import { Footer } from '@/components/Footer/Component';
+import { Header } from '@/Header/Component';
+import { Providers } from '@/providers';
+import { InitTheme } from '@/providers/Theme/InitTheme';
 
-import { AdminBar } from '@/components/AdminBar'
-import { Footer } from '@/components/Footer/Component'
-import { Header } from '@/Header/Component'
-import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
-
-import './globals.css'
-import '@eventuras/ratio-ui/ratio-ui.css'
-import '@eventuras/ratio-ui/fonts.css'
+import './globals.css';
+import '@eventuras/ratio-ui/ratio-ui.css';
+import '@eventuras/ratio-ui/fonts.css';
 
 export const metadata: Metadata = {
   title: {
@@ -18,17 +17,17 @@ export const metadata: Metadata = {
     default: 'Historia',
   },
   description: 'Historia - Knowledge management and content platform',
-}
+};
 
 type RootLayoutProps = {
-  children: React.ReactNode
-  params?: Promise<{ locale?: string }>
-}
+  children: React.ReactNode;
+  params?: Promise<{ locale?: string }>;
+};
 
 export default async function RootLayout({ children, params }: Readonly<RootLayoutProps>) {
-  const { isEnabled } = await draftMode()
-  const resolvedParams = params ? await params : {}
-  const locale = resolvedParams.locale || process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no'
+  const { isEnabled } = await draftMode();
+  const resolvedParams = params ? await params : {};
+  const locale = resolvedParams.locale || process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no';
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -61,5 +60,5 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
         </Providers>
       </body>
     </html>
-  )
+  );
 }

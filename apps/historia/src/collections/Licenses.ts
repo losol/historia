@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { description } from '@/fields/description';
@@ -24,8 +23,9 @@ export const Licenses: CollectionConfig = {
       type: 'text',
       localized: true,
       admin: {
-        description: 'A short abbreviation or acronym for the license (e.g., GPL for GNU Public License)',
-      }
+        description:
+          'A short abbreviation or acronym for the license (e.g., GPL for GNU Public License)',
+      },
     },
     description,
     url,

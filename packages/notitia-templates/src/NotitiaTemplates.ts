@@ -1,15 +1,15 @@
 import Handlebars from 'handlebars';
+import { defaultTemplates, getTemplatesForLocale } from './templates';
 import type {
   BaseTemplateParams,
   Locale,
   NotificationChannel,
-  RenderOptions,
   RenderedTemplate,
+  RenderOptions,
   Template,
   TemplateRegistry,
   TemplateType,
 } from './types';
-import { defaultTemplates, getTemplatesForLocale } from './templates';
 
 /**
  * Template renderer for generating notification messages
@@ -128,7 +128,7 @@ export class NotitiaTemplates {
     channel: NotificationChannel,
     type: TemplateType,
     params: BaseTemplateParams,
-    options: RenderOptions = {}
+    options: RenderOptions = {},
   ): RenderedTemplate {
     const key = this.getTemplateKey(channel, type);
     const locale = options.locale || this.defaultLocale;
@@ -176,7 +176,7 @@ export class NotitiaTemplates {
       };
     } catch (error) {
       throw new Error(
-        `Failed to render template ${key}: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to render template ${key}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -188,7 +188,7 @@ export class NotitiaTemplates {
     channel: NotificationChannel,
     type: TemplateType,
     params: BaseTemplateParams,
-    options: RenderOptions = {}
+    options: RenderOptions = {},
   ): string {
     const result = this.render(channel, type, params, options);
     return result.subject || '';
@@ -197,7 +197,11 @@ export class NotitiaTemplates {
   /**
    * Render a custom template string directly (not from registry)
    */
-  renderCustom(templateString: string, params: BaseTemplateParams, options: RenderOptions = {}): string {
+  renderCustom(
+    templateString: string,
+    params: BaseTemplateParams,
+    options: RenderOptions = {},
+  ): string {
     try {
       // Register custom helpers if provided
       if (options.helpers) {
@@ -222,7 +226,7 @@ export class NotitiaTemplates {
       return result.trim();
     } catch (error) {
       throw new Error(
-        `Failed to render custom template: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to render custom template: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

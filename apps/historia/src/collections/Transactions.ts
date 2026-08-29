@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { transactionsReadAccess } from '@/access/commerceReadAccess';
 import { isSystemAdminAccess } from '@/access/isSystemAdmin';
 import { currency } from '@/fields/currency';
@@ -7,10 +6,10 @@ import { currency } from '@/fields/currency';
 export const Transactions: CollectionConfig = {
   slug: 'transactions',
   access: {
-    create: isSystemAdminAccess,  // Only system-admin can create transactions
+    create: isSystemAdminAccess, // Only system-admin can create transactions
     read: transactionsReadAccess,
-    update: isSystemAdminAccess,  // Only system-admin can update transactions
-    delete: isSystemAdminAccess,  // Only system-admin can delete transactions
+    update: isSystemAdminAccess, // Only system-admin can update transactions
+    delete: isSystemAdminAccess, // Only system-admin can delete transactions
   },
   admin: {
     defaultColumns: ['id', 'order', 'customer', 'amount', 'currency', 'status', 'createdAt'],
@@ -35,7 +34,8 @@ export const Transactions: CollectionConfig = {
       required: false,
       index: true,
       admin: {
-        description: 'The order this transaction belongs to. Can be null for orphaned payments that will be linked later.',
+        description:
+          'The order this transaction belongs to. Can be null for orphaned payments that will be linked later.',
       },
     },
     {
@@ -51,7 +51,8 @@ export const Transactions: CollectionConfig = {
       type: 'number',
       required: true,
       admin: {
-        description: 'Amount in minor units (øre for NOK, cents for USD/EUR). Positive for payments, negative for refunds.',
+        description:
+          'Amount in minor units (øre for NOK, cents for USD/EUR). Positive for payments, negative for refunds.',
       },
     },
     currency,
@@ -61,7 +62,8 @@ export const Transactions: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique payment reference from payment provider (Vipps reference, Stripe payment intent ID, etc.)',
+        description:
+          'Unique payment reference from payment provider (Vipps reference, Stripe payment intent ID, etc.)',
       },
     },
     {
@@ -71,7 +73,8 @@ export const Transactions: CollectionConfig = {
       defaultValue: 'pending',
       index: true,
       admin: {
-        description: 'Transaction status from payment provider (e.g., pending, authorized, captured, failed, refunded)',
+        description:
+          'Transaction status from payment provider (e.g., pending, authorized, captured, failed, refunded)',
       },
     },
     {
@@ -88,7 +91,8 @@ export const Transactions: CollectionConfig = {
       type: 'json',
       required: false,
       admin: {
-        description: 'Full payment details from payment provider (includes profile, shipping, state, amounts, etc.)',
+        description:
+          'Full payment details from payment provider (includes profile, shipping, state, amounts, etc.)',
       },
     },
   ],

@@ -10,7 +10,6 @@
  */
 
 import { createConfig } from '@eventuras/app-config';
-
 import appConfigJson from '../app.config.json';
 
 /**

@@ -1,9 +1,5 @@
 'use server';
 
-import configPromise from '@payload-config';
-import { headers } from 'next/headers';
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
@@ -12,13 +8,15 @@ import {
 import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import {
-  createPayment,
   type CreatePaymentRequest,
   type CreatePaymentResponse,
+  createPayment,
   getPaymentDetails,
   type PaymentDetails,
 } from '@eventuras/vipps/epayment-v1';
-
+import configPromise from '@payload-config';
+import { headers } from 'next/headers';
+import { getPayload } from 'payload';
 import { setCartPaymentReference } from '@/app/actions/cart';
 import { appConfig } from '@/config.server';
 import { saveCartToDatabase } from '@/lib/cart/saveCartToDatabase';
@@ -132,9 +130,7 @@ export async function calculateCart(
     return actionSuccess(summary);
   } catch (error) {
     logger.error({ error, cartItems }, 'Failed to calculate cart totals');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to calculate cart',
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to calculate cart');
   }
 }
 
@@ -184,9 +180,7 @@ export async function validateCartProducts(
     return actionSuccess({ invalidProductIds, validProductIds });
   } catch (error) {
     logger.error({ error, cartItems }, 'Failed to validate cart products');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to validate cart',
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to validate cart');
   }
 }
 
@@ -216,13 +210,8 @@ export async function createVippsPayment({
     // This ensures cart persists during payment flow even if session expires
     const saveResult = await saveCartToDatabase();
     if (!saveResult.success) {
-      logger.error(
-        { error: saveResult.error },
-        'Failed to save cart to database',
-      );
-      return actionError(
-        'Failed to save cart to database',
-      );
+      logger.error({ error: saveResult.error }, 'Failed to save cart to database');
+      return actionError('Failed to save cart to database');
     }
 
     const { cartId } = saveResult.data;
@@ -262,9 +251,7 @@ export async function createVippsPayment({
     // Build payment description from cart items
     const productNames = cart.items.map((item) => item.title).join(', ');
     const paymentDescription =
-      cart.items.length > 0
-        ? `Kjøp: ${productNames.substring(0, 100)}`
-        : `Ordre ${reference}`;
+      cart.items.length > 0 ? `Kjøp: ${productNames.substring(0, 100)}` : `Ordre ${reference}`;
 
     // Build order lines from calculated cart
     const orderLines = cart.items.map((item) => ({
@@ -284,14 +271,10 @@ export async function createVippsPayment({
     const headersList = await headers();
     const host = headersList.get('host');
     const forwardedProto = headersList.get('x-forwarded-proto');
-    const protocol =
-      forwardedProto || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+    const protocol = forwardedProto || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
     const baseUrl = host ? `${protocol}://${host}` : appConfig.env.NEXT_PUBLIC_CMS_URL;
 
-    logger.info(
-      { host, baseUrl, reference },
-      'Building payment with dynamic callback URL'
-    );
+    logger.info({ host, baseUrl, reference }, 'Building payment with dynamic callback URL');
 
     // Build ePayment request
     const paymentRequest: CreatePaymentRequest = {
@@ -363,10 +346,16 @@ export async function createVippsPayment({
         },
         overrideAccess: true, // We have the cartId from saveCartToDatabase
       });
-      logger.debug({ cartId, reference }, 'Cart updated with payment reference and status=payment-initiated');
+      logger.debug(
+        { cartId, reference },
+        'Cart updated with payment reference and status=payment-initiated',
+      );
     } catch (error) {
       // Non-critical - cart can still be recovered via session
-      logger.warn({ error, cartId, reference }, 'Failed to update cart with payment reference and status');
+      logger.warn(
+        { error, cartId, reference },
+        'Failed to update cart with payment reference and status',
+      );
     }
 
     logger.info({ reference }, 'Vipps payment created');
@@ -392,9 +381,7 @@ export async function createVippsPayment({
  *
  * @returns Payment details if there's a pending/authorized payment, null otherwise
  */
-export async function checkPendingPayment(): Promise<
-  ServerActionResult<PaymentDetails | null>
-> {
+export async function checkPendingPayment(): Promise<ServerActionResult<PaymentDetails | null>> {
   try {
     const session = await getCurrentSession();
     const cart = session?.data?.cart;
@@ -409,10 +396,7 @@ export async function checkPendingPayment(): Promise<
     const paymentDetails = await getPaymentDetails(vippsConfig, reference);
 
     // Only return payment if it's in a state where user can continue
-    if (
-      paymentDetails.state === 'CREATED' ||
-      paymentDetails.state === 'AUTHORIZED'
-    ) {
+    if (paymentDetails.state === 'CREATED' || paymentDetails.state === 'AUTHORIZED') {
       return actionSuccess(paymentDetails);
     }
 

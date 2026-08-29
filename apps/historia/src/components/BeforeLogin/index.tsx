@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-
+import type React from 'react';
 import { VippsLoginButton } from './VippsLoginButton';
 
 const BeforeLogin: React.FC = () => {

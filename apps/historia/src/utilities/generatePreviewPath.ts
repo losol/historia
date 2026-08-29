@@ -1,6 +1,5 @@
-import { CollectionSlug, PayloadRequest } from 'payload'
-
-import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections'
+import type { CollectionSlug, PayloadRequest } from 'payload';
+import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   articles: 'c',
@@ -12,17 +11,23 @@ const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   quotes: 'i',
   sources: 'i',
   terms: 't',
-}
+};
 
 type Props = {
-  collection: keyof typeof collectionPrefixMap
-  slug?: string
-  resourceId?: string
-  breadcrumbsUrl?: string
-  req: PayloadRequest
-}
+  collection: keyof typeof collectionPrefixMap;
+  slug?: string;
+  resourceId?: string;
+  breadcrumbsUrl?: string;
+  req: PayloadRequest;
+};
 
-export const generatePreviewPath = ({ collection, slug, resourceId, breadcrumbsUrl, req }: Props) => {
+export const generatePreviewPath = ({
+  collection,
+  slug,
+  resourceId,
+  breadcrumbsUrl,
+  req,
+}: Props) => {
   const locale = req.locale || process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no';
   const prefix = collectionPrefixMap[collection];
 
@@ -65,24 +70,24 @@ export const generatePreviewPath = ({ collection, slug, resourceId, breadcrumbsU
     collection,
     path,
     previewSecret: process.env.PREVIEW_SECRET || '',
-  }
+  };
 
   // Only add slug if it exists (not required for resourceId-only routes)
   if (slug) {
     params.slug = slug;
   }
 
-  const encodedParams = new URLSearchParams()
+  const encodedParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
-    encodedParams.append(key, value)
-  })
+    encodedParams.append(key, value);
+  });
 
   const isProduction =
-    process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL_PROJECT_PRODUCTION_URL)
-  const protocol = isProduction ? 'https:' : req.protocol
+    process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  const protocol = isProduction ? 'https:' : req.protocol;
 
-  const url = `${protocol}//${req.host}/next/preview?${encodedParams.toString()}`
+  const url = `${protocol}//${req.host}/next/preview?${encodedParams.toString()}`;
 
-  return url
-}
+  return url;
+};

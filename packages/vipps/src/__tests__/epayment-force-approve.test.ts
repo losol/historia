@@ -19,21 +19,21 @@
  * - Normal amounts: Should succeed through full flow
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
+  cancelPayment,
+  capturePayment,
   createPayment,
   forceApprovePayment,
   getPaymentDetails,
-  capturePayment,
   refundPayment,
-  cancelPayment,
 } from '../epayment-v1/client';
 import type { CreatePaymentRequest } from '../epayment-v1/types';
 import {
-  hasTestConfig,
-  getTestConfig,
   generateTestReference,
+  getTestConfig,
   getTestPhoneNumber,
+  hasTestConfig,
   waitForPaymentState,
 } from './test-utils';
 
@@ -94,7 +94,7 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
         () => getPaymentDetails(config!, reference),
         'AUTHORIZED',
         20,
-        1000
+        1000,
       );
 
       const authorizedPayment = await getPaymentDetails(config!, reference);
@@ -109,12 +109,7 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
       });
 
       // 5. Verify capture
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'CAPTURED',
-        20,
-        1000
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'CAPTURED', 20, 1000);
 
       const capturedPayment = await getPaymentDetails(config!, reference);
       expect(capturedPayment.state).toBe('CAPTURED');
@@ -137,19 +132,13 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
 
       await createPayment(config!, payment);
       await forceApprovePayment(config!, reference, phoneNumber);
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'AUTHORIZED'
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'AUTHORIZED');
 
       // Capture
       await capturePayment(config!, reference, {
         modificationAmount: { value: 5000, currency: 'NOK' },
       });
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'CAPTURED'
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'CAPTURED');
 
       // Refund
       await refundPayment(config!, reference, {
@@ -161,7 +150,7 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
         () => getPaymentDetails(config!, reference),
         'TERMINATED',
         20,
-        1000
+        1000,
       );
 
       const refundedPayment = await getPaymentDetails(config!, reference);
@@ -184,20 +173,12 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
 
       await createPayment(config!, payment);
       await forceApprovePayment(config!, reference, phoneNumber);
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'AUTHORIZED'
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'AUTHORIZED');
 
       // Cancel instead of capture
       await cancelPayment(config!, reference);
 
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'ABORTED',
-        20,
-        1000
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'ABORTED', 20, 1000);
 
       const cancelledPayment = await getPaymentDetails(config!, reference);
       expect(cancelledPayment.state).toBe('ABORTED');
@@ -225,12 +206,7 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
         await forceApprovePayment(config!, reference, phoneNumber);
 
         // Even if approve succeeds, payment should end up ABORTED
-        await waitForPaymentState(
-          () => getPaymentDetails(config!, reference),
-          'ABORTED',
-          20,
-          1000
-        );
+        await waitForPaymentState(() => getPaymentDetails(config!, reference), 'ABORTED', 20, 1000);
 
         const failedPayment = await getPaymentDetails(config!, reference);
         expect(failedPayment.state).toBe('ABORTED');
@@ -257,20 +233,14 @@ describeIf('Vipps ePayment API - Automated Flow with Force Approve', () => {
 
       await createPayment(config!, payment);
       await forceApprovePayment(config!, reference, phoneNumber);
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'AUTHORIZED'
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'AUTHORIZED');
 
       // Capture only 50 NOK out of 100 NOK
       await capturePayment(config!, reference, {
         modificationAmount: { value: 5000, currency: 'NOK' },
       });
 
-      await waitForPaymentState(
-        () => getPaymentDetails(config!, reference),
-        'CAPTURED'
-      );
+      await waitForPaymentState(() => getPaymentDetails(config!, reference), 'CAPTURED');
 
       const partialCaptured = await getPaymentDetails(config!, reference);
       expect(partialCaptured.state).toBe('CAPTURED');

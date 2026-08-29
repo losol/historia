@@ -1,7 +1,16 @@
-import { Config } from '@/payload-types';
+import type { Config } from '@/payload-types';
 
-export const pageCollections = ['articles', 'happenings', 'notes', 'organizations', 'persons', 'products', 'cases', 'timelines'] as const;
-export type ValidCollection = typeof pageCollections[number];
+export const pageCollections = [
+  'articles',
+  'happenings',
+  'notes',
+  'organizations',
+  'persons',
+  'products',
+  'cases',
+  'timelines',
+] as const;
+export type ValidCollection = (typeof pageCollections)[number];
 type Collections = Config['collections'];
 export type PageCollectionsType = Extract<keyof Collections, ValidCollection>;
 
@@ -42,9 +51,10 @@ export const getLocalizedCollectionName = (collection: string, locale: string): 
 
 export const getOriginalCollectionName = (localizedCollection: string, locale: string): string => {
   const translations = collectionTranslations[locale];
-  return Object.keys(translations).find(
-    (key) => translations[key] === localizedCollection
-  ) ?? localizedCollection;
+  return (
+    Object.keys(translations).find((key) => translations[key] === localizedCollection) ??
+    localizedCollection
+  );
 };
 
 /**

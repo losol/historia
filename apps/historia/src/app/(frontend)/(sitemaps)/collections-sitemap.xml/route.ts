@@ -2,8 +2,10 @@ import config from '@payload-config';
 import { unstable_cache } from 'next/cache';
 import { getServerSideSitemap } from 'next-sitemap';
 import { getPayload } from 'payload';
-
-import { getLocalizedCollectionName, pageCollections } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
+import {
+  getLocalizedCollectionName,
+  pageCollections,
+} from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 
 const getCollectionsSitemap = unstable_cache(
   async () => {
@@ -44,19 +46,22 @@ const getCollectionsSitemap = unstable_cache(
 
           const sitemapEntries = results.docs
             ? results.docs
-              .filter((doc: any) => Boolean(doc?.slug) && Boolean(doc?.resourceId))
-              .map((doc: any) => {
-                const combinedSlug = `${doc.slug}--${doc.resourceId}`;
-                return {
-                  loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,
-                  lastmod: doc.updatedAt || dateFallback,
-                };
-              })
+                .filter((doc: any) => Boolean(doc?.slug) && Boolean(doc?.resourceId))
+                .map((doc: any) => {
+                  const combinedSlug = `${doc.slug}--${doc.resourceId}`;
+                  return {
+                    loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,
+                    lastmod: doc.updatedAt || dateFallback,
+                  };
+                })
             : [];
 
           allSitemapEntries.push(...sitemapEntries);
         } catch (error) {
-          console.error(`Failed to generate sitemap for collection "${collection}" in locale "${locale}":`, error);
+          console.error(
+            `Failed to generate sitemap for collection "${collection}" in locale "${locale}":`,
+            error,
+          );
         }
       }
     }

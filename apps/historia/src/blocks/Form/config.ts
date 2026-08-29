@@ -3,8 +3,8 @@ import {
   HeadingFeature,
   InlineToolbarFeature,
   lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-import type { Block } from 'payload'
+} from '@payloadcms/richtext-lexical';
+import type { Block } from 'payload';
 
 export const FormBlock: Block = {
   slug: 'formBlock',
@@ -34,7 +34,7 @@ export const FormBlock: Block = {
             HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
             FixedToolbarFeature(),
             InlineToolbarFeature(),
-          ]
+          ];
         },
       }),
       label: 'Intro Content',
@@ -47,4 +47,4 @@ export const FormBlock: Block = {
     plural: 'Form Blocks',
     singular: 'Form Block',
   },
-}
+};

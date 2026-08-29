@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -16,8 +15,6 @@ import { startDate } from '@/fields/startDate';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { seoTab } from '@/lib/payload-plugin-seo';
-
-
 
 export const Happenings: CollectionConfig = {
   slug: 'happenings',
@@ -36,24 +33,11 @@ export const Happenings: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          fields: [
-            title,
-            lead,
-            image,
-            storyField(),
-            startDate,
-            endDate,
-            program,
-            contentLocations,
-          ],
+          fields: [title, lead, image, storyField(), startDate, endDate, program, contentLocations],
         },
         {
           label: 'Meta',
-          fields: [
-            ...slugField(),
-            resourceId,
-            config,
-          ],
+          fields: [...slugField(), resourceId, config],
         },
         seoTab(),
       ],

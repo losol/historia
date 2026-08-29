@@ -1,12 +1,10 @@
 import type { CollectionConfig } from 'payload';
-
 import { description } from '@/fields/description';
 import { geoPoint } from '@/fields/geopoint';
 import { image } from '@/fields/image';
 import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
-
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 
@@ -32,18 +30,19 @@ export const Places: CollectionConfig = {
     {
       label: 'Postal Address',
       type: 'collapsible',
-      fields: [{
-        name: 'postalAddress',
-        type: 'group',
-        fields: [
-          { name: 'streetAddress', type: 'text' },
-          { name: 'region', type: 'text' },
-          { name: 'postalCode', type: 'text' },
-          { name: 'city', type: 'text' },
-          { name: 'country', type: 'text' },
-        ],
-      },
-      ]
+      fields: [
+        {
+          name: 'postalAddress',
+          type: 'group',
+          fields: [
+            { name: 'streetAddress', type: 'text' },
+            { name: 'region', type: 'text' },
+            { name: 'postalCode', type: 'text' },
+            { name: 'city', type: 'text' },
+            { name: 'country', type: 'text' },
+          ],
+        },
+      ],
     },
     {
       label: 'Geo point',
@@ -52,7 +51,6 @@ export const Places: CollectionConfig = {
     },
     storyField(),
     ...slugField(),
-    resourceId
+    resourceId,
   ],
 };
-

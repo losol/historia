@@ -1,11 +1,9 @@
 import type { CollectionConfig } from 'payload';
-
 import { Nav } from '@/blocks/Nav/config';
 import { name } from '@/fields/name';
 import { summary } from '@/fields/summary';
 import { title } from '@/fields/title';
 import { metaField } from '@/lib/payload-plugin-seo';
-
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { authenticatedOrFirstWebsite } from '../access/authenticatedOrFirstWebsite';
@@ -88,7 +86,8 @@ export const Websites: CollectionConfig = {
           relationTo: 'users',
           required: true,
           admin: {
-            description: 'User responsible for this contact point. Only their name will be visible publicly.',
+            description:
+              'User responsible for this contact point. Only their name will be visible publicly.',
           },
         },
         {
@@ -130,4 +129,3 @@ export const Websites: CollectionConfig = {
     metaField,
   ],
 };
-

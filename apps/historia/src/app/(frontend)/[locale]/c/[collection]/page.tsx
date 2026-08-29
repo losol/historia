@@ -1,21 +1,18 @@
+import { Container } from '@eventuras/ratio-ui/layout/Container';
 import configPromise from '@payload-config';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next/types';
-import { CollectionSlug, getPayload } from 'payload';
-
-import { Container } from '@eventuras/ratio-ui/layout/Container';
-
+import { type CollectionSlug, getPayload } from 'payload';
 import { CollectionArchive } from '@/components/CollectionArchive';
 import { PageRange } from '@/components/PageRange';
 import { Pagination } from '@/components/Pagination';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
-
 import {
   getLocalizedCollectionName,
   getOriginalCollectionName,
+  type PageCollectionsType,
   pageCollections,
-  PageCollectionsType,
 } from './pageCollections';
 
 type Props = {
@@ -69,8 +66,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Props>) {
       notFound();
     }
 
-    const capitalizedCollection =
-      collection.charAt(0).toUpperCase() + collection.slice(1);
+    const capitalizedCollection = collection.charAt(0).toUpperCase() + collection.slice(1);
 
     return (
       <Container>

@@ -1,16 +1,16 @@
-'use client'
-import React, { useEffect } from 'react'
-import { FieldLabel, TextInput, useField, useFormFields } from '@payloadcms/ui'
-import { TextFieldClientProps } from 'payload'
+'use client';
+import type React from 'react';
+import { useEffect } from 'react';
+import { FieldLabel, TextInput, useField, useFormFields } from '@payloadcms/ui';
+import type { TextFieldClientProps } from 'payload';
 
 // import 'index.scss'
-
 
 export const PersonNameComponent: React.FC<TextFieldClientProps> = ({
   field,
   path,
   readOnly: readOnlyFromProps,
- }) => {
+}) => {
   const { label } = field;
 
   const { value, setValue } = useField<string>({ path });
@@ -34,12 +34,7 @@ export const PersonNameComponent: React.FC<TextFieldClientProps> = ({
         <FieldLabel htmlFor={`field-${path}`} label={label} />
       </div>
 
-      <TextInput
-        value={value}
-        onChange={setValue}
-        path={path}
-        readOnly={true}
-      />
+      <TextInput value={value} onChange={setValue} path={path} readOnly={true} />
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-
 import type { ArrayField } from 'payload';
 
 export const orderItemsField = (): ArrayField => {
@@ -59,7 +58,8 @@ export const orderItemsField = (): ArrayField => {
                   // Auto-populate from product if empty
                   if (!value && data?.product && req?.payload) {
                     try {
-                      const productId = typeof data.product === 'object' ? data.product.id : data.product;
+                      const productId =
+                        typeof data.product === 'object' ? data.product.id : data.product;
                       const product = await req.payload.findByID({
                         collection: 'products',
                         id: productId,
@@ -87,7 +87,8 @@ export const orderItemsField = (): ArrayField => {
                   // Auto-populate from product if empty
                   if (!value && data?.product && req?.payload) {
                     try {
-                      const productId = typeof data.product === 'object' ? data.product.id : data.product;
+                      const productId =
+                        typeof data.product === 'object' ? data.product.id : data.product;
                       const product = await req.payload.findByID({
                         collection: 'products',
                         id: productId,
@@ -118,7 +119,8 @@ export const orderItemsField = (): ArrayField => {
                   // Auto-populate from product if empty
                   if (!value && data?.product && req?.payload) {
                     try {
-                      const productId = typeof data.product === 'object' ? data.product.id : data.product;
+                      const productId =
+                        typeof data.product === 'object' ? data.product.id : data.product;
                       const product = await req.payload.findByID({
                         collection: 'products',
                         id: productId,

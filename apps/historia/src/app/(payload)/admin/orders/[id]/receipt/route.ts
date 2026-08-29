@@ -1,6 +1,5 @@
 import { headers } from 'next/headers';
 import { getPayload } from 'payload';
-
 import {
   formatOrderDate,
   getLineTotalMinor,
@@ -25,10 +24,7 @@ function getStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const payload = await getPayload({ config });
 
@@ -47,11 +43,11 @@ export async function GET(
   }
 
   // Fetch the order with depth to get product and tenant details
-  const order = await payload.findByID({
+  const order = (await payload.findByID({
     collection: 'orders',
     id,
     depth: 3, // Need depth 3 to get website -> publisher -> organization details
-  }) as Order;
+  })) as Order;
 
   if (!order) {
     return new Response('Order not found', { status: 404 });
@@ -108,20 +104,21 @@ export async function GET(
   let totalVat = 0;
   let totalIncVat = 0;
 
-  const itemRows = items.map((item, index) => {
-    const productName = sanitizeForHtml(getProductName(item));
-    const quantity = item.quantity || 1;
-    const priceExVat = getPriceExVatMinor(item);
-    const vatRate = getVatRate(item, isTaxExempt);
-    const lineTotal = getLineTotalMinor(item, isTaxExempt);
-    const lineTotalExVat = priceExVat * quantity;
-    const lineVat = lineTotal - lineTotalExVat;
+  const itemRows = items
+    .map((item, index) => {
+      const productName = sanitizeForHtml(getProductName(item));
+      const quantity = item.quantity || 1;
+      const priceExVat = getPriceExVatMinor(item);
+      const vatRate = getVatRate(item, isTaxExempt);
+      const lineTotal = getLineTotalMinor(item, isTaxExempt);
+      const lineTotalExVat = priceExVat * quantity;
+      const lineVat = lineTotal - lineTotalExVat;
 
-    totalExVat += lineTotalExVat;
-    totalVat += lineVat;
-    totalIncVat += lineTotal;
+      totalExVat += lineTotalExVat;
+      totalVat += lineVat;
+      totalIncVat += lineTotal;
 
-    return `
+      return `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
         <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${productName}</td>
@@ -131,7 +128,8 @@ export async function GET(
         <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${toMajorUnits(lineTotal).toFixed(2)}</td>
       </tr>
     `;
-  }).join('');
+    })
+    .join('');
 
   const orderDate = formatOrderDate(order.createdAt, {
     year: 'numeric',
@@ -141,10 +139,12 @@ export async function GET(
 
   // Build transactions section
   const transactions = (order.transactions?.docs ?? []).filter(
-    (t): t is Transaction => typeof t !== 'string'
+    (t): t is Transaction => typeof t !== 'string',
   );
 
-  const transactionsHtml = transactions.length > 0 ? `
+  const transactionsHtml =
+    transactions.length > 0
+      ? `
     <div style="margin-top: 32px; border-top: 2px solid #374151; padding-top: 24px;">
       <h3 style="margin: 0 0 16px 0; font-size: 14px; text-transform: uppercase; color: #6b7280;">Transaksjoner</h3>
       <table style="width: 100%; border-collapse: collapse;">
@@ -158,12 +158,13 @@ export async function GET(
           </tr>
         </thead>
         <tbody>
-          ${transactions.map(txn => {
-            let statusBg: string;
-            if (txn.status === 'captured') statusBg = '#dcfce7';
-            else if (txn.status === 'refunded') statusBg = '#fef2f2';
-            else statusBg = '#f3f4f6';
-            return `
+          ${transactions
+            .map((txn) => {
+              let statusBg: string;
+              if (txn.status === 'captured') statusBg = '#dcfce7';
+              else if (txn.status === 'refunded') statusBg = '#fef2f2';
+              else statusBg = '#f3f4f6';
+              return `
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${new Date(txn.createdAt).toLocaleDateString('nb-NO')}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
@@ -175,16 +176,21 @@ export async function GET(
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 11px;">${sanitizeForHtml(txn.paymentReference)}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${currency} ${toMajorUnits(txn.amount).toFixed(2)}</td>
             </tr>
-          `}).join('')}
+          `;
+            })
+            .join('')}
         </tbody>
       </table>
     </div>
-  ` : '';
+  `
+      : '';
 
   const shippingAddress = order.shippingAddress;
   let shippingHtml = '';
   if (shippingAddress) {
-    const addressLine2Html = shippingAddress.addressLine2 ? `${sanitizeForHtml(shippingAddress.addressLine2)}<br>` : '';
+    const addressLine2Html = shippingAddress.addressLine2
+      ? `${sanitizeForHtml(shippingAddress.addressLine2)}<br>`
+      : '';
     const country = sanitizeForHtml(shippingAddress.country) || 'Norge';
     shippingHtml = `
     <div style="margin-top: 24px;">
@@ -286,12 +292,16 @@ export async function GET(
     </div>
   </div>
 
-  ${isTaxExempt && order.taxExemptReason ? `
+  ${
+    isTaxExempt && order.taxExemptReason
+      ? `
   <div style="margin-bottom: 24px; padding: 16px; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 4px;">
     <h3 style="margin: 0 0 8px 0; font-size: 12px; color: #991b1b; text-transform: uppercase;">Årsak til MVA-fritak</h3>
     <p style="margin: 0; color: #991b1b;">${sanitizeForHtml(order.taxExemptReason)}</p>
   </div>
-  ` : ''}
+  `
+      : ''
+  }
 
   <!-- Items table -->
   <table style="margin-bottom: 24px;">

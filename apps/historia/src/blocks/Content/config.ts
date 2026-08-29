@@ -5,7 +5,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
 import type { Block } from 'payload';
-
 import { Image } from '@/blocks/Image/config';
 
 export const Content: Block = {

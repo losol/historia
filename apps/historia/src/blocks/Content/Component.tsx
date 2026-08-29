@@ -1,7 +1,5 @@
-import React from 'react';
-
+import type React from 'react';
 import { Story } from '@eventuras/ratio-ui/blocks/Story';
-
 import RichText from '@/components/RichText';
 import type { ContentBlock as ContentBlockProps } from '@/payload-types';
 

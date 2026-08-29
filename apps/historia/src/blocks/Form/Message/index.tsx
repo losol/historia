@@ -1,12 +1,10 @@
-import React from 'react'
-import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
-
-import RichText from '@/components/RichText'
-
-import { Width } from '../Width'
+import type React from 'react';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+import RichText from '@/components/RichText';
+import { Width } from '../Width';
 
 interface MessageProps {
-  message: SerializedEditorState
+  message: SerializedEditorState;
 }
 
 export const Message: React.FC<MessageProps> = ({ message }) => {
@@ -14,5 +12,5 @@ export const Message: React.FC<MessageProps> = ({ message }) => {
     <Width className="my-12" width="100">
       {message && <RichText data={message} />}
     </Width>
-  )
-}
+  );
+};

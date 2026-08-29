@@ -1,15 +1,13 @@
 'use server';
 
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
-  ServerActionResult,
+  type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
 import { Logger } from '@eventuras/logger';
 import { getPaymentDetails, mergeExpiredPaymentDetails } from '@eventuras/vipps/epayment-v1';
-
+import { getPayload } from 'payload';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
 
@@ -22,7 +20,7 @@ const logger = Logger.create({
  * Fetch and update payment details from Vipps for a transaction
  */
 export async function updateTransactionDetails(
-  transactionId: string
+  transactionId: string,
 ): Promise<ServerActionResult<void>> {
   try {
     logger.info({ transactionId }, 'Fetching payment details from Vipps');
@@ -44,22 +42,19 @@ export async function updateTransactionDetails(
     if (transaction.paymentMethod !== 'vipps') {
       logger.warn(
         { transactionId, paymentMethod: transaction.paymentMethod },
-        'Can only fetch details for Vipps payments'
+        'Can only fetch details for Vipps payments',
       );
       return actionError('Can only fetch details for Vipps payments');
     }
 
     // Fetch payment details from Vipps
     const vippsConfig = getVippsConfig();
-    const paymentDetails = await getPaymentDetails(
-      vippsConfig,
-      transaction.paymentReference
-    );
+    const paymentDetails = await getPaymentDetails(vippsConfig, transaction.paymentReference);
 
     if (!paymentDetails) {
       logger.error(
         { transactionId, reference: transaction.paymentReference },
-        'Failed to fetch payment details from Vipps'
+        'Failed to fetch payment details from Vipps',
       );
       return actionError('Failed to fetch payment details from Vipps');
     }
@@ -72,7 +67,7 @@ export async function updateTransactionDetails(
         hasUserDetails: !!paymentDetails.userDetails,
         hasShipping: !!paymentDetails.shippingDetails,
       },
-      'Retrieved payment details from Vipps'
+      'Retrieved payment details from Vipps',
     );
 
     // Try to find customer by email if not already set
@@ -97,7 +92,7 @@ export async function updateTransactionDetails(
               email: paymentDetails.userDetails.email,
               transactionId,
             },
-            'Found and will link existing user from Vipps email'
+            'Found and will link existing user from Vipps email',
           );
         }
       } catch (error) {
@@ -107,7 +102,7 @@ export async function updateTransactionDetails(
             email: paymentDetails.userDetails?.email,
             transactionId,
           },
-          'Failed to lookup user by email'
+          'Failed to lookup user by email',
         );
       }
     }
@@ -127,7 +122,7 @@ export async function updateTransactionDetails(
 
     logger.info(
       { transactionId, newStatus: paymentDetails.state },
-      'Successfully updated transaction with payment details and status'
+      'Successfully updated transaction with payment details and status',
     );
 
     return actionSuccess(undefined, 'Payment details updated successfully');
@@ -137,10 +132,8 @@ export async function updateTransactionDetails(
         error,
         transactionId,
       },
-      'Error updating transaction details'
+      'Error updating transaction details',
     );
-    return actionError(
-      error instanceof Error ? error.message : 'Unknown error occurred'
-    );
+    return actionError(error instanceof Error ? error.message : 'Unknown error occurred');
   }
 }

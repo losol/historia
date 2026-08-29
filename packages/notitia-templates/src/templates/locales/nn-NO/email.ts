@@ -1,6 +1,6 @@
 import type { TemplateRegistry } from '../../../types';
-import { buildOrderStatusTemplate } from '../../utils/orderStatusBuilder';
 import { buildOrderShippedTemplate } from '../../utils/orderShippedBuilder';
+import { buildOrderStatusTemplate } from '../../utils/orderStatusBuilder';
 
 /**
  * Norwegian Nynorsk email templates
@@ -169,7 +169,8 @@ Beste helsing,
       copyBanner: 'KOPI - Intern kopi av kundestadfesting',
       headerTitle: 'Bestilling mottatt',
       greeting: 'Hei {{name}}! 👋',
-      thankYouMessage: 'Takk for bestillinga di! Vi har mottatt ordren din og vil behandle han så snart som mogleg.',
+      thankYouMessage:
+        'Takk for bestillinga di! Vi har mottatt ordren din og vil behandle han så snart som mogleg.',
       orderDetailsTitle: 'Ordredetaljar',
       orderNumberLabel: 'Ordrenummer',
       orderDateLabel: 'Ordredato',
@@ -185,7 +186,8 @@ Beste helsing,
       taxExemptReasonLabel: 'Årsak',
       shippingAddressTitle: 'Leveringsadresse',
       trackingNumberLabel: 'Sporingsnummer',
-      shippingNotification: 'Vi varslar deg når betalinga er stadfesta og ordren din vert behandla.',
+      shippingNotification:
+        'Vi varslar deg når betalinga er stadfesta og ordren din vert behandla.',
       footerClosing: 'Beste helsing',
     }),
     description: 'Stadfesting på mottatt bestilling (nn-NO)',
@@ -197,7 +199,8 @@ Beste helsing,
       copyBanner: 'KOPI - Intern kopi av kundestadfesting',
       headerTitle: 'Ordrestadfesting',
       greeting: 'Hei {{name}}! 👋',
-      thankYouMessage: 'Betalinga di er nå stadfesta og ordren din er under behandling. Vi startar å pakke varene dine snarest.',
+      thankYouMessage:
+        'Betalinga di er nå stadfesta og ordren din er under behandling. Vi startar å pakke varene dine snarest.',
       orderDetailsTitle: 'Ordredetaljar',
       orderNumberLabel: 'Ordrenummer',
       orderDateLabel: 'Ordredato',
@@ -224,7 +227,8 @@ Beste helsing,
     content: buildOrderShippedTemplate({
       headerTitle: 'Ordren din er sendt! 🎉',
       greeting: 'Hei {{name}}! 👋',
-      shippedMessage: 'Gode nyhendar! Ordren din har vorte sendt og er no på veg til deg. Du kan følgje med på leveringa med informasjonen nedanfor.',
+      shippedMessage:
+        'Gode nyhendar! Ordren din har vorte sendt og er no på veg til deg. Du kan følgje med på leveringa med informasjonen nedanfor.',
       shipmentDetailsTitle: 'Sendingsdetaljar',
       orderNumberLabel: 'Ordrenummer',
       trackingNumberLabel: 'Sporingsnummer',

@@ -5,8 +5,8 @@
  * https://developer.vippsmobilepay.com/docs/APIs/webhooks-api/
  */
 
-import { getAccessToken } from '../vipps-core';
 import type { VippsConfig } from '../vipps-core';
+import { getAccessToken } from '../vipps-core';
 import type {
   ListWebhooksResponse,
   RegisterWebhookRequest,
@@ -49,9 +49,7 @@ export async function registerWebhook(
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(
-      `Failed to register webhook: ${response.status} - ${error}`,
-    );
+    throw new Error(`Failed to register webhook: ${response.status} - ${error}`);
   }
 
   return response.json();
@@ -63,9 +61,7 @@ export async function registerWebhook(
  * @param config - Vipps configuration
  * @returns List of webhooks
  */
-export async function listWebhooks(
-  config: VippsConfig,
-): Promise<ListWebhooksResponse> {
+export async function listWebhooks(config: VippsConfig): Promise<ListWebhooksResponse> {
   const accessToken = await getAccessToken(config);
 
   const response = await fetch(`${getWebhooksApiUrl(config)}/webhooks`, {
@@ -91,23 +87,17 @@ export async function listWebhooks(
  * @param config - Vipps configuration
  * @param webhookId - Webhook ID to delete
  */
-export async function deleteWebhook(
-  config: VippsConfig,
-  webhookId: string,
-): Promise<void> {
+export async function deleteWebhook(config: VippsConfig, webhookId: string): Promise<void> {
   const accessToken = await getAccessToken(config);
 
-  const response = await fetch(
-    `${getWebhooksApiUrl(config)}/webhooks/${webhookId}`,
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Ocp-Apim-Subscription-Key': config.subscriptionKey,
-        'Merchant-Serial-Number': config.merchantSerialNumber,
-      },
+  const response = await fetch(`${getWebhooksApiUrl(config)}/webhooks/${webhookId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Ocp-Apim-Subscription-Key': config.subscriptionKey,
+      'Merchant-Serial-Number': config.merchantSerialNumber,
     },
-  );
+  });
 
   if (!response.ok) {
     const error = await response.text();
@@ -129,19 +119,16 @@ export async function updateWebhookEvents(
 ): Promise<void> {
   const accessToken = await getAccessToken(config);
 
-  const response = await fetch(
-    `${getWebhooksApiUrl(config)}/webhooks/${webhookId}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-        'Ocp-Apim-Subscription-Key': config.subscriptionKey,
-        'Merchant-Serial-Number': config.merchantSerialNumber,
-      },
-      body: JSON.stringify({ events }),
+  const response = await fetch(`${getWebhooksApiUrl(config)}/webhooks/${webhookId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+      'Ocp-Apim-Subscription-Key': config.subscriptionKey,
+      'Merchant-Serial-Number': config.merchantSerialNumber,
     },
-  );
+    body: JSON.stringify({ events }),
+  });
 
   if (!response.ok) {
     const error = await response.text();

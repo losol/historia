@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 
 /**
@@ -50,7 +49,8 @@ export const BusinessEvents: CollectionConfig = {
       required: false,
       index: true,
       admin: {
-        description: 'Source that generated this event (e.g., "vipps", "stripe", "internal", "user", "system")',
+        description:
+          'Source that generated this event (e.g., "vipps", "stripe", "internal", "user", "system")',
       },
     },
     {

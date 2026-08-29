@@ -10,12 +10,7 @@ import type { PaymentAmount } from '../vipps-core';
 /**
  * Payment state enumeration
  */
-export type PaymentState =
-  | 'CREATED'
-  | 'AUTHORIZED'
-  | 'TERMINATED'
-  | 'ABORTED'
-  | 'EXPIRED';
+export type PaymentState = 'CREATED' | 'AUTHORIZED' | 'TERMINATED' | 'ABORTED' | 'EXPIRED';
 
 /**
  * Payment method types
@@ -30,12 +25,7 @@ export type UserFlow = 'WEB_REDIRECT' | 'PUSH_MESSAGE' | 'QR' | 'NATIVE_REDIRECT
 /**
  * Shipping delivery type
  */
-export type ShippingType =
-  | 'HOME_DELIVERY'
-  | 'PICKUP_POINT'
-  | 'MAILBOX'
-  | 'IN_STORE'
-  | 'OTHER';
+export type ShippingType = 'HOME_DELIVERY' | 'PICKUP_POINT' | 'MAILBOX' | 'IN_STORE' | 'OTHER';
 
 /**
  * Shipping brand/provider

@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { publishedOnly } from '@/access/publishedOnly';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -17,9 +16,8 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { seoTab } from '@/lib/payload-plugin-seo';
-
-import { revalidateInstruction } from './hooks/revalidateInstruction';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
+import { revalidateInstruction } from './hooks/revalidateInstruction';
 
 export const Instructions: CollectionConfig = {
   slug: 'instructions',
@@ -49,7 +47,7 @@ export const Instructions: CollectionConfig = {
         slug: typeof data?.slug === 'string' ? data.slug : '',
         resourceId: typeof data?.resourceId === 'string' ? data.resourceId : undefined,
         collection: 'instructions',
-        req
+        req,
       });
 
       return path;
@@ -66,22 +64,12 @@ export const Instructions: CollectionConfig = {
             title,
             lead,
             image,
-            storyField([
-              Content,
-              ResourcesBlock,
-              InstructionBlock,
-              InstructionSection,
-            ]),
+            storyField([Content, ResourcesBlock, InstructionBlock, InstructionSection]),
           ],
         },
         {
           label: 'Meta',
-          fields: [
-            publishedAt,
-            ...slugField(),
-            resourceId,
-            config,
-          ],
+          fields: [publishedAt, ...slugField(), resourceId, config],
         },
         seoTab(),
       ],

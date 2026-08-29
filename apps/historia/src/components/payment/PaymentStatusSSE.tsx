@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-
 import { Logger } from '@eventuras/logger';
 import { useToast } from '@eventuras/ratio-ui/toast';
+import { useRouter } from 'next/navigation';
 
 const logger = Logger.create({
   namespace: 'historia:payment',
@@ -32,10 +31,7 @@ interface PaymentStatusUpdate {
  * Connects to /api/payment/[reference]/events endpoint which polls
  * the transaction status and sends updates via SSE.
  */
-export function PaymentStatusSSE({
-  reference,
-  onStatusChange,
-}: Readonly<PaymentStatusProps>) {
+export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<PaymentStatusProps>) {
   const router = useRouter();
   const toast = useToast();
   const [status, setStatus] = useState<string>('pending');
@@ -55,7 +51,10 @@ export function PaymentStatusSSE({
     isConnectedRef.current = true;
 
     logger.info({ reference }, 'Opening SSE connection for payment status');
-    console.log('🔌 [PaymentStatusSSE] Creating EventSource to:', `/api/payment/${reference}/events`);
+    console.log(
+      '🔌 [PaymentStatusSSE] Creating EventSource to:',
+      `/api/payment/${reference}/events`,
+    );
 
     // Create EventSource connection
     const eventSource = new EventSource(`/api/payment/${reference}/events`);
@@ -119,7 +118,7 @@ export function PaymentStatusSSE({
           if (data.status === 'failed' || data.status === 'cancelled') {
             logger.warn(
               { reference, status: data.status, failureReason: data.failureReason },
-              'Payment failed'
+              'Payment failed',
             );
 
             // Pass failure reason to parent via status callback (format: "failed:reason")

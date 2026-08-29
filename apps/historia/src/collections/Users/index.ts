@@ -1,8 +1,9 @@
+import { createVippsAuthStrategy } from '@eventuras/payload-vipps-auth';
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields';
 import type { CollectionConfig } from 'payload';
-
-import { createVippsAuthStrategy } from '@eventuras/payload-vipps-auth';
-
+import { adminsFieldLevel } from '../../access/admins';
+import { isSystemAdmin } from '../../access/isSystemAdmin';
+import { addressFields } from '../../fields/address';
 import { createAccess } from './access/create';
 import { readAccess } from './access/read';
 import { updateAndDeleteAccess } from './access/updateAndDelete';
@@ -10,9 +11,6 @@ import { createVerifiedFieldAccess, verificationFlagAccess } from './access/veri
 import { ensureFirstUserIsAdmin } from './hooks/ensureFirstUserIsAdmin';
 import { protectApiKeyFields } from './hooks/protectApiKeyFields';
 import { setCookieBasedOnDomain } from './hooks/setCookieBasedOnDomain';
-import { adminsFieldLevel } from '../../access/admins';
-import { isSystemAdmin } from '../../access/isSystemAdmin';
-import { addressFields } from '../../fields/address';
 
 const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',
@@ -141,7 +139,8 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       access: verificationFlagAccess,
       admin: {
-        description: 'Indicates if the user\'s email has been verified by a trusted identity provider',
+        description:
+          "Indicates if the user's email has been verified by a trusted identity provider",
         position: 'sidebar',
       },
     },
@@ -151,7 +150,8 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       access: verificationFlagAccess,
       admin: {
-        description: 'Indicates if the user\'s name has been verified by a trusted identity provider',
+        description:
+          "Indicates if the user's name has been verified by a trusted identity provider",
         position: 'sidebar',
       },
     },
@@ -166,7 +166,7 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       access: verificationFlagAccess,
       admin: {
-        description: 'Indicates if the user\'s phone number has been verified.',
+        description: "Indicates if the user's phone number has been verified.",
         position: 'sidebar',
       },
     },
@@ -220,7 +220,8 @@ export const Users: CollectionConfig = {
       admin: {
         ...defaultTenantArrayField?.admin,
         position: 'sidebar',
-        description: 'Optional: Assign user to specific websites/tenants. Leave empty for global access.',
+        description:
+          'Optional: Assign user to specific websites/tenants. Leave empty for global access.',
       },
     },
   ],
@@ -231,7 +232,12 @@ export const Users: CollectionConfig = {
       ({ args, operation }) => {
         // Bypass tenant filtering for system admins on read operations
         // Check if user is from 'users' collection before passing to isSystemAdmin
-        if (operation === 'read' && args.req?.user && 'email' in args.req.user && isSystemAdmin(args.req.user)) {
+        if (
+          operation === 'read' &&
+          args.req?.user &&
+          'email' in args.req.user &&
+          isSystemAdmin(args.req.user)
+        ) {
           // Set flag to bypass tenant scope
           args.req.context = args.req.context || {};
           args.req.context.disableMultiTenant = true;

@@ -1,9 +1,7 @@
+import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { headers } from 'next/headers';
 import { getPayload } from 'payload';
-
-import { Logger } from '@eventuras/logger';
-
 import { allowedOrigins } from '@/config/allowed-origins';
 import type { Website } from '@/payload-types';
 
@@ -17,14 +15,14 @@ const logger = Logger.create({
  */
 function getAllowedDomains(): Set<string> {
   const domains = allowedOrigins
-    .map(origin => {
+    .map((origin) => {
       try {
         return new URL(origin).host;
       } catch {
         return origin;
       }
     })
-    .map(s => s.trim().toLowerCase())
+    .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 
   return new Set(domains);
@@ -93,7 +91,7 @@ export async function getCurrentWebsite(): Promise<Website | null> {
         host,
         allowedOrigins,
       },
-      'Host not in allowed origins - rejecting request'
+      'Host not in allowed origins - rejecting request',
     );
     throw new Error(`Host ${host} is not in the allowed origins list`);
   }
@@ -111,14 +109,18 @@ export async function getCurrentWebsite(): Promise<Website | null> {
   });
 
   if (website.docs.length && website.docs[0]) {
-    logger.info({ host, websiteId: website.docs[0].id, title: website.docs[0].title }, 'Found website for host');
+    logger.info(
+      { host, websiteId: website.docs[0].id, title: website.docs[0].title },
+      'Found website for host',
+    );
     return website.docs[0];
   }
 
   // No match found - fail fast to prevent serving wrong content
   // Build complete request URL using proxy headers for accurate debugging
   const proto = requestHeaders.get('x-forwarded-proto') || 'http';
-  const path = requestHeaders.get('x-forwarded-path') || requestHeaders.get('x-original-url') || '/';
+  const path =
+    requestHeaders.get('x-forwarded-path') || requestHeaders.get('x-original-url') || '/';
   const requestUrl = `${proto}://${host}${path}`;
 
   logger.error(
@@ -132,8 +134,10 @@ export async function getCurrentWebsite(): Promise<Website | null> {
       hostHeader: requestHeaders.get('host'),
       userAgent: requestHeaders.get('user-agent'),
     },
-    'No website configuration found for host'
+    'No website configuration found for host',
   );
 
-  throw new Error(`No website configuration found for host: ${host}. Please configure the domain in the website settings.`);
+  throw new Error(
+    `No website configuration found for host: ${host}. Please configure the domain in the website settings.`,
+  );
 }

@@ -1,7 +1,7 @@
-import { Field } from "payload";
+import type { Field } from 'payload';
 
 export const bio: Field = {
   name: 'bio',
   type: 'textarea',
-  localized: true
+  localized: true,
 };

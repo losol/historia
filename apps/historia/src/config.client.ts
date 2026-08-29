@@ -5,14 +5,9 @@
  * This module is safe for webpack bundling (no Node.js fs/path).
  */
 
-import {
-  AppConfig,
-  createPublicEnv,
-  defineGetter,
-} from '@eventuras/app-config/clientside';
-
-import type { HistoriaPublicEnv } from './config.client.generated';
+import { type AppConfig, createPublicEnv, defineGetter } from '@eventuras/app-config/clientside';
 import appConfig from '../app.config.json';
+import type { HistoriaPublicEnv } from './config.client.generated';
 
 /**
  * Client-side public environment variables - use publicEnv.NEXT_PUBLIC_*
@@ -33,20 +28,12 @@ const _publicEnv = createPublicEnv(appConfig as AppConfig);
 
 // Define explicit getters for each NEXT_PUBLIC_* variable
 // This allows Next.js to statically analyze and replace at build time
-defineGetter(
-  _publicEnv,
-  'NEXT_PUBLIC_CMS_URL',
-  () => process.env.NEXT_PUBLIC_CMS_URL
-);
-defineGetter(
-  _publicEnv,
-  'NEXT_PUBLIC_CMS_LOCALES',
-  () => process.env.NEXT_PUBLIC_CMS_LOCALES
-);
+defineGetter(_publicEnv, 'NEXT_PUBLIC_CMS_URL', () => process.env.NEXT_PUBLIC_CMS_URL);
+defineGetter(_publicEnv, 'NEXT_PUBLIC_CMS_LOCALES', () => process.env.NEXT_PUBLIC_CMS_LOCALES);
 defineGetter(
   _publicEnv,
   'NEXT_PUBLIC_CMS_DEFAULT_LOCALE',
-  () => process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE
+  () => process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE,
 );
 // Export with proper typing
 export const publicEnv = _publicEnv as HistoriaPublicEnv;

@@ -1,11 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { formatPrice } from '@eventuras/core/currency';
 import { Button } from '@eventuras/ratio-ui/core/Button';
 import { NumberField } from '@eventuras/ratio-ui/forms';
-
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart';
 import { fromMinorUnits } from '@/lib/price';
 import type { Product } from '@/payload-types';
@@ -38,7 +36,7 @@ export function ProductActions({ product, locale }: Readonly<ProductActionsProps
             {formatPrice(
               fromMinorUnits(product.price.amountIncVat, product.price.currency || 'NOK'),
               product.price.currency || 'NOK',
-              locale
+              locale,
             )}
           </span>
         </div>

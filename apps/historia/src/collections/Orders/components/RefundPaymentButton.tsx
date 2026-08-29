@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { toast, useAuth } from '@payloadcms/ui';
 import { useRouter } from 'next/navigation';
-
 import { refundOrderPayment } from '@/app/actions/refundPayment';
 
 interface RefundPaymentButtonProps {
@@ -33,7 +32,7 @@ export function RefundPaymentButton({ orderId, orderStatus }: Readonly<RefundPay
 
     if (
       !confirm(
-        'Refund this payment?\n\nThis will:\n- Refund the full captured amount via Vipps\n- Return money to the customer\n- Mark the transaction as refunded\n\nThis action cannot be undone.'
+        'Refund this payment?\n\nThis will:\n- Refund the full captured amount via Vipps\n- Return money to the customer\n- Mark the transaction as refunded\n\nThis action cannot be undone.',
       )
     ) {
       return;

@@ -1,11 +1,10 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
 import { accessOR } from '@/access/utils/accessOR';
-import { Archive } from "@/blocks/ArchiveBlock/config";
-import { Content } from "@/blocks/Content/config";
+import { Archive } from '@/blocks/ArchiveBlock/config';
+import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
 import { Product } from '@/blocks/Product/config';
 import { contributors } from '@/fields/contributors';
@@ -19,11 +18,9 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { seoTab } from '@/lib/payload-plugin-seo';
-
-import { revalidateDelete, revalidatePage } from './hooks/revalidatePage';
 import { populatePublishedAt } from '../../hooks/populatePublishedAt';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
-
+import { revalidateDelete, revalidatePage } from './hooks/revalidatePage';
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -74,23 +71,11 @@ export const Pages: CollectionConfig<'pages'> = {
       tabs: [
         {
           label: 'Content',
-          fields: [
-            name,
-            title,
-            lead,
-            image,
-            storyField([Archive, Content, Image, Product])
-          ],
+          fields: [name, title, lead, image, storyField([Archive, Content, Image, Product])],
         },
         {
           label: 'Meta',
-          fields: [
-            ...slugField("name"),
-            resourceId,
-            license,
-            contributors,
-            publishedAt
-          ]
+          fields: [...slugField('name'), resourceId, license, contributors, publishedAt],
         },
         seoTab(),
       ],

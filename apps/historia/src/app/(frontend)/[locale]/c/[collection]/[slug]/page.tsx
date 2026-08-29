@@ -1,16 +1,14 @@
 import React, { cache } from 'react';
-import configPromise from '@payload-config';
-import type { Metadata } from 'next';
-import { draftMode } from 'next/headers';
-import { permanentRedirect, redirect } from 'next/navigation';
-import { CollectionSlug, getPayload } from 'payload';
-
-import { Story, StoryBody,StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
+import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { Image } from '@eventuras/ratio-ui-next/Image';
-
+import configPromise from '@payload-config';
+import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
+import { permanentRedirect, redirect } from 'next/navigation';
+import { type CollectionSlug, getPayload } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { PayloadRedirects } from '@/components/PayloadRedirects';
@@ -20,14 +18,20 @@ import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
 import type { Product } from '@/payload-types';
 import { getImageProps } from '@/utilities/image';
-
+import {
+  getLocalizedCollectionName,
+  getOriginalCollectionName,
+  type PageCollectionsType,
+  pageCollections,
+} from '../pageCollections';
 import PageClient from './page.client';
-import { getLocalizedCollectionName, getOriginalCollectionName, pageCollections,PageCollectionsType } from '../pageCollections';
 
 /**
  * Parse slug in format: {human-readable-slug}--{resourceId}
  */
-function parseSlugWithResourceId(combinedSlug: string): { slug: string; resourceId: string } | null {
+function parseSlugWithResourceId(
+  combinedSlug: string,
+): { slug: string; resourceId: string } | null {
   const lastDashDashIndex = combinedSlug.lastIndexOf('--');
 
   if (lastDashDashIndex === -1 || lastDashDashIndex === combinedSlug.length - 2) {
@@ -87,7 +91,7 @@ export async function generateStaticParams() {
           if (slug && resourceId) {
             const combinedSlug = `${slug}--${resourceId}`;
             console.log(
-              `Generating static params for ${locale}/c/${localizedCollectionName}/${combinedSlug}`
+              `Generating static params for ${locale}/c/${localizedCollectionName}/${combinedSlug}`,
             );
 
             params.push({
@@ -98,7 +102,10 @@ export async function generateStaticParams() {
           }
         });
       } catch (error) {
-        console.error(`Failed to fetch documents for collection "${collection}" in locale "${locale}":`, error);
+        console.error(
+          `Failed to fetch documents for collection "${collection}" in locale "${locale}":`,
+          error,
+        );
       }
     }
   }
@@ -161,7 +168,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 
   return (
     <Container>
-      <Story as="article" className='px-3'>
+      <Story as="article" className="px-3">
         <PageClient />
 
         <PayloadRedirects
@@ -203,7 +210,6 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
   );
 }
 
-
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { collection, locale, slug: combinedSlug } = await params;
 
@@ -227,7 +233,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 const queryDocumentByResourceId = cache(
-  async ({ collection, resourceId }: { collection: PageCollectionsType; resourceId: string; }) => {
+  async ({ collection, resourceId }: { collection: PageCollectionsType; resourceId: string }) => {
     const { isEnabled: draft } = await draftMode();
     const payload = await getPayload({ config: configPromise });
 
@@ -245,5 +251,5 @@ const queryDocumentByResourceId = cache(
     });
 
     return result.docs?.[0] ?? null;
-  }
+  },
 );

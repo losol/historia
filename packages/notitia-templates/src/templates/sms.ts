@@ -5,7 +5,8 @@ import type { TemplateRegistry } from '../types';
  */
 export const defaultSmsTemplates: TemplateRegistry = {
   'sms:welcome': {
-    content: 'Welcome to {{organizationName}}, {{name}}! {{#if loginUrl}}Login: {{loginUrl}}{{/if}}',
+    content:
+      'Welcome to {{organizationName}}, {{name}}! {{#if loginUrl}}Login: {{loginUrl}}{{/if}}',
     description: 'Welcome SMS for new users',
   },
 
@@ -28,12 +29,14 @@ export const defaultSmsTemplates: TemplateRegistry = {
   },
 
   'sms:password-reset': {
-    content: '{{organizationName}}: Password reset requested. {{#if resetUrl}}Reset at: {{resetUrl}}{{/if}}',
+    content:
+      '{{organizationName}}: Password reset requested. {{#if resetUrl}}Reset at: {{resetUrl}}{{/if}}',
     description: 'Password reset SMS',
   },
 
   'sms:order-confirmation': {
-    content: '{{organizationName}}: Order #{{orderId}} confirmed. {{#if totalAmount}}Total: {{totalAmount}} {{currency}}.{{/if}} Thank you!',
+    content:
+      '{{organizationName}}: Order #{{orderId}} confirmed. {{#if totalAmount}}Total: {{totalAmount}} {{currency}}.{{/if}} Thank you!',
     description: 'Order confirmation SMS',
   },
 

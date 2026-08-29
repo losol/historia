@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -54,7 +53,7 @@ export const Organizations: CollectionConfig = {
     },
     addressGroup('address'),
     image,
-    ...slugField("name"),
-    resourceId
+    ...slugField('name'),
+    resourceId,
   ],
 };

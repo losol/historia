@@ -3,7 +3,6 @@ import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
 import { redirect } from 'next/navigation';
 import type { AdminViewServerProps } from 'payload';
-
 import { PackingQueueView } from './PackingQueueView';
 
 export default function PackingQueuePage({

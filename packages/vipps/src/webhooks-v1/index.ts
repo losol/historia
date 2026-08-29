@@ -5,6 +5,6 @@
  * https://developer.vippsmobilepay.com/docs/APIs/epayment-api/api-guide/webhooks/
  */
 
-export * from './types';
 export * from './client';
+export * from './types';
 export * from './verify';

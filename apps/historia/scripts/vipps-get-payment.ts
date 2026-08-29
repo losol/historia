@@ -45,7 +45,9 @@ function printHeader(text: string) {
 }
 
 function printField(label: string, value: unknown) {
-  console.log(`${colors.dim}${label}:${colors.reset} ${value ?? colors.dim + 'N/A' + colors.reset}`);
+  console.log(
+    `${colors.dim}${label}:${colors.reset} ${value ?? colors.dim + 'N/A' + colors.reset}`,
+  );
 }
 
 function formatAmount(amount: { value: number; currency: string }) {
@@ -79,9 +81,8 @@ async function main() {
     clientSecret: process.env.VIPPS_CLIENT_SECRET!,
     subscriptionKey: process.env.VIPPS_SUBSCRIPTION_KEY!,
     merchantSerialNumber: process.env.VIPPS_MERCHANT_SERIAL_NUMBER!,
-    apiUrl: process.env.VIPPS_IS_TEST !== 'false'
-      ? 'https://apitest.vipps.no'
-      : 'https://api.vipps.no',
+    apiUrl:
+      process.env.VIPPS_IS_TEST !== 'false' ? 'https://apitest.vipps.no' : 'https://api.vipps.no',
     systemName: 'eventuras-historia',
     systemVersion: '1.0.0',
     pluginName: '',
@@ -102,7 +103,9 @@ async function main() {
 
   console.log(`${colors.bright}Fetching payment details from Vipps...${colors.reset}`);
   console.log(`${colors.dim}Reference: ${paymentReference}${colors.reset}`);
-  console.log(`${colors.dim}Environment: ${config.apiUrl.includes('apitest') ? 'TEST' : 'PRODUCTION'}${colors.reset}\n`);
+  console.log(
+    `${colors.dim}Environment: ${config.apiUrl.includes('apitest') ? 'TEST' : 'PRODUCTION'}${colors.reset}\n`,
+  );
 
   try {
     const payment = await getPaymentDetails(config, paymentReference);
@@ -128,7 +131,10 @@ async function main() {
       printHeader('Customer Profile (from Vipps)');
       printField('Email', payment.profile.email);
       printField('Phone', payment.profile.phoneNumber);
-      printField('Name', `${payment.profile.givenName || ''} ${payment.profile.familyName || ''}`.trim() || null);
+      printField(
+        'Name',
+        `${payment.profile.givenName || ''} ${payment.profile.familyName || ''}`.trim() || null,
+      );
       printField('Birth Date', payment.profile.birthdate);
     }
 
@@ -153,7 +159,10 @@ async function main() {
       printHeader('Shipping Details');
       printField('Option ID', payment.shippingDetails.shippingOptionId);
       printField('Option Name', payment.shippingDetails.shippingOptionName);
-      printField('Shipping Cost', `${payment.shippingDetails.shippingCost / 100} ${payment.aggregate.authorizedAmount.currency}`);
+      printField(
+        'Shipping Cost',
+        `${payment.shippingDetails.shippingCost / 100} ${payment.aggregate.authorizedAmount.currency}`,
+      );
       if (payment.shippingDetails.address) {
         const addr = payment.shippingDetails.address;
         printField('Address Line 1', addr.addressLine1);
@@ -163,7 +172,6 @@ async function main() {
         printField('Country', addr.country);
       }
     }
-
 
     // Summary
     printHeader('Summary');

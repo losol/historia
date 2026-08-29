@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { slugField } from '@/fields/slug';
@@ -36,7 +35,7 @@ export const MediaCollections: CollectionConfig = {
         description: 'What this collection is for',
       },
     },
-    ...slugField("name"),
+    ...slugField('name'),
     {
       name: 'parentCollection',
       type: 'relationship',

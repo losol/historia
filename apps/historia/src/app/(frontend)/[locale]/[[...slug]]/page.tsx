@@ -1,21 +1,18 @@
 import React, { cache } from 'react';
+import { Story, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
+import { Breadcrumb, Breadcrumbs } from '@eventuras/ratio-ui/core/Breadcrumbs';
+import { Link } from '@eventuras/ratio-ui-next';
 import configPromise from '@payload-config';
 import type { Metadata } from 'next';
 import { draftMode, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getPayload } from 'payload';
-
-import { Story, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
-import { Breadcrumb,Breadcrumbs } from '@eventuras/ratio-ui/core/Breadcrumbs';
-import { Link } from '@eventuras/ratio-ui-next';
-
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { Hero } from '@/heros/Hero';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
-import { PagesSelect } from '@/payload-types';
-
+import type { PagesSelect } from '@/payload-types';
 import PageClient from './page.client';
 
 // Read locales and default locale from environment variables, fallback to 'en'
@@ -133,9 +130,10 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
   // Return 404 for invalid locale
   if (!locales.includes(locale)) {
     const headersData = await headers();
-    const ip = headersData.get('x-forwarded-for')?.split(',')[0].trim() ||
-               headersData.get('x-real-ip') ||
-               'unknown';
+    const ip =
+      headersData.get('x-forwarded-for')?.split(',')[0].trim() ||
+      headersData.get('x-real-ip') ||
+      'unknown';
     const userAgent = headersData.get('user-agent') || 'unknown';
 
     console.info('Invalid locale access attempt', {
@@ -178,25 +176,24 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     <>
       <PageClient />
       <LivePreviewListener />
-        {breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 1 && (
-          <nav className="mb-4">
-            <Breadcrumbs LinkComponent={Link}>
-              <Breadcrumb href="/">{locale === 'en' ? 'Home' : 'Hjem'}</Breadcrumb>
-              {breadcrumbs.map((bc, idx) => (
-                <Breadcrumb key={bc.id || `bc-${idx}`} href={bc.url || undefined}>
-                  {bc.label || ''}
-                </Breadcrumb>
-              ))}
-            </Breadcrumbs>
-          </nav>
-        )}
-      <Story className='container mx-auto p-3'>
+      {breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 1 && (
+        <nav className="mb-4">
+          <Breadcrumbs LinkComponent={Link}>
+            <Breadcrumb href="/">{locale === 'en' ? 'Home' : 'Hjem'}</Breadcrumb>
+            {breadcrumbs.map((bc, idx) => (
+              <Breadcrumb key={bc.id || `bc-${idx}`} href={bc.url || undefined}>
+                {bc.label || ''}
+              </Breadcrumb>
+            ))}
+          </Breadcrumbs>
+        </nav>
+      )}
+      <Story className="container mx-auto p-3">
         <StoryHeader>
           <Hero title={title} image={image} />
         </StoryHeader>
-          {story && story.length > 0 && <RenderBlocks blocks={story} />}
+        {story && story.length > 0 && <RenderBlocks blocks={story} />}
       </Story>
-
     </>
   );
 }
@@ -235,117 +232,122 @@ const getHomePageId = cache(async (): Promise<string | null> => {
 });
 
 // Query a page dynamically based on ID or slug
-const queryPage = cache(async ({
-  id,
-  slug,
-  locale,
-  draft,
-}: {
-  id?: string;
-  slug?: string;
-  locale: string;
-  draft: boolean;
-}) => {
-  const payload = await getPayload({ config: configPromise });
+const queryPage = cache(
+  async ({
+    id,
+    slug,
+    locale,
+    draft,
+  }: {
+    id?: string;
+    slug?: string;
+    locale: string;
+    draft: boolean;
+  }) => {
+    const payload = await getPayload({ config: configPromise });
 
-  const where: Record<string, any> = {};
+    const where: Record<string, any> = {};
 
-  if (id) {
-    where.id = { equals: id };
-  } else if (slug) {
-    where.slug = { equals: slug };
-  }
+    if (id) {
+      where.id = { equals: id };
+    } else if (slug) {
+      where.slug = { equals: slug };
+    }
 
-  if (Object.keys(where).length === 0) {
-    console.warn('No valid filter provided for queryPage.');
-    return null;
-  }
-
-  try {
-    const result = await payload.find({
-      collection: 'pages',
-      draft,
-      limit: 1,
-      depth: 3,
-      pagination: false,
-      overrideAccess: draft,
-      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
-      locale,
-      where,
-      select: contentSelection,
-    });
-
-    if (!result.docs?.length) {
-      console.warn(`No document found for query: ${JSON.stringify(where)}`);
+    if (Object.keys(where).length === 0) {
+      console.warn('No valid filter provided for queryPage.');
       return null;
     }
 
-    return result.docs[0];
-  } catch (error) {
-    console.error(`Error querying page: ${error}`, error);
-    return null;
-  }
-});
+    try {
+      const result = await payload.find({
+        collection: 'pages',
+        draft,
+        limit: 1,
+        depth: 3,
+        pagination: false,
+        overrideAccess: draft,
+        // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+        locale,
+        where,
+        select: contentSelection,
+      });
+
+      if (!result.docs?.length) {
+        console.warn(`No document found for query: ${JSON.stringify(where)}`);
+        return null;
+      }
+
+      return result.docs[0];
+    } catch (error) {
+      console.error(`Error querying page: ${error}`, error);
+      return null;
+    }
+  },
+);
 
 // Query a page by its breadcrumbs URL (for nested pages)
-const queryPageByBreadcrumbsUrl = cache(async ({
-  breadcrumbsUrl,
-  locale,
-  draft,
-}: {
-  breadcrumbsUrl: string;
-  locale: string;
-  draft: boolean;
-}) => {
-  const payload = await getPayload({ config: configPromise });
+const queryPageByBreadcrumbsUrl = cache(
+  async ({
+    breadcrumbsUrl,
+    locale,
+    draft,
+  }: {
+    breadcrumbsUrl: string;
+    locale: string;
+    draft: boolean;
+  }) => {
+    const payload = await getPayload({ config: configPromise });
 
-  try {
-    // Fetch pages and filter by breadcrumbs URL
-    // Note: Payload doesn't support querying nested array fields directly,
-    // so we fetch pages and filter in memory. For large sites, consider
-    // adding a denormalized fullPath field on the page document.
-    const result = await payload.find({
-      collection: 'pages',
-      draft,
-      limit: 1000,
-      depth: 3,
-      pagination: false,
-      overrideAccess: draft,
-      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
-      locale,
-      select: contentSelection,
-    });
-
-    // Find the page where the last breadcrumb's URL matches
-    const page = result.docs.find((doc) => {
-      const breadcrumbs = doc.breadcrumbs as Array<{ url?: string | null }> | null;
-      if (!breadcrumbs || breadcrumbs.length === 0) return false;
-      const lastBreadcrumb = breadcrumbs.at(-1);
-      return lastBreadcrumb?.url === breadcrumbsUrl;
-    });
-
-    if (!page) {
-      const headersData = await headers();
-      const ip = headersData.get('x-forwarded-for')?.split(',')[0].trim() ||
-                 headersData.get('x-real-ip') ||
-                 'unknown';
-      const userAgent = headersData.get('user-agent') || 'unknown';
-
-      console.warn('No page found for breadcrumbs URL', {
-        breadcrumbsUrl,
-        ip,
-        userAgent,
-        timestamp: new Date().toISOString(),
+    try {
+      // Fetch pages and filter by breadcrumbs URL
+      // Note: Payload doesn't support querying nested array fields directly,
+      // so we fetch pages and filter in memory. For large sites, consider
+      // adding a denormalized fullPath field on the page document.
+      const result = await payload.find({
+        collection: 'pages',
+        draft,
+        limit: 1000,
+        depth: 3,
+        pagination: false,
+        overrideAccess: draft,
+        // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+        locale,
+        select: contentSelection,
       });
+
+      // Find the page where the last breadcrumb's URL matches
+      const page = result.docs.find((doc) => {
+        const breadcrumbs = doc.breadcrumbs as Array<{ url?: string | null }> | null;
+        if (!breadcrumbs || breadcrumbs.length === 0) return false;
+        const lastBreadcrumb = breadcrumbs.at(-1);
+        return lastBreadcrumb?.url === breadcrumbsUrl;
+      });
+
+      if (!page) {
+        const headersData = await headers();
+        const ip =
+          headersData.get('x-forwarded-for')?.split(',')[0].trim() ||
+          headersData.get('x-real-ip') ||
+          'unknown';
+        const userAgent = headersData.get('user-agent') || 'unknown';
+
+        console.warn('No page found for breadcrumbs URL', {
+          breadcrumbsUrl,
+          ip,
+          userAgent,
+          timestamp: new Date().toISOString(),
+        });
+        return null;
+      }
+
+      return page;
+    } catch (error) {
+      console.error(`Error querying page by breadcrumbs URL: ${error}`, error);
       return null;
     }
-
-    return page;
-  } catch (error) {
-    console.error(`Error querying page by breadcrumbs URL: ${error}`, error);
-    return null;
-  }
-});
+  },
+);
 
 // Fields to select when querying pages
 const contentSelection: PagesSelect = {
