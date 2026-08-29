@@ -20,8 +20,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Lint
-        run: pnpm --filter @eventuras/historia lint
+      # Biome covers the whole workspace in a single run: formatting,
+      # linting and import sorting. Fails on errors, not on warnings.
+      - name: Lint & format
+        run: pnpm exec biome ci .
 
       # Unit tests only — the vipps integration suites need live Vipps test
       # credentials and are run locally.
