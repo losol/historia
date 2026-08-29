@@ -6,6 +6,6 @@ export const topics: Field = {
   relationTo: 'topics',
   hasMany: true,
   admin: {
-    description: 'What is this about?.',
+    description: 'What is this about?',
   },
 };

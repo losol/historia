@@ -16,7 +16,7 @@ export const ThemeSelector: React.FC = () => {
   const { setTheme } = useTheme();
   const [value, setValue] = useState('');
 
-  const onThemeChange = (themeToSet: Theme & 'auto') => {
+  const onThemeChange = (themeToSet: Theme | 'auto') => {
     if (themeToSet === 'auto') {
       setTheme(null);
       setValue('auto');
