@@ -10,8 +10,8 @@
     "dev:prod": "rm -rf .next && pnpm run build && pnpm run start",
     "generate:config-types": "tsx scripts/generate-config-types.ts",
     "generate:types": "payload generate:types",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "payload": "payload",
     "start": "next start"
   },
@@ -78,25 +78,12 @@
     "yjs": "^13.6.32"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.0",
-    "@eventuras/eslint-config": "^1.0.4",
-    "@next/eslint-plugin-next": "^15.0.0",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.18",
-    "eslint": "^10.8.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-only-warn": "^1.1.0",
-    "eslint-plugin-react": "^7.34.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "eslint-plugin-turbo": "^2.10.11",
-    "globals": "^17.11.0",
     "nodemon": "^3.1.14",
-    "prettier": "^3.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.67.0"
+    "typescript": "^6.0.2"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.28.2",

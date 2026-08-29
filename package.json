@@ -9,11 +9,14 @@
     "changeset:tag": "changeset tag",
     "changeset:version": "changeset version",
     "dev": "pnpm --filter @eventuras/historia dev",
-    "lint": "pnpm -r lint",
+    "lint": "biome check .",
     "release": "changeset version && git add . && git commit -m 'chore: version packages' && changeset tag && git push --follow-tags",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "format": "biome format --write .",
+    "lint:fix": "biome check --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
     "@changesets/cli": "^2.31.1"
   },
   "packageManager": "pnpm@11.8.0",
