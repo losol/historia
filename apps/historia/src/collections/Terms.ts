@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -72,8 +71,7 @@ export const Terms: CollectionConfig = {
               required: true,
               label: 'Term',
               admin: {
-                description:
-                  'The term being defined (e.g., "Kildekritikk", "Database")',
+                description: 'The term being defined (e.g., "Kildekritikk", "Database")',
               },
             },
             {
@@ -142,8 +140,7 @@ export const Terms: CollectionConfig = {
                   defaultValue: false,
                   label: 'Primary Definition',
                   admin: {
-                    description:
-                      'Show this definition by default in tooltips and previews',
+                    description: 'Show this definition by default in tooltips and previews',
                   },
                 },
                 {
@@ -165,8 +162,7 @@ export const Terms: CollectionConfig = {
               type: 'array',
               label: 'Synonyms',
               admin: {
-                description:
-                  'Alternative terms, translations, or common misspellings',
+                description: 'Alternative terms, translations, or common misspellings',
               },
               fields: [
                 {
@@ -185,8 +181,7 @@ export const Terms: CollectionConfig = {
               hasMany: true,
               label: 'Related Terms',
               admin: {
-                description:
-                  'Semantically related concepts (broader, narrower, or related terms)',
+                description: 'Semantically related concepts (broader, narrower, or related terms)',
               },
             },
 

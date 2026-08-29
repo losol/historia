@@ -1,11 +1,9 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { shipmentsReadAccess } from '@/access/commerceReadAccess';
 import { siteCommerceManagers } from '@/access/siteRoleAccess';
 import { accessOR } from '@/access/utils/accessOR';
 import { addressGroup } from '@/fields/address';
-
 import { sendShipmentNotification } from './Shipments/hooks/sendShipmentNotification';
 
 export const Shipments: CollectionConfig = {
@@ -44,7 +42,8 @@ export const Shipments: CollectionConfig = {
               label: 'Shipped Items',
               required: true,
               admin: {
-                description: 'Items included in this shipment. Reference order item IDs for partial shipments.',
+                description:
+                  'Items included in this shipment. Reference order item IDs for partial shipments.',
                 initCollapsed: false,
               },
               fields: [

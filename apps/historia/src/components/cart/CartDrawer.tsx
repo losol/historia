@@ -1,18 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-
 import { formatPrice } from '@eventuras/core/currency';
 import { CartLineItem } from '@eventuras/ratio-ui/commerce/CartLineItem';
 import { Button } from '@eventuras/ratio-ui/core/Button';
 import { NumberField } from '@eventuras/ratio-ui/forms';
 import { Drawer } from '@eventuras/ratio-ui/layout/Drawer';
-
-import {
-  calculateCart,
-  type CartSummary,
-} from '@/app/(frontend)/[locale]/checkout/actions';
+import Link from 'next/link';
+import { type CartSummary, calculateCart } from '@/app/(frontend)/[locale]/checkout/actions';
 import { useCart } from '@/lib/cart';
 import { fromMinorUnits } from '@/lib/price';
 
@@ -47,8 +42,6 @@ export function CartDrawer({ isOpen, onClose, locale }: Readonly<CartDrawerProps
       loadCart();
     }
   }, [items, isOpen]);
-
-
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose}>
@@ -117,7 +110,11 @@ export function CartDrawer({ isOpen, onClose, locale }: Readonly<CartDrawerProps
             <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
               <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
               <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatPrice(fromMinorUnits(cartSummary.totalIncVat, cartSummary.currency), cartSummary.currency, locale)}
+                {formatPrice(
+                  fromMinorUnits(cartSummary.totalIncVat, cartSummary.currency),
+                  cartSummary.currency,
+                  locale,
+                )}
               </span>
             </div>
 

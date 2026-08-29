@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NotitiaTemplates, createNotitiaTemplates } from '../NotitiaTemplates';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
 
 describe('NotitiaTemplates - Template Rendering', () => {
   let templates: NotitiaTemplates;
@@ -193,11 +193,9 @@ describe('NotitiaTemplates - Template Rendering', () => {
         },
         {
           helpers: {
-            double: function (n: number) {
-              return n * 2;
-            },
+            double: (n: number) => n * 2,
           },
-        }
+        },
       );
 
       expect(result).toBe('Value: 42');

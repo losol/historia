@@ -1,17 +1,15 @@
 import React from 'react';
-import configPromise from '@payload-config';
-import type { Metadata } from 'next';
-import { draftMode } from 'next/headers';
-import { notFound } from 'next/navigation';
-import { getPayload } from 'payload';
-
 import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
 import { Link } from '@eventuras/ratio-ui-next';
-
+import configPromise from '@payload-config';
+import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
+import { notFound } from 'next/navigation';
+import { getPayload } from 'payload';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
@@ -206,7 +204,9 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
                 <Heading as="h2">Synonyms</Heading>
                 <p>
                   {synonyms
-                    .map((s) => (typeof s === 'object' && s !== null && 'synonym' in s ? s.synonym : ''))
+                    .map((s) =>
+                      typeof s === 'object' && s !== null && 'synonym' in s ? s.synonym : '',
+                    )
                     .filter(Boolean)
                     .join(', ')}
                 </p>
@@ -242,7 +242,9 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
                 <Heading as="h2">Categories</Heading>
                 <p>
                   {categories
-                    .map((cat) => (typeof cat === 'object' && cat !== null && 'title' in cat ? cat.title : ''))
+                    .map((cat) =>
+                      typeof cat === 'object' && cat !== null && 'title' in cat ? cat.title : '',
+                    )
                     .filter(Boolean)
                     .join(', ')}
                 </p>
@@ -282,7 +284,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const definitions = Array.isArray(term.definitions) ? term.definitions : [];
   const primaryDefinition = definitions.find((d) => d.isPrimary) || definitions[0];
 
-  const description = primaryDefinition?.shortDefinition || extractPlainText(primaryDefinition?.definition).substring(0, 160);
+  const description =
+    primaryDefinition?.shortDefinition ||
+    extractPlainText(primaryDefinition?.definition).substring(0, 160);
 
   return generateMeta({
     doc: {

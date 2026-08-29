@@ -1,4 +1,4 @@
-import { Field } from 'payload';
+import type { Field } from 'payload';
 
 export const partners: Field = {
   name: 'partners',
@@ -18,6 +18,7 @@ export const partners: Field = {
     },
   ],
   admin: {
-    description: 'Use this field to define a list of partners, assign their roles, and add any necessary details.',
+    description:
+      'Use this field to define a list of partners, assign their roles, and add any necessary details.',
   },
 };

@@ -1,5 +1,4 @@
 import type { Block } from 'payload';
-
 import { description } from '@/fields/description';
 import { title } from '@/fields/title';
 
@@ -64,7 +63,7 @@ export const Session: Block = {
               type: 'text',
               label: 'Speaker text',
               localized: true,
-            }
+            },
           ],
         },
       ],

@@ -2,7 +2,6 @@ import config from '@payload-config';
 import { unstable_cache } from 'next/cache';
 import { getServerSideSitemap } from 'next-sitemap';
 import { getPayload } from 'payload';
-
 import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 
 const getArticlesSitemap = unstable_cache(
@@ -42,14 +41,14 @@ const getArticlesSitemap = unstable_cache(
 
       const sitemapEntries = results.docs
         ? results.docs
-          .filter((article) => Boolean(article?.slug) && Boolean(article?.resourceId))
-          .map((article) => {
-            const combinedSlug = `${article.slug}--${article.resourceId}`;
-            return {
-              loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,
-              lastmod: article.updatedAt || dateFallback,
-            };
-          })
+            .filter((article) => Boolean(article?.slug) && Boolean(article?.resourceId))
+            .map((article) => {
+              const combinedSlug = `${article.slug}--${article.resourceId}`;
+              return {
+                loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,
+                lastmod: article.updatedAt || dateFallback,
+              };
+            })
         : [];
 
       allSitemapEntries.push(...sitemapEntries);

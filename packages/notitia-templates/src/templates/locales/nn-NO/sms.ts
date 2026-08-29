@@ -5,7 +5,8 @@ import type { TemplateRegistry } from '../../../types';
  */
 export const smsTemplatesNnNO: TemplateRegistry = {
   'sms:welcome': {
-    content: 'Velkomen til {{organizationName}}, {{name}}! {{#if loginUrl}}Logg inn: {{loginUrl}}{{/if}}',
+    content:
+      'Velkomen til {{organizationName}}, {{name}}! {{#if loginUrl}}Logg inn: {{loginUrl}}{{/if}}',
     description: 'Velkomst-SMS for nye brukarar (nn-NO)',
   },
 
@@ -28,12 +29,14 @@ export const smsTemplatesNnNO: TemplateRegistry = {
   },
 
   'sms:password-reset': {
-    content: '{{organizationName}}: Førespurnad om tilbakestilling av passord. {{#if resetUrl}}Tilbakestill her: {{resetUrl}}{{/if}}',
+    content:
+      '{{organizationName}}: Førespurnad om tilbakestilling av passord. {{#if resetUrl}}Tilbakestill her: {{resetUrl}}{{/if}}',
     description: 'SMS for tilbakestilling av passord (nn-NO)',
   },
 
   'sms:order-confirmation': {
-    content: '{{organizationName}}: Ordre #{{orderId}} stadfesta. {{#if totalAmount}}Totalt: {{totalAmount}} {{currency}}.{{/if}} Takk!',
+    content:
+      '{{organizationName}}: Ordre #{{orderId}} stadfesta. {{#if totalAmount}}Totalt: {{totalAmount}} {{currency}}.{{/if}} Takk!',
     description: 'Stadfesting på bestilling (nn-NO)',
   },
 

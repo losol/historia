@@ -34,14 +34,16 @@ export function logStartupConfig() {
   // Sentry Configuration (only if enabled)
   if (process.env.NEXT_PUBLIC_FEATURE_SENTRY === 'true') {
     console.log('\n🔍 Sentry Configuration:');
-    console.log(`   Server DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`);
     console.log(
-      `   Client DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`
+      `   Server DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`,
+    );
+    console.log(
+      `   Client DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`,
     );
     console.log(`   Organization: ${process.env.CMS_SENTRY_ORG || 'not set'}`);
     console.log(`   Project: ${process.env.CMS_SENTRY_PROJECT || 'not set'}`);
     console.log(
-      `   Send PII: ${process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true' ? 'yes' : 'no'}`
+      `   Send PII: ${process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true' ? 'yes' : 'no'}`,
     );
   }
 
@@ -50,7 +52,7 @@ export function logStartupConfig() {
   const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
   const otlpHeaders = process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
   const serviceName = process.env.OTEL_SERVICE_NAME || 'historia';
-  
+
   if (otlpEndpoint) {
     console.log(`   Logs Export: ✅ ENABLED`);
     // Extract host from URL without revealing full path/credentials
@@ -80,22 +82,16 @@ export function logStartupConfig() {
   console.log(`   CORS Credentials: ${process.env.CORS_CREDENTIALS || 'not set'}`);
   console.log(`   Cookie Domain: ${process.env.COOKIE_DOMAIN || 'not set'}`);
   console.log(
-    `   Cookie Secure: ${process.env.COOKIE_SECURE === 'true' ? 'yes' : 'no (HTTP allowed)'}`
+    `   Cookie Secure: ${process.env.COOKIE_SECURE === 'true' ? 'yes' : 'no (HTTP allowed)'}`,
   );
-  console.log(
-    `   Cookie SameSite: ${process.env.COOKIE_SAME_SITE || 'lax (default)'}`
-  );
+  console.log(`   Cookie SameSite: ${process.env.COOKIE_SAME_SITE || 'lax (default)'}`);
 
   // Session & Authentication
   console.log('\n🔑 Session & Auth:');
+  console.log(`   Session Secret: ${process.env.PAYLOAD_SECRET ? '✅ configured' : '❌ missing'}`);
+  console.log(`   Session Max Age: ${process.env.SESSION_MAX_AGE || '30 days (default)'}`);
   console.log(
-    `   Session Secret: ${process.env.PAYLOAD_SECRET ? '✅ configured' : '❌ missing'}`
-  );
-  console.log(
-    `   Session Max Age: ${process.env.SESSION_MAX_AGE || '30 days (default)'}`
-  );
-  console.log(
-    `   CSRF Protection: ${process.env.DISABLE_CSRF !== 'true' ? '✅ enabled' : '⚠️ disabled'}`
+    `   CSRF Protection: ${process.env.DISABLE_CSRF !== 'true' ? '✅ enabled' : '⚠️ disabled'}`,
   );
 
   // Email Configuration
@@ -105,9 +101,7 @@ export function logStartupConfig() {
   console.log(`   SMTP Host: ${process.env.SMTP_HOST || 'not configured'}`);
   console.log(`   SMTP Port: ${process.env.SMTP_PORT || 'not configured'}`);
   console.log(`   SMTP Secure: ${process.env.SMTP_SECURE === 'true' ? 'yes (TLS)' : 'no'}`);
-  console.log(
-    `   SMTP User: ${process.env.SMTP_USER ? '✅ configured' : 'not configured'}`
-  );
+  console.log(`   SMTP User: ${process.env.SMTP_USER ? '✅ configured' : 'not configured'}`);
 
   // Storage Configuration
   console.log('\n📦 Storage:');
@@ -130,10 +124,10 @@ export function logStartupConfig() {
   console.log(`   Test Mode: ${process.env.VIPPS_USE_TEST_MODE === 'true' ? '✅ yes' : 'no'}`);
   console.log(`   Client ID: ${process.env.VIPPS_CLIENT_ID ? '✅ configured' : '❌ missing'}`);
   console.log(
-    `   Client Secret: ${process.env.VIPPS_CLIENT_SECRET ? '✅ configured' : '❌ missing'}`
+    `   Client Secret: ${process.env.VIPPS_CLIENT_SECRET ? '✅ configured' : '❌ missing'}`,
   );
   console.log(
-    `   Subscription Key: ${process.env.VIPPS_SUBSCRIPTION_KEY ? '✅ configured' : '❌ missing'}`
+    `   Subscription Key: ${process.env.VIPPS_SUBSCRIPTION_KEY ? '✅ configured' : '❌ missing'}`,
   );
   console.log(`   MSN: ${process.env.VIPPS_MSN || 'not set'}`);
 

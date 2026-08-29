@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
-
+import type React from 'react';
+import { useEffect } from 'react';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Box } from '@eventuras/ratio-ui/layout/Box';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
 import { Image as UIImage } from '@eventuras/ratio-ui-next/Image';
-
 import { Contributors as ContributersComponent } from '@/components/Contributors';
 import RichText from '@/components/RichText';
-import { Contributors, Image } from '@/payload-types';
+import type { Contributors, Image } from '@/payload-types';
 import { useHeaderTheme } from '@/providers/HeaderTheme';
 import { getImageProps } from '@/utilities/image';
 
@@ -19,16 +18,10 @@ interface HeroProps {
   image?: Image | null;
   contributors?: Contributors;
   publishedAt?: string | null;
-  topics?: { title?: string; }[];
+  topics?: { title?: string }[];
 }
 
-export const Hero: React.FC<HeroProps> = ({
-  title,
-  lead,
-  image,
-  contributors,
-  publishedAt,
-}) => {
+export const Hero: React.FC<HeroProps> = ({ title, lead, image, contributors, publishedAt }) => {
   const { setHeaderTheme } = useHeaderTheme();
 
   useEffect(() => {

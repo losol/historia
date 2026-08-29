@@ -1,24 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 /**
  * Proxy to handle health checks and system paths
- * 
+ *
  * This proxy runs before any page/route handlers and:
  * 1. Allows health check endpoints to pass through
  * 2. Returns 404 for known system/bot paths without logging errors
  * 3. Prevents these requests from reaching locale validation
- * 
+ *
  * Note: In Next.js 16+, Middleware is called Proxy to better reflect its purpose.
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Health check and monitoring endpoints - let them through to their route handlers
-  const healthCheckPaths = [
-    '/api/health',
-    '/api/healthz',
-    '/api/ready',
-  ];
+  const healthCheckPaths = ['/api/health', '/api/healthz', '/api/ready'];
 
   if (healthCheckPaths.some((path) => pathname === path)) {
     return NextResponse.next();
@@ -46,7 +42,7 @@ export function proxy(request: NextRequest) {
 
 /**
  * Matcher configuration
- * 
+ *
  * Run middleware on all paths except:
  * - Static files (_next/static)
  * - Images (_next/image, favicon, etc.)

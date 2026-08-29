@@ -1,7 +1,6 @@
-import { Field } from "payload";
-
-import { Content } from "../blocks/Content/config";
-import { Session } from "../blocks/session";
+import type { Field } from 'payload';
+import { Content } from '../blocks/Content/config';
+import { Session } from '../blocks/session';
 
 export const program: Field = {
   name: 'program',

@@ -3,8 +3,8 @@ import {
   BoldFeature,
   InlineToolbarFeature,
   ItalicFeature,
-  lexicalEditor,
   LinkFeature,
+  lexicalEditor,
   ParagraphFeature,
 } from '@payloadcms/richtext-lexical';
 import type { RichTextField } from 'payload';
@@ -33,10 +33,7 @@ type RichText = (
  * )
  * ```
  */
-export const richText: RichText = (
-  overrides = {},
-  additionalFeatures = [],
-): RichTextField => {
+export const richText: RichText = (overrides = {}, additionalFeatures = []): RichTextField => {
   const defaultFeatures = [
     InlineToolbarFeature(),
     ParagraphFeature(),
@@ -59,7 +56,10 @@ export const richText: RichText = (
               condition: ({ linkType }) => linkType !== 'internal',
             },
             label: ({ t }) => t('fields:enterURL'),
-            validate: (value: string | null | undefined, { siblingData }: { siblingData?: { linkType?: string } }) => {
+            validate: (
+              value: string | null | undefined,
+              { siblingData }: { siblingData?: { linkType?: string } },
+            ) => {
               if (siblingData?.linkType !== 'internal' && !value) {
                 return 'URL is required for external links';
               }
@@ -82,4 +82,3 @@ export const richText: RichText = (
     ...overrides,
   };
 };
-

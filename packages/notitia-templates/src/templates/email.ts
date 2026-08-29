@@ -1,6 +1,6 @@
 import type { TemplateRegistry } from '../types';
-import { buildOrderStatusTemplate } from './utils/orderStatusBuilder';
 import { buildOrderShippedTemplate } from './utils/orderShippedBuilder';
+import { buildOrderStatusTemplate } from './utils/orderStatusBuilder';
 
 /**
  * Default email templates
@@ -114,7 +114,8 @@ The {{organizationName}} Team`,
       copyBanner: 'KOPI - Intern kopi av kundebekreftelse',
       headerTitle: 'Ordrebekreftelse',
       greeting: 'Hei {{name}}! 👋',
-      thankYouMessage: 'Takk for din bestilling! Vi har mottatt ordren din og begynner å behandle den med en gang.',
+      thankYouMessage:
+        'Takk for din bestilling! Vi har mottatt ordren din og begynner å behandle den med en gang.',
       orderDetailsTitle: 'Ordredetaljer',
       orderNumberLabel: 'Ordrenummer',
       orderDateLabel: 'Ordredato',
@@ -133,14 +134,13 @@ The {{organizationName}} Team`,
     description: 'Order confirmation email',
   },
 
-
-
   'email:order-shipped': {
     subject: 'Din ordre er sendt - #{{orderId}}',
     content: buildOrderShippedTemplate({
       headerTitle: 'Ordren din er sendt! 🎉',
       greeting: 'Hei {{name}}! 👋',
-      shippedMessage: 'Gode nyheter! Din ordre har blitt sendt og er nå på vei til deg. Du kan følge med på leveringen med informasjonen nedenfor.',
+      shippedMessage:
+        'Gode nyheter! Din ordre har blitt sendt og er nå på vei til deg. Du kan følge med på leveringen med informasjonen nedenfor.',
       shipmentDetailsTitle: 'Sendingsdetaljer',
       orderNumberLabel: 'Ordrenummer',
       trackingNumberLabel: 'Sporingsnummer',

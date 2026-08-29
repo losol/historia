@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-
 import { Logger } from '@eventuras/logger';
 import { ErrorBlock } from '@eventuras/ratio-ui/blocks/Error';
 import { Button } from '@eventuras/ratio-ui/core/Button';
@@ -12,10 +10,9 @@ import { Loading } from '@eventuras/ratio-ui/core/Loading';
 import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { useToast } from '@eventuras/ratio-ui/toast';
-
+import { useRouter, useSearchParams } from 'next/navigation';
 import { PaymentStatusSSE } from '@/components/payment/PaymentStatusSSE';
 import { useSessionCart } from '@/lib/cart/use-session-cart';
-
 import { checkExistingOrder, processPaymentAndCreateOrder } from './actions';
 import { createPaymentFailureEvent } from './businessEvents';
 
@@ -61,6 +58,7 @@ export default function VippsCheckoutPage() {
   const reference = searchParams.get('reference');
 
   // Check if order already exists on mount (handles page revisits)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when reference changes
   useEffect(() => {
     if (!reference) return;
 
@@ -84,7 +82,7 @@ export default function VippsCheckoutPage() {
       if (result.data.exists) {
         logger.info(
           { reference, orderId: result.data.orderId },
-          'Order already exists, skipping SSE'
+          'Order already exists, skipping SSE',
         );
 
         // Clear cart
@@ -109,133 +107,142 @@ export default function VippsCheckoutPage() {
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reference]);
 
   // Handle payment status change from SSE
   // CRITICAL: useCallback to prevent EventSource recreation on every render
-  const handlePaymentStatusChange = React.useCallback(async (status: string) => {
-    // Log to both console and logger to ensure visibility
-    console.log('🔔 [CLIENT] handlePaymentStatusChange called with status:', status);
-    console.log('🔔 [CLIENT] reference:', reference);
-    console.log('🔔 [CLIENT] Current state:', { currentState: state, processingFlag: processingRef.current });
+  const handlePaymentStatusChange = React.useCallback(
+    async (status: string) => {
+      // Log to both console and logger to ensure visibility
+      console.log('🔔 [CLIENT] handlePaymentStatusChange called with status:', status);
+      console.log('🔔 [CLIENT] reference:', reference);
+      console.log('🔔 [CLIENT] Current state:', {
+        currentState: state,
+        processingFlag: processingRef.current,
+      });
 
-    logger.info({ reference, status, currentState: state }, '🔔 Payment status changed via SSE');
+      logger.info({ reference, status, currentState: state }, '🔔 Payment status changed via SSE');
 
-    // Only process if payment is captured/authorized
-    if (status === 'captured' || status === 'authorized') {
-      console.log('✅ [CLIENT] Status is captured/authorized, will process');
+      // Only process if payment is captured/authorized
+      if (status === 'captured' || status === 'authorized') {
+        console.log('✅ [CLIENT] Status is captured/authorized, will process');
 
-      // Prevent duplicate processing
-      if (processingRef.current) {
-        console.log('⚠️ [CLIENT] Already processing, skipping');
-        logger.warn({ reference }, 'Already processing payment');
-        return;
-      }
-
-      console.log('🚀 [CLIENT] Setting processing flag and calling server action');
-      processingRef.current = true;
-
-      setState('processing');
-      setMessage('Oppretter ordre...');
-
-      try {
-        console.log('📞 [CLIENT] Calling processPaymentAndCreateOrder with reference:', reference);
-
-        // Call server action to process payment and create order
-        const orderResult = await processPaymentAndCreateOrder(reference!);
-
-        console.log('📬 [CLIENT] Received response from server action:', orderResult);
-
-        if (!orderResult.success) {
-          logger.error(
-            { reference, error: orderResult.error },
-            'Order creation failed',
-          );
-          setState('error');
-          // Show user-friendly message, log technical details
-          let userMessage: string;
-          if (orderResult.error.message.includes('Cart is empty')) {
-            userMessage = 'Handlekurven er tom. Vennligst start en ny bestilling.';
-          } else if (orderResult.error.message.includes('not found')) {
-            userMessage = 'Noen produkter er ikke lenger tilgjengelige. Vennligst start en ny bestilling.';
-          } else if (orderResult.error.message.includes('amount')) {
-            userMessage = 'Betalingsbeløpet stemmer ikke. Vennligst kontakt support med referanse: ' + reference;
-          } else {
-            userMessage = 'Kunne ikke opprette ordre. Vennligst kontakt support hvis beløpet er trukket.';
-          }
-          setMessage(userMessage);
-          toast.error(userMessage);
+        // Prevent duplicate processing
+        if (processingRef.current) {
+          console.log('⚠️ [CLIENT] Already processing, skipping');
+          logger.warn({ reference }, 'Already processing payment');
           return;
         }
 
-        logger.info(
-          { reference, orderId: orderResult.data.orderId },
-          'Order created successfully',
-        );
+        console.log('🚀 [CLIENT] Setting processing flag and calling server action');
+        processingRef.current = true;
 
-        // Clear cart
-        clearCart();
+        setState('processing');
+        setMessage('Oppretter ordre...');
 
-        // Show success
-        setOrderDetails({
-          orderId: orderResult.data.orderId,
-          userEmail: orderResult.data.userEmail,
-          shippingAddress: orderResult.data.shippingAddress,
+        try {
+          console.log(
+            '📞 [CLIENT] Calling processPaymentAndCreateOrder with reference:',
+            reference,
+          );
+
+          // Call server action to process payment and create order
+          const orderResult = await processPaymentAndCreateOrder(reference!);
+
+          console.log('📬 [CLIENT] Received response from server action:', orderResult);
+
+          if (!orderResult.success) {
+            logger.error({ reference, error: orderResult.error }, 'Order creation failed');
+            setState('error');
+            // Show user-friendly message, log technical details
+            let userMessage: string;
+            if (orderResult.error.message.includes('Cart is empty')) {
+              userMessage = 'Handlekurven er tom. Vennligst start en ny bestilling.';
+            } else if (orderResult.error.message.includes('not found')) {
+              userMessage =
+                'Noen produkter er ikke lenger tilgjengelige. Vennligst start en ny bestilling.';
+            } else if (orderResult.error.message.includes('amount')) {
+              userMessage =
+                'Betalingsbeløpet stemmer ikke. Vennligst kontakt support med referanse: ' +
+                reference;
+            } else {
+              userMessage =
+                'Kunne ikke opprette ordre. Vennligst kontakt support hvis beløpet er trukket.';
+            }
+            setMessage(userMessage);
+            toast.error(userMessage);
+            return;
+          }
+
+          logger.info(
+            { reference, orderId: orderResult.data.orderId },
+            'Order created successfully',
+          );
+
+          // Clear cart
+          clearCart();
+
+          // Show success
+          setOrderDetails({
+            orderId: orderResult.data.orderId,
+            userEmail: orderResult.data.userEmail,
+            shippingAddress: orderResult.data.shippingAddress,
+          });
+
+          setState('success');
+          // Success state is clear from UI, no need for toast
+        } catch (error) {
+          logger.error({ reference, error }, 'Unexpected error creating order');
+          setState('error');
+          setMessage(
+            'En uventet feil oppstod. Vennligst kontakt support med referanse: ' + reference,
+          );
+          // Error already shown in UI, only toast for critical issues
+        }
+      } else if (status.startsWith('failed:')) {
+        // Parse failure reason from status string
+        const failureReason = status.split(':')[1];
+
+        logger.warn({ reference, status, failureReason }, 'Payment failed with reason');
+
+        // Create business event for analytics
+        createPaymentFailureEvent(reference!, failureReason).catch((error) => {
+          logger.error({ reference, failureReason, error }, 'Failed to create business event');
+          // Don't show error to user - this is analytics only
         });
 
-        setState('success');
-        // Success state is clear from UI, no need for toast
-      } catch (error) {
-        logger.error({ reference, error }, 'Unexpected error creating order');
+        // Map failure reasons to user-friendly messages
+        let userMessage = 'Betalingen ble avbrutt eller feilet.';
+
+        switch (failureReason) {
+          case 'aborted':
+            userMessage =
+              'Betalingen ble avbrutt. Dette kan skyldes avslått kort, utilstrekkelige midler eller andre kortproblemer.';
+            break;
+          case 'expired':
+            userMessage = 'Betalingssesjonen har utløpt. Vennligst prøv igjen.';
+            break;
+          case 'terminated':
+            userMessage = 'Betalingen ble avsluttet. Vennligst prøv igjen.';
+            break;
+        }
+
         setState('error');
-        setMessage('En uventet feil oppstod. Vennligst kontakt support med referanse: ' + reference);
-        // Error already shown in UI, only toast for critical issues
+        setMessage(userMessage + ' Ingen beløp er trukket.');
+      } else if (status === 'failed' || status === 'cancelled') {
+        logger.warn({ reference, status }, 'Payment failed without specific reason');
+
+        // Create business event for analytics (no specific reason)
+        createPaymentFailureEvent(reference!, 'unknown').catch((error) => {
+          logger.error({ reference, error }, 'Failed to create business event');
+        });
+
+        setState('error');
+        setMessage('Betalingen ble avbrutt eller feilet. Ingen beløp er trukket.');
       }
-    } else if (status.startsWith('failed:')) {
-      // Parse failure reason from status string
-      const failureReason = status.split(':')[1];
-
-      logger.warn(
-        { reference, status, failureReason },
-        'Payment failed with reason'
-      );
-
-      // Create business event for analytics
-      createPaymentFailureEvent(reference!, failureReason).catch((error) => {
-        logger.error({ reference, failureReason, error }, 'Failed to create business event');
-        // Don't show error to user - this is analytics only
-      });
-
-      // Map failure reasons to user-friendly messages
-      let userMessage = 'Betalingen ble avbrutt eller feilet.';
-
-      switch (failureReason) {
-        case 'aborted':
-          userMessage = 'Betalingen ble avbrutt. Dette kan skyldes avslått kort, utilstrekkelige midler eller andre kortproblemer.';
-          break;
-        case 'expired':
-          userMessage = 'Betalingssesjonen har utløpt. Vennligst prøv igjen.';
-          break;
-        case 'terminated':
-          userMessage = 'Betalingen ble avsluttet. Vennligst prøv igjen.';
-          break;
-      }
-
-      setState('error');
-      setMessage(userMessage + ' Ingen beløp er trukket.');
-    } else if (status === 'failed' || status === 'cancelled') {
-      logger.warn({ reference, status }, 'Payment failed without specific reason');
-
-      // Create business event for analytics (no specific reason)
-      createPaymentFailureEvent(reference!, 'unknown').catch((error) => {
-        logger.error({ reference, error }, 'Failed to create business event');
-      });
-
-      setState('error');
-      setMessage('Betalingen ble avbrutt eller feilet. Ingen beløp er trukket.');
-    }
-  }, [reference, clearCart, toast]);
+    },
+    [reference, clearCart, toast],
+  );
 
   // Validate reference on mount
   if (!reference) {
@@ -276,10 +283,7 @@ export default function VippsCheckoutPage() {
               </Text>
 
               {/* SSE Component */}
-              <PaymentStatusSSE
-                reference={reference}
-                onStatusChange={handlePaymentStatusChange}
-              />
+              <PaymentStatusSSE reference={reference} onStatusChange={handlePaymentStatusChange} />
 
               {/* Loading spinner */}
               <div className="mt-6 flex justify-center">
@@ -304,8 +308,6 @@ export default function VippsCheckoutPage() {
           {/* SUCCESS STATE - Order created */}
           {state === 'success' && orderDetails && (
             <>
-
-
               <Heading as="h1" marginBottom="xs">
                 Takk for din bestilling!
               </Heading>
@@ -313,20 +315,16 @@ export default function VippsCheckoutPage() {
               {/* Order number */}
               <div className="mb-8">
                 <Text>
-                  Ordrenummer:{' '}
-                  <span className="font-mono font-medium">
-                    {orderDetails.orderId}
-                  </span>
+                  Ordrenummer: <span className="font-mono font-medium">{orderDetails.orderId}</span>
                 </Text>
               </div>
 
               {/* What happens next */}
               <div className="mb-8 text-left">
-                <Heading as="h2">
-                  Hva skjer nå?
-                </Heading>
+                <Heading as="h2">Hva skjer nå?</Heading>
                 <Text>
-                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er bekreftet.
+                  Vi sender deg en e-post om ordren din. Ordren er ikke endelig før den er
+                  bekreftet.
                 </Text>
               </div>
             </>

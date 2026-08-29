@@ -1,6 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPayload } from 'payload';
-
 import { Logger } from '@eventuras/logger';
 import { getPaymentDetails, mergeExpiredPaymentDetails } from '@eventuras/vipps/epayment-v1';
 import {
@@ -9,7 +6,8 @@ import {
   verifyWebhookSignature,
   type WebhookPayload,
 } from '@eventuras/vipps/webhooks-v1';
-
+import { type NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
 import type { Transaction } from '@/payload-types';
@@ -22,7 +20,14 @@ const logger = Logger.create({
 /**
  * Valid transaction statuses based on Transactions collection
  */
-type TransactionStatus = 'pending' | 'authorized' | 'captured' | 'completed' | 'failed' | 'refunded' | 'partially-refunded';
+type TransactionStatus =
+  | 'pending'
+  | 'authorized'
+  | 'captured'
+  | 'completed'
+  | 'failed'
+  | 'refunded'
+  | 'partially-refunded';
 
 /**
  * Update user with verified data from Vipps
@@ -46,7 +51,7 @@ async function updateUserFromVipps(
     family_name?: string;
     email?: string;
     phone_number?: string;
-  }
+  },
 ): Promise<void> {
   try {
     // Build update object with only fields that Vipps actually provided
@@ -110,13 +115,10 @@ async function updateUserFromVipps(
 
     logger.info(
       { userId, verifiedFields: ['name', 'email', 'phone_number'] },
-      'Updated user with verified Vipps data'
+      'Updated user with verified Vipps data',
     );
   } catch (error) {
-    logger.error(
-      { error, userId, vippsData },
-      'Failed to update user with Vipps data'
-    );
+    logger.error({ error, userId, vippsData }, 'Failed to update user with Vipps data');
     throw error;
   }
 }
@@ -172,9 +174,9 @@ export async function POST(request: NextRequest) {
       'x-azure-socketip': allHeaders['x-azure-socketip'],
 
       // Request metadata
-      'host': allHeaders['host'],
+      host: allHeaders['host'],
       'user-agent': allHeaders['user-agent'],
-      'referer': allHeaders['referer'],
+      referer: allHeaders['referer'],
       'content-type': allHeaders['content-type'],
       'content-length': allHeaders['content-length'],
 
@@ -216,7 +218,7 @@ export async function POST(request: NextRequest) {
         safeHeaders,
         allHeaderKeys: Object.keys(allHeaders),
       },
-      'Incoming Vipps webhook request - full details'
+      'Incoming Vipps webhook request - full details',
     );
 
     // Read raw body for signature verification
@@ -229,7 +231,7 @@ export async function POST(request: NextRequest) {
         fullBody: rawBody, // Log complete payload for debugging
         isEmptyBody: rawBody.length === 0,
       },
-      'Vipps webhook body received'
+      'Vipps webhook body received',
     );
 
     // Get headers for signature verification
@@ -247,11 +249,14 @@ export async function POST(request: NextRequest) {
           authorization: !!authorization,
           allHeaderKeys: Object.keys(allHeaders),
         },
-        'Missing required webhook headers'
+        'Missing required webhook headers',
       );
       return NextResponse.json(
-        { error: 'Missing required headers', required: ['x-ms-date', 'x-ms-content-sha256', 'host', 'authorization'] },
-        { status: 400 }
+        {
+          error: 'Missing required headers',
+          required: ['x-ms-date', 'x-ms-content-sha256', 'host', 'authorization'],
+        },
+        { status: 400 },
       );
     }
 
@@ -262,10 +267,7 @@ export async function POST(request: NextRequest) {
     const webhookSecret = process.env.VIPPS_WEBHOOK_SECRET;
     if (!webhookSecret) {
       logger.error('VIPPS_WEBHOOK_SECRET not configured');
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
     const isValid = verifyWebhookSignature(
@@ -280,7 +282,7 @@ export async function POST(request: NextRequest) {
         },
         body: rawBody,
       },
-      webhookSecret
+      webhookSecret,
     );
 
     if (!isValid) {
@@ -292,14 +294,12 @@ export async function POST(request: NextRequest) {
           contentSha256: xMsContentSha256,
           authHeader: authorization?.substring(0, 50) + '...', // Log first 50 chars only
           bodyLength: rawBody.length,
-          expectedSignatureFormat: 'HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=...',
+          expectedSignatureFormat:
+            'HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=...',
         },
-        'Invalid webhook signature - HMAC verification failed. Check VIPPS_WEBHOOK_SECRET matches registration.'
+        'Invalid webhook signature - HMAC verification failed. Check VIPPS_WEBHOOK_SECRET matches registration.',
       );
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     logger.info('Webhook signature verified successfully');
@@ -307,16 +307,16 @@ export async function POST(request: NextRequest) {
     // Parse webhook payload
     const payload = parseWebhookPayload(rawBody);
     if (!payload) {
-      logger.error({
-        rawBody: rawBody.substring(0, 500),  // Log first 500 chars to avoid huge logs
-        bodyLength: rawBody.length,
-        xMsDate,
-        host,
-      }, 'CRITICAL: Failed to parse webhook payload - invalid JSON or structure');
-      return NextResponse.json(
-        { error: 'Invalid payload' },
-        { status: 400 }
+      logger.error(
+        {
+          rawBody: rawBody.substring(0, 500), // Log first 500 chars to avoid huge logs
+          bodyLength: rawBody.length,
+          xMsDate,
+          host,
+        },
+        'CRITICAL: Failed to parse webhook payload - invalid JSON or structure',
       );
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
     // Convert PaymentEventName to WebhookEventType
@@ -337,7 +337,7 @@ export async function POST(request: NextRequest) {
         pspReference: payload.pspReference,
         success: payload.success,
       },
-      'Webhook payload parsed'
+      'Webhook payload parsed',
     );
 
     // Check for duplicate webhook using externalId (idempotency)
@@ -369,19 +369,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info(
-      { eventId, businessEventId: businessEvent.id },
-      'Business event stored'
-    );
+    logger.info({ eventId, businessEventId: businessEvent.id }, 'Business event stored');
 
     // Process business event
     try {
       await processPaymentEvent(businessEvent.id, payload);
 
-      logger.info(
-        { eventId, duration: Date.now() - startTime },
-        'Webhook processed successfully'
-      );
+      logger.info({ eventId, duration: Date.now() - startTime }, 'Webhook processed successfully');
     } catch (error) {
       // Log error but still return 200 to acknowledge receipt
       logger.error(
@@ -399,7 +393,7 @@ export async function POST(request: NextRequest) {
           webhookUrl: url.toString(),
           webhookHost: host,
         },
-        'Error processing payment event - business event stored but processing failed'
+        'Error processing payment event - business event stored but processing failed',
       );
 
       // Update business event with detailed error information
@@ -407,9 +401,10 @@ export async function POST(request: NextRequest) {
         collection: 'business-events',
         id: businessEvent.id,
         data: {
-          error: error instanceof Error
-            ? `${error.name}: ${error.message}\n${error.stack || ''}`
-            : String(error),
+          error:
+            error instanceof Error
+              ? `${error.name}: ${error.message}\n${error.stack || ''}`
+              : String(error),
         },
       });
     }
@@ -435,14 +430,11 @@ export async function POST(request: NextRequest) {
           hasContentHash: !!request.headers.get('x-ms-content-sha256'),
         },
       },
-      'CRITICAL: Unexpected error handling webhook - Vipps will retry'
+      'CRITICAL: Unexpected error handling webhook - Vipps will retry',
     );
 
     // Return 500 to indicate failure - Vipps will retry
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -468,7 +460,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 
   logger.info(
     { businessEventId, eventType: payload.name, reference: payload.reference },
-    'Processing payment event'
+    'Processing payment event',
   );
 
   // Find transaction by payment reference
@@ -493,7 +485,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         amount: payload.amount,
         businessEventId,
       },
-      'No transaction found - creating orphaned transaction from webhook'
+      'No transaction found - creating orphaned transaction from webhook',
     );
 
     // Determine tenant from webhook request
@@ -510,7 +502,11 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         limit: 1,
       });
 
-      if (carts.docs.length > 0 && typeof carts.docs[0].tenant === 'object' && carts.docs[0].tenant !== null) {
+      if (
+        carts.docs.length > 0 &&
+        typeof carts.docs[0].tenant === 'object' &&
+        carts.docs[0].tenant !== null
+      ) {
         tenantId = carts.docs[0].tenant.id;
         logger.info(
           {
@@ -518,7 +514,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             reference: payload.reference,
             cartId: carts.docs[0].id,
           },
-          'Determined tenant for orphaned transaction from cart'
+          'Determined tenant for orphaned transaction from cart',
         );
       } else {
         // Cannot determine tenant - cart not found or has no tenant
@@ -529,10 +525,10 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             cartFound: carts.docs.length > 0,
             cartHasTenant: carts.docs.length > 0 && carts.docs[0].tenant !== null,
           },
-          'Cannot determine tenant for orphaned transaction - cart not found or has no tenant'
+          'Cannot determine tenant for orphaned transaction - cart not found or has no tenant',
         );
         throw new Error(
-          `Cannot create orphaned transaction for reference ${payload.reference}: Unable to determine tenant. Cart not found or missing tenant information.`
+          `Cannot create orphaned transaction for reference ${payload.reference}: Unable to determine tenant. Cart not found or missing tenant information.`,
         );
       }
     } catch (error) {
@@ -551,27 +547,27 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           reference: payload.reference,
           businessEventId,
           webhookUrl: payloadInstance.config.serverURL,
-          configuredWebsites: allWebsites.docs.map(w => ({
+          configuredWebsites: allWebsites.docs.map((w) => ({
             id: w.id,
             title: w.title,
             domains: w.domains,
           })),
         },
-        'Failed to determine tenant for orphaned transaction - cannot create transaction'
+        'Failed to determine tenant for orphaned transaction - cannot create transaction',
       );
       throw error; // Re-throw to be caught by outer try-catch
     }
 
     // Map event name to transaction status
     const statusMap: Record<string, string> = {
-      'CREATED': 'pending',
-      'AUTHORIZED': 'authorized',
-      'CAPTURED': 'captured',
-      'CANCELLED': 'failed',
-      'ABORTED': 'failed',
-      'EXPIRED': 'failed',
-      'TERMINATED': 'failed',
-      'REFUNDED': 'refunded',
+      CREATED: 'pending',
+      AUTHORIZED: 'authorized',
+      CAPTURED: 'captured',
+      CANCELLED: 'failed',
+      ABORTED: 'failed',
+      EXPIRED: 'failed',
+      TERMINATED: 'failed',
+      REFUNDED: 'refunded',
     };
 
     const transactionStatus = statusMap[payload.name] || 'pending';
@@ -599,7 +595,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         status: transactionStatus,
         businessEventId,
       },
-      'Orphaned transaction created - SSE will link to order'
+      'Orphaned transaction created - SSE will link to order',
     );
 
     // Update business event with transaction relationship
@@ -627,7 +623,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       paymentReference: payload.reference,
       businessEventId,
     },
-    'Transaction found, updating status'
+    'Transaction found, updating status',
   );
 
   // Update business event with entity relationship (if not already set)
@@ -646,14 +642,14 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 
   // Map event name to transaction status
   const statusMap: Record<string, string> = {
-    'CREATED': 'pending',
-    'AUTHORIZED': 'authorized',
-    'CAPTURED': 'captured',
-    'CANCELLED': 'failed',
-    'ABORTED': 'failed',
-    'EXPIRED': 'failed',
-    'TERMINATED': 'failed',
-    'REFUNDED': 'refunded',
+    CREATED: 'pending',
+    AUTHORIZED: 'authorized',
+    CAPTURED: 'captured',
+    CANCELLED: 'failed',
+    ABORTED: 'failed',
+    EXPIRED: 'failed',
+    TERMINATED: 'failed',
+    REFUNDED: 'refunded',
   };
 
   const newStatus = statusMap[payload.name];
@@ -668,7 +664,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         payloadAmount: payload.amount,
         payloadSuccess: payload.success,
       },
-      'CRITICAL: Unknown event type - cannot map to transaction status'
+      'CRITICAL: Unknown event type - cannot map to transaction status',
     );
     await payloadInstance.update({
       collection: 'business-events',
@@ -696,7 +692,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           hasUserDetails: !!paymentDetails.userDetails,
           hasShipping: !!paymentDetails.shippingDetails,
         },
-        'Retrieved full payment details from Vipps API'
+        'Retrieved full payment details from Vipps API',
       );
 
       // Update existing logged-in user with Vipps data
@@ -715,7 +711,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             email: paymentDetails.userDetails.email,
             reference: payload.reference,
           },
-          'Updated logged-in user with Vipps data'
+          'Updated logged-in user with Vipps data',
         );
       }
       // Try to find and link customer by email from Vipps userDetails (guest checkout)
@@ -749,7 +745,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
                 email: paymentDetails.userDetails.email,
                 reference: payload.reference,
               },
-              'Found and updated existing user from Vipps email'
+              'Found and updated existing user from Vipps email',
             );
           }
         } catch (error) {
@@ -759,7 +755,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
               email: paymentDetails.userDetails?.email,
               reference: payload.reference,
             },
-            'Failed to lookup user by email from Vipps userDetails'
+            'Failed to lookup user by email from Vipps userDetails',
           );
         }
       }
@@ -770,7 +766,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           reference: payload.reference,
           eventType: payload.name,
         },
-        'Failed to fetch payment details from Vipps API - continuing with webhook data only'
+        'Failed to fetch payment details from Vipps API - continuing with webhook data only',
       );
     }
   }
@@ -800,7 +796,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       reference: payload.reference,
       businessEventId,
     },
-    'Transaction status updated successfully'
+    'Transaction status updated successfully',
   );
 
   // Trigger revalidation for SSE endpoints and pages
@@ -810,14 +806,18 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 
   // Automatic order creation for AUTHORIZED payments without order
   // This handles cases where the callback (SSE) fails or is delayed
-  if ((payload.name === 'AUTHORIZED' || payload.name === 'CAPTURED') && !transaction.order && paymentDetails) {
+  if (
+    (payload.name === 'AUTHORIZED' || payload.name === 'CAPTURED') &&
+    !transaction.order &&
+    paymentDetails
+  ) {
     logger.info(
       {
         reference: payload.reference,
         transactionId: transaction.id,
         eventType: payload.name,
       },
-      'Attempting automatic order creation from webhook (no order linked to transaction)'
+      'Attempting automatic order creation from webhook (no order linked to transaction)',
     );
 
     try {
@@ -849,7 +849,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             transactionId: orderResult.data.transactionId,
             reference: payload.reference,
           },
-          'Order auto-created successfully from webhook'
+          'Order auto-created successfully from webhook',
         );
 
         // Update transaction with order reference
@@ -866,7 +866,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           payload.reference,
           orderResult.data.orderId,
           paymentDetails.aggregate.authorizedAmount,
-          'webhook'
+          'webhook',
         );
 
         logger.info(
@@ -875,7 +875,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             transactionId: transaction.id,
             reference: payload.reference,
           },
-          'Webhook successfully created order and linked to transaction'
+          'Webhook successfully created order and linked to transaction',
         );
       } else {
         // Order creation failed - this is a critical issue
@@ -888,7 +888,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             paymentState: paymentDetails.state,
             authorizedAmount: paymentDetails.aggregate.authorizedAmount,
           },
-          'Automatic order creation from webhook failed - creating orphaned payment notification'
+          'Automatic order creation from webhook failed - creating orphaned payment notification',
         );
 
         // Send orphaned payment notification for manual handling
@@ -898,7 +898,8 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 
         await notifyOrphanedPayment({
           paymentReference: payload.reference,
-          customerEmail: paymentDetails.profile?.email || paymentDetails.userDetails?.email || 'unknown',
+          customerEmail:
+            paymentDetails.profile?.email || paymentDetails.userDetails?.email || 'unknown',
           amount: paymentDetails.aggregate.authorizedAmount.value,
           currency: paymentDetails.aggregate.authorizedAmount.currency,
           paymentState: paymentDetails.state,
@@ -909,7 +910,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             reference: payload.reference,
             transactionId: transaction.id,
           },
-          'Orphaned payment notification sent - manual order creation required'
+          'Orphaned payment notification sent - manual order creation required',
         );
       }
     } catch (error) {
@@ -924,7 +925,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           transactionId: transaction.id,
           paymentState: paymentDetails?.state,
         },
-        'CRITICAL: Unexpected error during automatic order creation from webhook'
+        'CRITICAL: Unexpected error during automatic order creation from webhook',
       );
 
       // Send orphaned payment notification
@@ -935,7 +936,8 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 
         await notifyOrphanedPayment({
           paymentReference: payload.reference,
-          customerEmail: paymentDetails?.profile?.email || paymentDetails?.userDetails?.email || 'unknown',
+          customerEmail:
+            paymentDetails?.profile?.email || paymentDetails?.userDetails?.email || 'unknown',
           amount: paymentDetails?.aggregate?.authorizedAmount?.value || 0,
           currency: paymentDetails?.aggregate?.authorizedAmount?.currency || 'NOK',
           paymentState: paymentDetails?.state || 'UNKNOWN',
@@ -946,7 +948,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             notifyError,
             reference: payload.reference,
           },
-          'Failed to send orphaned payment notification after order creation error'
+          'Failed to send orphaned payment notification after order creation error',
         );
       }
     }
@@ -963,7 +965,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       reference: payload.reference,
       eventType: payload.name,
     },
-    'Payment event processed successfully'
+    'Payment event processed successfully',
   );
 }
 
@@ -974,7 +976,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
 async function updateOrderStatus(
   transaction: Transaction,
   transactionStatus: TransactionStatus,
-  vippsPayload?: WebhookPayload
+  vippsPayload?: WebhookPayload,
 ) {
   // Skip if transaction has no associated order
   if (!transaction.order) {
@@ -984,7 +986,7 @@ async function updateOrderStatus(
         status: transactionStatus,
         reference: vippsPayload?.reference,
       },
-      'Transaction has no associated order, skipping order update'
+      'Transaction has no associated order, skipping order update',
     );
     return;
   }
@@ -998,18 +1000,18 @@ async function updateOrderStatus(
       transactionStatus,
       reference: vippsPayload?.reference,
     },
-    'Starting order status update based on transaction'
+    'Starting order status update based on transaction',
   );
 
   // Map transaction status to order status
   type OrderStatus = 'pending' | 'processing' | 'on-hold' | 'completed' | 'canceled';
   const orderStatusMap: Record<TransactionStatus, OrderStatus> = {
-    'pending': 'pending',           // Payment initiated, waiting for user action
-    'authorized': 'processing',     // Payment authorized, ready to be captured
-    'captured': 'completed',        // Payment captured, order can be fulfilled
-    'completed': 'completed',       // Payment completed (same as captured)
-    'failed': 'canceled',           // Payment failed or cancelled
-    'refunded': 'canceled',         // Payment refunded, treat as cancelled
+    pending: 'pending', // Payment initiated, waiting for user action
+    authorized: 'processing', // Payment authorized, ready to be captured
+    captured: 'completed', // Payment captured, order can be fulfilled
+    completed: 'completed', // Payment completed (same as captured)
+    failed: 'canceled', // Payment failed or cancelled
+    refunded: 'canceled', // Payment refunded, treat as cancelled
     'partially-refunded': 'completed', // Partial refund doesn't cancel the order
   };
 
@@ -1025,7 +1027,7 @@ async function updateOrderStatus(
         availableStatuses: Object.keys(orderStatusMap),
         vippsEventType: vippsPayload?.name,
       },
-      'CRITICAL: Unknown transaction status, cannot map to order status'
+      'CRITICAL: Unknown transaction status, cannot map to order status',
     );
     return;
   }
@@ -1043,7 +1045,7 @@ async function updateOrderStatus(
     if (order.status === newOrderStatus) {
       logger.debug(
         { orderId, status: newOrderStatus },
-        'Order status already set, skipping update'
+        'Order status already set, skipping update',
       );
       return;
     }
@@ -1057,7 +1059,7 @@ async function updateOrderStatus(
         transactionStatus,
         reference: vippsPayload?.reference,
       },
-      'Updating order status'
+      'Updating order status',
     );
 
     await payloadInstance.update({
@@ -1093,7 +1095,7 @@ async function updateOrderStatus(
                 orderId,
                 paymentReference: vippsPayload?.reference,
               },
-              'Cart already marked as completed (likely by checkout callback) - skipping update'
+              'Cart already marked as completed (likely by checkout callback) - skipping update',
             );
           } else {
             await payloadInstance.update({
@@ -1111,7 +1113,7 @@ async function updateOrderStatus(
                 paymentReference: vippsPayload?.reference,
                 previousStatus: cart.status,
               },
-              'Cart status updated to completed and linked to order (from webhook)'
+              'Cart status updated to completed and linked to order (from webhook)',
             );
           }
         } else {
@@ -1120,7 +1122,7 @@ async function updateOrderStatus(
               paymentReference: vippsPayload?.reference,
               orderId,
             },
-            'No cart found for payment reference when updating status from webhook'
+            'No cart found for payment reference when updating status from webhook',
           );
         }
       } catch (error) {
@@ -1130,7 +1132,7 @@ async function updateOrderStatus(
             paymentReference: vippsPayload?.reference,
             orderId,
           },
-          'Failed to update cart status from webhook'
+          'Failed to update cart status from webhook',
         );
       }
     }
@@ -1166,7 +1168,7 @@ async function updateOrderStatus(
         newStatus: newOrderStatus,
         transactionStatus,
       },
-      'Order status updated based on transaction status'
+      'Order status updated based on transaction status',
     );
   } catch (error) {
     logger.error(
@@ -1182,7 +1184,7 @@ async function updateOrderStatus(
         vippsReference: vippsPayload?.reference,
         vippsEventType: vippsPayload?.name,
       },
-      'CRITICAL: Failed to update order status - transaction updated but order status not synced'
+      'CRITICAL: Failed to update order status - transaction updated but order status not synced',
     );
     // Don't throw - we've already processed the transaction update successfully
   }

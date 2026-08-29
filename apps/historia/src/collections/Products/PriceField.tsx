@@ -1,44 +1,43 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { FieldLabel, useField, useFormFields } from '@payloadcms/ui'
-
-import { getCurrency } from '@/currencies'
+import React from 'react';
+import { FieldLabel, useField, useFormFields } from '@payloadcms/ui';
+import { getCurrency } from '@/currencies';
 
 export const PriceField: React.FC = () => {
-  const { value, setValue } = useField<number>({ path: 'price.amountExVat' })
-  const currencyField = useFormFields(([fields]) => fields['price.currency'])
-  const currencyCode = currencyField?.value as string || 'NOK'
-  const currency = getCurrency(currencyCode)
-  const decimals = currency?.decimals ?? 2
+  const { value, setValue } = useField<number>({ path: 'price.amountExVat' });
+  const currencyField = useFormFields(([fields]) => fields['price.currency']);
+  const currencyCode = (currencyField?.value as string) || 'NOK';
+  const currency = getCurrency(currencyCode);
+  const decimals = currency?.decimals ?? 2;
 
   // Convert from minor units (stored) to major units (displayed)
-  const [displayValue, setDisplayValue] = React.useState<string>('')
+  const [displayValue, setDisplayValue] = React.useState<string>('');
 
   React.useEffect(() => {
     if (value !== undefined && value !== null) {
-      const divisor = Math.pow(10, decimals)
-      setDisplayValue((value / divisor).toFixed(decimals))
+      const divisor = 10 ** decimals;
+      setDisplayValue((value / divisor).toFixed(decimals));
     } else {
-      setDisplayValue('')
+      setDisplayValue('');
     }
-  }, [value, decimals])
+  }, [value, decimals]);
 
   const handleBlur = () => {
     if (displayValue === '') {
-      setValue(undefined)
-      return
+      setValue(undefined);
+      return;
     }
 
-    const majorUnits = Number.parseFloat(displayValue)
+    const majorUnits = Number.parseFloat(displayValue);
     if (!Number.isNaN(majorUnits)) {
-      const multiplier = Math.pow(10, decimals)
-      const minorUnits = Math.round(majorUnits * multiplier)
-      setValue(minorUnits)
+      const multiplier = 10 ** decimals;
+      const minorUnits = Math.round(majorUnits * multiplier);
+      setValue(minorUnits);
     }
-  }
+  };
 
-  const step = Math.pow(10, -decimals)
+  const step = 10 ** -decimals;
 
   return (
     <div className="field-type number">
@@ -53,8 +52,9 @@ export const PriceField: React.FC = () => {
         placeholder={`249${decimals > 0 ? '.99' : ''}`}
       />
       <div className="field-description">
-        Enter price (e.g., 249{decimals > 0 ? '.99' : ''}). Stored as minor units ({Math.pow(10, decimals)} {currency?.code || 'units'} = 1 {currency?.symbol || ''}).
+        Enter price (e.g., 249{decimals > 0 ? '.99' : ''}). Stored as minor units ({10 ** decimals}{' '}
+        {currency?.code || 'units'} = 1 {currency?.symbol || ''}).
       </div>
     </div>
-  )
-}
+  );
+};

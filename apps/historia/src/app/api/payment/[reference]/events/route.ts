@@ -1,8 +1,6 @@
-import { NextRequest } from 'next/server';
-import { getPayload } from 'payload';
-
 import { Logger } from '@eventuras/logger';
-
+import type { NextRequest } from 'next/server';
+import { getPayload } from 'payload';
 import config from '@/payload.config';
 
 const logger = Logger.create({
@@ -32,7 +30,7 @@ const logger = Logger.create({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ reference: string }> }
+  { params }: { params: Promise<{ reference: string }> },
 ) {
   const { reference } = await params;
 
@@ -76,15 +74,12 @@ export async function GET(
 
         // Safety check: stop polling if we've exceeded maximum attempts
         if (pollCount > MAX_POLLS) {
-          logger.warn(
-            { reference, pollCount },
-            'Maximum poll count exceeded, stopping polling'
-          );
+          logger.warn({ reference, pollCount }, 'Maximum poll count exceeded, stopping polling');
 
           controller.enqueue(
             encoder.encode(
-              `data: ${JSON.stringify({ timeout: true, reason: 'max_polls_exceeded' })}\n\n`
-            )
+              `data: ${JSON.stringify({ timeout: true, reason: 'max_polls_exceeded' })}\n\n`,
+            ),
           );
 
           isActive = false;
@@ -125,7 +120,10 @@ export async function GET(
             // Fallback: After 3 polls (9 seconds), try polling Vipps API directly
             // This handles cases where webhook is not configured/arrives late
             if (pollCount >= 3) {
-              logger.info({ reference, pollCount }, 'Trying Vipps API fallback after no transaction found');
+              logger.info(
+                { reference, pollCount },
+                'Trying Vipps API fallback after no transaction found',
+              );
 
               try {
                 const { getPaymentDetails } = await import('@eventuras/vipps/epayment-v1');
@@ -140,9 +138,9 @@ export async function GET(
                     state: paymentDetails.state,
                     capturedAmount: paymentDetails.aggregate.capturedAmount.value,
                     authorizedAmount: paymentDetails.aggregate.authorizedAmount.value,
-                    pollCount
+                    pollCount,
                   },
-                  'Got payment details from Vipps API'
+                  'Got payment details from Vipps API',
                 );
 
                 // Check if payment is authorized or captured
@@ -153,7 +151,7 @@ export async function GET(
                   const status = isCaptured ? 'captured' : 'authorized';
                   logger.info(
                     { reference, state: paymentDetails.state, status },
-                    'Payment confirmed via Vipps API fallback'
+                    'Payment confirmed via Vipps API fallback',
                   );
 
                   controller.enqueue(
@@ -161,8 +159,8 @@ export async function GET(
                       `data: ${JSON.stringify({
                         status,
                         source: 'vipps-api-fallback',
-                      })}\n\n`
-                    )
+                      })}\n\n`,
+                    ),
                   );
 
                   isActive = false;
@@ -176,9 +174,9 @@ export async function GET(
                     error: apiError,
                     errorMessage: apiError instanceof Error ? apiError.message : String(apiError),
                     reference,
-                    pollCount
+                    pollCount,
                   },
-                  'Failed to poll Vipps API, continuing with database polling'
+                  'Failed to poll Vipps API, continuing with database polling',
                 );
               }
             }
@@ -199,9 +197,9 @@ export async function GET(
                   reference,
                   transactionId: transaction.id,
                   orderId: transaction.order,
-                  status: transaction.status
+                  status: transaction.status,
                 },
-                'Transaction already linked to order, notifying client'
+                'Transaction already linked to order, notifying client',
               );
 
               controller.enqueue(
@@ -209,9 +207,12 @@ export async function GET(
                   `data: ${JSON.stringify({
                     status: transaction.status,
                     hasOrder: true,
-                    orderId: typeof transaction.order === 'string' ? transaction.order : transaction.order.id,
-                  })}\n\n`
-                )
+                    orderId:
+                      typeof transaction.order === 'string'
+                        ? transaction.order
+                        : transaction.order.id,
+                  })}\n\n`,
+                ),
               );
 
               isActive = false;
@@ -227,9 +228,9 @@ export async function GET(
                 reference,
                 transactionId: transaction.id,
                 status: transaction.status,
-                pollCount
+                pollCount,
               },
-              'Orphaned transaction detected - sending signal to client to create order'
+              'Orphaned transaction detected - sending signal to client to create order',
             );
 
             controller.enqueue(
@@ -237,8 +238,8 @@ export async function GET(
                 `data: ${JSON.stringify({
                   status: transaction.status,
                   source: 'webhook',
-                })}\n\n`
-              )
+                })}\n\n`,
+              ),
             );
 
             isActive = false;
@@ -251,7 +252,7 @@ export async function GET(
           if (transaction.status === 'failed') {
             logger.info(
               { reference, transactionId: transaction.id, status: transaction.status },
-              'Transaction failed, sending failure status'
+              'Transaction failed, sending failure status',
             );
 
             controller.enqueue(
@@ -259,8 +260,8 @@ export async function GET(
                 `data: ${JSON.stringify({
                   status: 'failed',
                   source: 'transaction',
-                })}\n\n`
-              )
+                })}\n\n`,
+              ),
             );
 
             isActive = false;
@@ -272,7 +273,7 @@ export async function GET(
           // Transaction exists but still pending - continue polling
           logger.debug(
             { reference, transactionId: transaction.id, status: transaction.status, pollCount },
-            'Transaction pending, continuing to poll'
+            'Transaction pending, continuing to poll',
           );
         } catch (error) {
           logger.error(
@@ -285,7 +286,7 @@ export async function GET(
               pollCount,
               currentInterval,
             },
-            'Error polling payment status'
+            'Error polling payment status',
           );
 
           // Don't close connection on error, just continue polling

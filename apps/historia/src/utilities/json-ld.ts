@@ -21,7 +21,8 @@ export function extractPlainText(richText: unknown): string {
   if (!('root' in richText)) return '';
 
   const { root } = richText;
-  if (!root || typeof root !== 'object' || !('children' in root) || !Array.isArray(root.children)) return '';
+  if (!root || typeof root !== 'object' || !('children' in root) || !Array.isArray(root.children))
+    return '';
 
   function walkNodes(nodes: unknown[]): string {
     return nodes
@@ -59,10 +60,8 @@ export function extractPlainText(richText: unknown): string {
  * ```
  */
 export function generateQuoteJsonLd(quote: Quote): object {
-  const author =
-    typeof quote.author === 'object' && quote.author !== null ? quote.author : null;
-  const source =
-    typeof quote.source === 'object' && quote.source !== null ? quote.source : null;
+  const author = typeof quote.author === 'object' && quote.author !== null ? quote.author : null;
+  const source = typeof quote.source === 'object' && quote.source !== null ? quote.source : null;
 
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -165,7 +164,12 @@ export function generateSourceJsonLd(source: Source): object {
           ? contributor.entity
           : null;
 
-      if (!rawEntity || !('value' in rawEntity) || !rawEntity.value || typeof rawEntity.value !== 'object') {
+      if (
+        !rawEntity ||
+        !('value' in rawEntity) ||
+        !rawEntity.value ||
+        typeof rawEntity.value !== 'object'
+      ) {
         return;
       }
 

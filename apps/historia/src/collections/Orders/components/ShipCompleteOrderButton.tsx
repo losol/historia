@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { toast } from '@payloadcms/ui';
 import { useRouter } from 'next/navigation';
-
 import { shipCompleteOrderAndCapture } from '@/app/actions/shipment';
 
 interface ShipCompleteOrderButtonProps {
@@ -28,7 +27,11 @@ export function ShipCompleteOrderButton({
   }
 
   const handleShipAndCapture = async () => {
-    if (!confirm('Ship complete order and capture payment?\n\nThis will:\n- Create a full shipment\n- Capture the payment from Vipps\n- Mark the order as completed')) {
+    if (
+      !confirm(
+        'Ship complete order and capture payment?\n\nThis will:\n- Create a full shipment\n- Capture the payment from Vipps\n- Mark the order as completed',
+      )
+    ) {
       return;
     }
 

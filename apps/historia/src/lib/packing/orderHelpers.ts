@@ -76,7 +76,7 @@ export const getPriceIncVatMinor = (item: Order['items'][0], isTaxExempt = false
  */
 export const formatOrderDate = (
   createdAt: string,
-  options?: Intl.DateTimeFormatOptions
+  options?: Intl.DateTimeFormatOptions,
 ): string => {
   return new Date(createdAt).toLocaleDateString('nb-NO', options);
 };

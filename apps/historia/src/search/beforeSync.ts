@@ -1,11 +1,11 @@
-import { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types'
+import type { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types';
 
 export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc, payload }) => {
   const {
     doc: { relationTo: collection },
-  } = searchDoc
+  } = searchDoc;
 
-  const { slug, id, topics, title, meta } = originalDoc
+  const { slug, id, topics, title, meta } = originalDoc;
 
   const modifiedDoc: DocToSync = {
     ...searchDoc,
@@ -17,29 +17,29 @@ export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc,
       description: meta?.description,
     },
     topics: [],
-  }
+  };
 
   if (topics && Array.isArray(topics) && topics.length > 0) {
     // get full topics and keep a flattened copy of their most important properties
     try {
       const mappedTopics = topics.map((topic) => {
-        const { id, title } = topic
+        const { id, title } = topic;
 
         return {
           relationTo: 'topics',
           id,
           title,
-        }
-      })
+        };
+      });
 
-      modifiedDoc.topics = mappedTopics
+      modifiedDoc.topics = mappedTopics;
     } catch (err) {
       console.error(
         `Failed. Topic not found when syncing collection '${collection}' with id: '${id}' to search.`,
         err,
-      )
+      );
     }
   }
 
-  return modifiedDoc
-}
+  return modifiedDoc;
+};

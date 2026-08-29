@@ -67,7 +67,7 @@ export function vippsAuthPlugin(pluginConfig: VippsAuthPluginConfig) {
       logger.info('Disabling local authentication strategy');
 
       const usersCollection = incomingConfig.collections?.find(
-        (collection) => collection.slug === 'users'
+        (collection) => collection.slug === 'users',
       );
 
       if (usersCollection?.auth) {

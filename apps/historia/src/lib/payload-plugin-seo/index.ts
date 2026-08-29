@@ -50,4 +50,4 @@
  */
 
 export { metaField, seoTab } from './fields';
-export type { SEOConfig, SEODocument,SEOFields } from './types';
+export type { SEOConfig, SEODocument, SEOFields } from './types';

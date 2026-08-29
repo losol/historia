@@ -1,21 +1,19 @@
-import React from 'react'
-import type { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form'
-import type { EmailField } from '@payloadcms/plugin-form-builder/types'
-
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-import { FieldError } from '../Error'
-import { Width } from '../Width'
+import type React from 'react';
+import type { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form';
+import type { EmailField } from '@payloadcms/plugin-form-builder/types';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FieldError } from '../Error';
+import { Width } from '../Width';
 
 export const Email: React.FC<
   EmailField & {
     errors: Partial<
       FieldErrorsImpl<{
-        [x: string]: any
+        [x: string]: any;
       }>
-    >
-    register: UseFormRegister<FieldValues>
+    >;
+    register: UseFormRegister<FieldValues>;
   }
 > = ({ name, defaultValue, errors, label, register, required: requiredFromProps, width }) => {
   return (
@@ -30,5 +28,5 @@ export const Email: React.FC<
 
       {requiredFromProps && errors[name] && <FieldError />}
     </Width>
-  )
-}
+  );
+};

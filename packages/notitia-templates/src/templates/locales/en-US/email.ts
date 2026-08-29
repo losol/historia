@@ -1,6 +1,6 @@
 import type { TemplateRegistry } from '../../../types';
-import { buildOrderStatusTemplate } from '../../utils/orderStatusBuilder';
 import { buildOrderShippedTemplate } from '../../utils/orderShippedBuilder';
+import { buildOrderStatusTemplate } from '../../utils/orderStatusBuilder';
 
 /**
  * American English email templates
@@ -114,7 +114,8 @@ The {{organizationName}} Team`,
       copyBanner: 'COPY - Internal copy of customer confirmation',
       headerTitle: 'Order Received',
       greeting: 'Hello {{name}}! 👋',
-      thankYouMessage: 'Thank you for your order! We have received it and will process it as soon as possible.',
+      thankYouMessage:
+        'Thank you for your order! We have received it and will process it as soon as possible.',
       orderDetailsTitle: 'Order Details',
       orderNumberLabel: 'Order Number',
       orderDateLabel: 'Order Date',
@@ -131,7 +132,8 @@ The {{organizationName}} Team`,
       taxExemptReasonLabel: 'Reason',
       shippingAddressTitle: 'Shipping Address',
       trackingNumberLabel: 'Tracking Number',
-      shippingNotification: 'We will notify you when your payment is confirmed and your order is being processed.',
+      shippingNotification:
+        'We will notify you when your payment is confirmed and your order is being processed.',
       footerClosing: 'Best regards',
     }),
     description: 'Order received confirmation email (en-US)',
@@ -143,7 +145,8 @@ The {{organizationName}} Team`,
       copyBanner: 'COPY - Internal copy of customer confirmation',
       headerTitle: 'Order Confirmation',
       greeting: 'Hello {{name}}! 👋',
-      thankYouMessage: 'Your payment has been confirmed and your order is now being processed. We will start packing your items shortly.',
+      thankYouMessage:
+        'Your payment has been confirmed and your order is now being processed. We will start packing your items shortly.',
       orderDetailsTitle: 'Order Details',
       orderNumberLabel: 'Order Number',
       orderDateLabel: 'Order Date',
@@ -171,7 +174,8 @@ The {{organizationName}} Team`,
     content: buildOrderShippedTemplate({
       headerTitle: 'Your Order Has Shipped! 🎉',
       greeting: 'Hello {{name}}! 👋',
-      shippedMessage: 'Great news! Your order has been shipped and is now on its way to you. You can track your delivery using the information below.',
+      shippedMessage:
+        'Great news! Your order has been shipped and is now on its way to you. You can track your delivery using the information below.',
       shipmentDetailsTitle: 'Shipment Details',
       orderNumberLabel: 'Order Number',
       trackingNumberLabel: 'Tracking Number',
@@ -181,7 +185,7 @@ The {{organizationName}} Team`,
       productColumn: 'Product',
       quantityColumn: 'Quantity',
       shippingAddressTitle: 'Shipping Address',
-      supportMessage: '💬 Questions about your delivery? Reply to this email and we\'ll help you.',
+      supportMessage: "💬 Questions about your delivery? Reply to this email and we'll help you.",
       footerClosing: 'Best regards',
     }),
     description: 'Order shipped notification email (en-US)',

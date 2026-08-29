@@ -2,8 +2,12 @@
  * Vipps Callback Handler - Handles OAuth callback
  */
 
+import {
+  getVippsIssuer,
+  VippsLoginClient,
+  type VippsUserInfo,
+} from '@eventuras/fides-auth/providers/vipps';
 import { Logger } from '@eventuras/logger';
-import { VippsLoginClient, getVippsIssuer, type VippsUserInfo } from '@eventuras/fides-auth/providers/vipps';
 import type { Payload } from 'payload';
 import { VIPPS_SESSION_PENDING_COOKIE } from '../strategy';
 import type { ResolvedVippsAuthConfig } from '../types';
@@ -74,7 +78,7 @@ function defaultMapVippsUser(vippsUser: VippsUserInfo): Partial<any> {
 export async function handleVippsCallback(
   request: Request,
   config: ResolvedVippsAuthConfig,
-  payload: Payload
+  payload: Payload,
 ): Promise<Response> {
   logger.info('Handling Vipps callback');
 
@@ -89,15 +93,15 @@ export async function handleVippsCallback(
     const redirectCookieName = state ? `vipps_redirect_${state}` : undefined;
     const isSecure = url.protocol === 'https:';
 
-    const redirectUriFromCookie = redirectCookieName ? getCookieValue(request, redirectCookieName) : undefined;
-    const redirectUri = redirectUriFromCookie || config.redirectUri || `${url.origin}/api/auth/vipps/callback`;
+    const redirectUriFromCookie = redirectCookieName
+      ? getCookieValue(request, redirectCookieName)
+      : undefined;
+    const redirectUri =
+      redirectUriFromCookie || config.redirectUri || `${url.origin}/api/auth/vipps/callback`;
 
     const appendClearPkceCookie = (response: Response, cookieName?: string) => {
       if (!cookieName) return response;
-      return withSetCookie(
-        response,
-        clearCookieHeader(cookieName, isSecure)
-      );
+      return withSetCookie(response, clearCookieHeader(cookieName, isSecure));
     };
 
     const appendClearRedirectCookie = (response: Response, cookieName?: string) => {
@@ -107,7 +111,10 @@ export async function handleVippsCallback(
 
     // Check for OAuth errors
     if (error) {
-      logger.error({ error, description: url.searchParams.get('error_description') }, 'OAuth error');
+      logger.error(
+        { error, description: url.searchParams.get('error_description') },
+        'OAuth error',
+      );
       return Response.redirect(new URL('/admin/login?error=oauth_failed', url.origin));
     }
 
@@ -120,7 +127,9 @@ export async function handleVippsCallback(
     const pkceCookieNameToClear = pkceCookieName;
     const redirectCookieNameToClear = redirectCookieName;
 
-    const codeVerifier = pkceCookieNameToClear ? getCookieValue(request, pkceCookieNameToClear) : undefined;
+    const codeVerifier = pkceCookieNameToClear
+      ? getCookieValue(request, pkceCookieNameToClear)
+      : undefined;
     if (codeVerifier) {
       logger.info({ state }, 'Using PKCE code verifier from cookie');
     }
@@ -128,7 +137,10 @@ export async function handleVippsCallback(
     if (!codeVerifier) {
       logger.error({ state }, 'Invalid or expired state');
       const response = Response.redirect(new URL('/admin/login?error=invalid_state', url.origin));
-      return appendClearRedirectCookie(appendClearPkceCookie(response, pkceCookieNameToClear), redirectCookieNameToClear);
+      return appendClearRedirectCookie(
+        appendClearPkceCookie(response, pkceCookieNameToClear),
+        redirectCookieNameToClear,
+      );
     }
 
     // Initialize Vipps client
@@ -155,7 +167,10 @@ export async function handleVippsCallback(
     if (!tokens.access_token) {
       logger.error('No access token received');
       const response = Response.redirect(new URL('/admin/login?error=token_failed', url.origin));
-      return appendClearRedirectCookie(appendClearPkceCookie(response, pkceCookieNameToClear), redirectCookieNameToClear);
+      return appendClearRedirectCookie(
+        appendClearPkceCookie(response, pkceCookieNameToClear),
+        redirectCookieNameToClear,
+      );
     }
 
     // Get user info from Vipps
@@ -165,7 +180,10 @@ export async function handleVippsCallback(
     if (!vippsUser.email) {
       logger.error({ sub: vippsUser.sub }, 'Vipps user has no email');
       const response = Response.redirect(new URL('/admin/login?error=no_email', url.origin));
-      return appendClearRedirectCookie(appendClearPkceCookie(response, pkceCookieNameToClear), redirectCookieNameToClear);
+      return appendClearRedirectCookie(
+        appendClearPkceCookie(response, pkceCookieNameToClear),
+        redirectCookieNameToClear,
+      );
     }
 
     // Find or create user in Payload
@@ -218,31 +236,42 @@ export async function handleVippsCallback(
 
     if (!user) {
       logger.error('Failed to create or find user');
-      const response = Response.redirect(new URL('/admin/login?error=user_creation_failed', url.origin));
-      return appendClearRedirectCookie(appendClearPkceCookie(response, pkceCookieNameToClear), redirectCookieNameToClear);
+      const response = Response.redirect(
+        new URL('/admin/login?error=user_creation_failed', url.origin),
+      );
+      return appendClearRedirectCookie(
+        appendClearPkceCookie(response, pkceCookieNameToClear),
+        redirectCookieNameToClear,
+      );
     }
 
     // Create encrypted session cookie with Vipps user data for the strategy to pick up
     // The strategy will decrypt this, find the user by email, and Payload handles the JWT session
     const { createEncryptedJWT, getSessionSecret } = await import('@eventuras/fides-auth/utils');
-    const sessionToken = await createEncryptedJWT({
-      user: {
-        email: user.email,
-        id: user.id,
-        // Store additional Vipps data in case we need it
-        vipps: {
-          email_verified: vippsUser.email_verified,
-          phone_number: vippsUser.phone_number,
-          given_name: vippsUser.given_name,
-          family_name: vippsUser.family_name,
+    const sessionToken = await createEncryptedJWT(
+      {
+        user: {
+          email: user.email,
+          id: user.id,
+          // Store additional Vipps data in case we need it
+          vipps: {
+            email_verified: vippsUser.email_verified,
+            phone_number: vippsUser.phone_number,
+            given_name: vippsUser.given_name,
+            family_name: vippsUser.family_name,
+          },
         },
       },
-    }, getSessionSecret());
+      getSessionSecret(),
+    );
 
     // Set encrypted session cookie (60 second TTL, just for the OAuth handshake)
     const vippsSessionCookie = `${VIPPS_SESSION_PENDING_COOKIE}=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=60${isSecure ? '; Secure' : ''}`;
 
-    logger.info({ userId: user?.id, email: user?.email }, 'Vipps login successful, redirecting to session endpoint');
+    logger.info(
+      { userId: user?.id, email: user?.email },
+      'Vipps login successful, redirecting to session endpoint',
+    );
 
     // Redirect to session endpoint which will authenticate via the strategy and create Payload JWT session
     // Use the redirectUri origin to ensure we redirect to the correct domain
@@ -251,14 +280,17 @@ export async function handleVippsCallback(
     let response = new Response(null, {
       status: 302,
       headers: {
-        'Location': sessionUrl.toString(),
+        Location: sessionUrl.toString(),
       },
     });
 
     // Add all cookies
     response = withSetCookie(response, vippsSessionCookie);
 
-    return appendClearRedirectCookie(appendClearPkceCookie(response, pkceCookieNameToClear), redirectCookieNameToClear);
+    return appendClearRedirectCookie(
+      appendClearPkceCookie(response, pkceCookieNameToClear),
+      redirectCookieNameToClear,
+    );
   } catch (error) {
     logger.error({ error }, 'Failed to handle Vipps callback');
     const url = new URL(request.url);

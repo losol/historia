@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NotitiaTemplates, createNotitiaTemplates } from '../NotitiaTemplates';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
 import type { Template } from '../types';
 
 describe('NotitiaTemplates - Core Functionality', () => {

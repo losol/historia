@@ -1,10 +1,6 @@
 'use server';
 
 import crypto from 'node:crypto';
-
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
@@ -12,13 +8,13 @@ import {
 } from '@eventuras/core-nextjs/actions';
 import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
-import { type PaymentDetails } from '@eventuras/vipps/epayment-v1';
-
+import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import type { Cart, SessionData } from '@/lib/cart/types';
 import { getSessionContext } from '@/lib/session/sessionId';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { Product } from '@/payload-types';
-
 import { createOrderAutoCreatedEvent } from './businessEvents';
 import { notifyOrphanedPayment } from './orphanedPaymentNotification';
 
@@ -74,7 +70,7 @@ function normalizePhoneNumber(phoneNumber: string | undefined): string | undefin
  * @returns Success if payment is owned by current session or found in cart database
  */
 async function validatePaymentOwnership(
-  paymentReference: string
+  paymentReference: string,
 ): Promise<ServerActionResult<boolean>> {
   // Get session context for logging
   const sessionContext = await getSessionContext();
@@ -99,7 +95,7 @@ async function validatePaymentOwnership(
           paymentReference,
           cartId: (carts.docs[0] as any).id,
         },
-        'Payment validated via database cart lookup'
+        'Payment validated via database cart lookup',
       );
       return actionSuccess(true);
     }
@@ -115,7 +111,7 @@ async function validatePaymentOwnership(
           ...sessionContext,
           paymentReference,
         },
-        'Payment validated via session fallback'
+        'Payment validated via session fallback',
       );
       return actionSuccess(true);
     }
@@ -128,19 +124,22 @@ async function validatePaymentOwnership(
         hasSession: !!session,
         paymentCount: paymentReferences.length,
       },
-      'Payment reference not found in database or session - will trigger manual order creation'
+      'Payment reference not found in database or session - will trigger manual order creation',
     );
 
     return actionError('Unauthorized access to payment');
   } catch (error) {
-    logger.error({
-      ...sessionContext,
-      error,
-      errorName: error instanceof Error ? error.name : 'Unknown',
-      errorMessage: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      paymentReference,
-    }, 'CRITICAL: Error validating payment ownership');
+    logger.error(
+      {
+        ...sessionContext,
+        error,
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        paymentReference,
+      },
+      'CRITICAL: Error validating payment ownership',
+    );
     return actionError('Failed to validate payment ownership');
   }
 }
@@ -216,7 +215,7 @@ export async function createOrderFromPayment({
           itemCount: cart?.items.length || 0,
           paymentReference,
         },
-        'Cart retrieved from database by paymentReference'
+        'Cart retrieved from database by paymentReference',
       );
     } else {
       logger.error(
@@ -224,7 +223,7 @@ export async function createOrderFromPayment({
           ...sessionContext,
           paymentReference,
         },
-        'Cart not found by paymentReference in database'
+        'Cart not found by paymentReference in database',
       );
     }
   } catch (error) {
@@ -234,7 +233,7 @@ export async function createOrderFromPayment({
         error,
         paymentReference,
       },
-      'Failed to retrieve cart from database'
+      'Failed to retrieve cart from database',
     );
   }
 
@@ -244,7 +243,7 @@ export async function createOrderFromPayment({
         ...sessionContext,
         paymentReference,
       },
-      'No cart ID or secret in session - attempting to find cart by payment reference'
+      'No cart ID or secret in session - attempting to find cart by payment reference',
     );
 
     // Fallback: Try to find cart by payment reference
@@ -283,13 +282,13 @@ export async function createOrderFromPayment({
               itemCount: cart.items.length,
               paymentReference,
             },
-            'Successfully recovered cart from database using payment reference'
+            'Successfully recovered cart from database using payment reference',
           );
         }
       } else {
         logger.error(
           { ...sessionContext, paymentReference },
-          'Cart not found in database by payment reference'
+          'Cart not found in database by payment reference',
         );
       }
     } catch (error) {
@@ -299,7 +298,7 @@ export async function createOrderFromPayment({
           error,
           paymentReference,
         },
-        'Failed to recover cart from database'
+        'Failed to recover cart from database',
       );
     }
   }
@@ -313,14 +312,17 @@ export async function createOrderFromPayment({
           hasCart: !!cart,
           paymentState: paymentDetails.state,
           authorizedAmount: paymentDetails.aggregate.authorizedAmount.value,
-          customerEmail: paymentDetails.profile?.email || paymentDetails.userDetails?.email
+          customerEmail: paymentDetails.profile?.email || paymentDetails.userDetails?.email,
         },
-        'CRITICAL: Cart not found in session but payment may be authorized - potential orphaned payment'
+        'CRITICAL: Cart not found in session but payment may be authorized - potential orphaned payment',
       );
 
       // Check if this is a cross-domain session issue where payment is authorized
       // This is a CRITICAL scenario that needs manual intervention
-      if (paymentDetails.state === 'AUTHORIZED' || paymentDetails.aggregate.capturedAmount.value > 0) {
+      if (
+        paymentDetails.state === 'AUTHORIZED' ||
+        paymentDetails.aggregate.capturedAmount.value > 0
+      ) {
         const customerEmail = paymentDetails.profile?.email || paymentDetails.userDetails?.email;
 
         logger.error(
@@ -331,7 +333,7 @@ export async function createOrderFromPayment({
             amount: paymentDetails.aggregate.authorizedAmount.value,
             currency: paymentDetails.aggregate.authorizedAmount.currency,
           },
-          'CRITICAL: Payment is AUTHORIZED but cart unavailable - requires manual order creation!'
+          'CRITICAL: Payment is AUTHORIZED but cart unavailable - requires manual order creation!',
         );
 
         // Create business event and notify sales team
@@ -345,8 +347,9 @@ export async function createOrderFromPayment({
 
         return actionError(
           'Din betaling er godkjent og sikret! Vi behandler ordren din manuelt og sender ' +
-          'deg en bekreftelse på e-post innen kort tid. ' +
-          'Referanse: ' + paymentReference
+            'deg en bekreftelse på e-post innen kort tid. ' +
+            'Referanse: ' +
+            paymentReference,
         );
       }
 
@@ -360,10 +363,10 @@ export async function createOrderFromPayment({
           paymentReference,
           cartPaymentReference: cart.paymentReference,
         },
-        'Payment reference mismatch - possible fraud attempt'
+        'Payment reference mismatch - possible fraud attempt',
       );
       return actionError(
-        'This payment session is no longer valid. Your cart may have been modified or a new checkout was started. Please start a new checkout.'
+        'This payment session is no longer valid. Your cart may have been modified or a new checkout was started. Please start a new checkout.',
       );
     }
 
@@ -375,7 +378,7 @@ export async function createOrderFromPayment({
         paymentState: paymentDetails.state,
         authorizedAmount: paymentDetails.aggregate.authorizedAmount,
       },
-      'Starting order creation from payment'
+      'Starting order creation from payment',
     );
 
     const payload = await getPayload({ config: configPromise });
@@ -393,9 +396,10 @@ export async function createOrderFromPayment({
 
     if (existingTransactions.docs.length > 0) {
       const existingTransaction = existingTransactions.docs[0];
-      const orderId = typeof existingTransaction.order === 'string'
-        ? existingTransaction.order
-        : existingTransaction.order?.id;
+      const orderId =
+        typeof existingTransaction.order === 'string'
+          ? existingTransaction.order
+          : existingTransaction.order?.id;
 
       // Only return early if order actually exists
       // Transaction might exist without order (orphaned from webhook)
@@ -406,7 +410,7 @@ export async function createOrderFromPayment({
             existingOrderId: orderId,
             existingTransactionId: existingTransaction.id,
           },
-          'Order already exists for this payment reference, returning existing order'
+          'Order already exists for this payment reference, returning existing order',
         );
         return actionSuccess({
           orderId: orderId as string,
@@ -419,7 +423,7 @@ export async function createOrderFromPayment({
             existingTransactionId: existingTransaction.id,
             transactionStatus: existingTransaction.status,
           },
-          'Transaction exists but has no order (orphaned from webhook) - will create order now'
+          'Transaction exists but has no order (orphaned from webhook) - will create order now',
         );
         // Continue to order creation below
       }
@@ -437,19 +441,22 @@ export async function createOrderFromPayment({
       const rawVippsEmail = paymentDetails.profile?.email || paymentDetails.userDetails?.email;
       const vippsEmail =
         rawVippsEmail && rawVippsEmail !== '[Expired]' ? rawVippsEmail.toLowerCase() : undefined;
-      const vippsPhone = paymentDetails.profile?.phoneNumber || paymentDetails.userDetails?.mobileNumber;
-      const vippsFirstName = paymentDetails.profile?.givenName || paymentDetails.userDetails?.firstName;
-      const vippsLastName = paymentDetails.profile?.familyName || paymentDetails.userDetails?.lastName;
+      const vippsPhone =
+        paymentDetails.profile?.phoneNumber || paymentDetails.userDetails?.mobileNumber;
+      const vippsFirstName =
+        paymentDetails.profile?.givenName || paymentDetails.userDetails?.firstName;
+      const vippsLastName =
+        paymentDetails.profile?.familyName || paymentDetails.userDetails?.lastName;
 
       if (!vippsEmail) {
         logger.error(
           {
             paymentReference,
           },
-          "Guest checkout attempted but email not available from Vipps",
+          'Guest checkout attempted but email not available from Vipps',
         );
         return actionError(
-          "Email address is required for order confirmation. Please ensure Vipps has permission to share your email address.",
+          'Email address is required for order confirmation. Please ensure Vipps has permission to share your email address.',
         );
       }
 
@@ -463,7 +470,7 @@ export async function createOrderFromPayment({
           hasPhone: !!normalizedPhone,
           hasName: !!(vippsFirstName && vippsLastName),
         },
-        'Guest checkout - finding or creating user from Vipps data'
+        'Guest checkout - finding or creating user from Vipps data',
       );
 
       // Try to find existing user by email
@@ -484,7 +491,7 @@ export async function createOrderFromPayment({
             userId: effectiveUserId,
             email: existingUser.email,
           },
-          'Found existing user for checkout'
+          'Found existing user for checkout',
         );
       } else {
         // Create new user from Vipps data
@@ -510,7 +517,7 @@ export async function createOrderFromPayment({
             emailVerified: true,
             phoneVerified: true,
           },
-          'Created new user from Vipps profile'
+          'Created new user from Vipps profile',
         );
       }
     } else {
@@ -520,7 +527,7 @@ export async function createOrderFromPayment({
           paymentReference,
           pspReference: paymentDetails.pspReference,
         },
-        'Processing order for authenticated Historia user'
+        'Processing order for authenticated Historia user',
       );
     }
 
@@ -550,32 +557,32 @@ export async function createOrderFromPayment({
       {
         requestedProducts: cart.items.length,
         foundProducts: products.length,
-        productIds: products.map(p => p.id),
+        productIds: products.map((p) => p.id),
         fetchTimeMs: productFetchTime,
       },
-      'Products fetched'
+      'Products fetched',
     );
 
     if (products.length !== cart.items.length) {
       const missingIds = cart.items
-        .map(i => i.productId)
-        .filter(id => !products.find(p => p.id === id));
+        .map((i) => i.productId)
+        .filter((id) => !products.find((p) => p.id === id));
 
       logger.error(
         {
           expected: cart.items.length,
           found: products.length,
-          requestedIds: cart.items.map(i => i.productId),
-          foundIds: products.map(p => p.id),
+          requestedIds: cart.items.map((i) => i.productId),
+          foundIds: products.map((p) => p.id),
           missingIds,
           paymentReference,
-          cartItems: cart.items.map(item => ({
+          cartItems: cart.items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
           })),
           websiteId,
         },
-        'CRITICAL: Not all products found - products may have been deleted or are in different tenant'
+        'CRITICAL: Not all products found - products may have been deleted or are in different tenant',
       );
       return actionError('Some products not found');
     }
@@ -602,7 +609,7 @@ export async function createOrderFromPayment({
         shippingDetails: paymentDetails.shippingDetails,
         paymentState: paymentDetails.state,
       },
-      'Checking for shipping details from Vipps'
+      'Checking for shipping details from Vipps',
     );
 
     if (paymentDetails.shippingDetails) {
@@ -627,7 +634,7 @@ export async function createOrderFromPayment({
           shippingProduct = shippingProducts.docs[0] as Product;
           logger.info(
             { productId: shippingProduct.id, sku: shippingOptionId },
-            'Found existing shipping product'
+            'Found existing shipping product',
           );
         } else {
           // Create shipping product with data from Vipps
@@ -653,7 +660,7 @@ export async function createOrderFromPayment({
           shippingProduct = newShippingProduct as Product;
           logger.info(
             { productId: shippingProduct.id, sku: shippingOptionId, name: shippingOptionName },
-            'Created new shipping product from Vipps option'
+            'Created new shipping product from Vipps option',
           );
         }
 
@@ -666,8 +673,10 @@ export async function createOrderFromPayment({
         // Validate currency
         const currency = paymentDetails.aggregate.authorizedAmount.currency || 'NOK';
         const supportedCurrencies = ['NOK', 'USD', 'EUR', 'GBP', 'SEK', 'DKK'] as const;
-        const validCurrency = supportedCurrencies.includes(currency as typeof supportedCurrencies[number])
-          ? (currency as typeof supportedCurrencies[number])
+        const validCurrency = supportedCurrencies.includes(
+          currency as (typeof supportedCurrencies)[number],
+        )
+          ? (currency as (typeof supportedCurrencies)[number])
           : 'NOK';
 
         // Add shipping as order item
@@ -690,7 +699,7 @@ export async function createOrderFromPayment({
             shippingCostExVat,
             vatRate,
           },
-          'Added shipping line item from Vipps'
+          'Added shipping line item from Vipps',
         );
       } catch (error) {
         logger.error(
@@ -702,7 +711,7 @@ export async function createOrderFromPayment({
             paymentReference,
             shippingDetails: paymentDetails.shippingDetails,
           },
-          'Failed to add shipping line item - continuing without shipping'
+          'Failed to add shipping line item - continuing without shipping',
         );
         // Continue without shipping rather than failing the entire order
       }
@@ -725,14 +734,14 @@ export async function createOrderFromPayment({
         authorizedAmount,
         authorizedAmountNOK: authorizedAmount / 100,
         difference: authorizedAmount - calculatedTotal,
-        orderItems: orderItems.map(i => ({
+        orderItems: orderItems.map((i) => ({
           productId: i.product,
           quantity: i.quantity,
           unitPrice: i.price.amountExVat,
           total: i.price.amountExVat * i.quantity,
         })),
       },
-      'Validating payment amount'
+      'Validating payment amount',
     );
 
     // Accept payment if authorized amount >= order total
@@ -747,10 +756,10 @@ export async function createOrderFromPayment({
           difference: calculatedTotal - authorizedAmount,
           paymentReference,
         },
-        'Payment amount insufficient - authorized less than order total'
+        'Payment amount insufficient - authorized less than order total',
       );
       return actionError(
-        `Payment amount insufficient: authorized ${authorizedAmount / 100} NOK but order total is ${calculatedTotal / 100} NOK (ex VAT)`
+        `Payment amount insufficient: authorized ${authorizedAmount / 100} NOK but order total is ${calculatedTotal / 100} NOK (ex VAT)`,
       );
     }
 
@@ -760,7 +769,7 @@ export async function createOrderFromPayment({
         calculatedTotal,
         overpayment: authorizedAmount - calculatedTotal,
       },
-      'Payment amount validated - authorized amount covers order total'
+      'Payment amount validated - authorized amount covers order total',
     );
 
     // Get user details from Historia account
@@ -779,7 +788,7 @@ export async function createOrderFromPayment({
           paymentState: paymentDetails.state,
           authorizedAmount: paymentDetails.aggregate.authorizedAmount,
         },
-        'CRITICAL: User or user email not found - cannot create order'
+        'CRITICAL: User or user email not found - cannot create order',
       );
       return actionError('User account information not found');
     }
@@ -790,7 +799,7 @@ export async function createOrderFromPayment({
         userEmail: user.email,
         itemCount: orderItems.length,
       },
-      'Creating order in database'
+      'Creating order in database',
     );
 
     // Extract shipping address from Vipps (prioritize shippingDetails over userDetails)
@@ -818,13 +827,10 @@ export async function createOrderFromPayment({
           paymentReference,
           address: vippsShippingAddress,
         },
-        'Shipping address received from Vipps'
+        'Shipping address received from Vipps',
       );
     } else {
-      logger.warn(
-        { paymentReference },
-        'No shipping address available from Vipps'
-      );
+      logger.warn({ paymentReference }, 'No shipping address available from Vipps');
     }
 
     // Create Order
@@ -852,7 +858,7 @@ export async function createOrderFromPayment({
         status: order.status,
         createTimeMs: orderCreateTime,
       },
-      'Order created successfully'
+      'Order created successfully',
     );
 
     // Update cart status to completed and link to order
@@ -879,7 +885,7 @@ export async function createOrderFromPayment({
               orderId: order.id,
               paymentReference,
             },
-            'Cart already marked as completed (likely by webhook) - skipping update'
+            'Cart already marked as completed (likely by webhook) - skipping update',
           );
         } else {
           await payload.update({
@@ -897,7 +903,7 @@ export async function createOrderFromPayment({
               paymentReference,
               previousStatus: cart.status,
             },
-            'Cart status updated to completed and linked to order'
+            'Cart status updated to completed and linked to order',
           );
         }
       } else {
@@ -906,7 +912,7 @@ export async function createOrderFromPayment({
             paymentReference,
             orderId: order.id,
           },
-          'No cart found for payment reference when updating status - order was created successfully'
+          'No cart found for payment reference when updating status - order was created successfully',
         );
       }
     } catch (error) {
@@ -916,7 +922,7 @@ export async function createOrderFromPayment({
           paymentReference,
           orderId: order.id,
         },
-        'Failed to update cart status - order was created successfully'
+        'Failed to update cart status - order was created successfully',
       );
     }
 
@@ -925,9 +931,7 @@ export async function createOrderFromPayment({
       try {
         // Find existing Vipps address or add new one
         const currentAddresses = user.addresses || [];
-        const vippsAddressIndex = currentAddresses.findIndex(
-          (addr) => addr.label === 'Vipps'
-        );
+        const vippsAddressIndex = currentAddresses.findIndex((addr) => addr.label === 'Vipps');
 
         let updatedAddresses;
         if (vippsAddressIndex >= 0) {
@@ -940,7 +944,7 @@ export async function createOrderFromPayment({
           };
           logger.info(
             { userId: effectiveUserId, addressIndex: vippsAddressIndex },
-            'Updated existing Vipps address in user profile'
+            'Updated existing Vipps address in user profile',
           );
         } else {
           // Add new Vipps address
@@ -957,7 +961,7 @@ export async function createOrderFromPayment({
               userId: effectiveUserId,
               isFirstAddress: currentAddresses.length === 0,
             },
-            'Added new Vipps address to user profile'
+            'Added new Vipps address to user profile',
           );
         }
 
@@ -980,7 +984,7 @@ export async function createOrderFromPayment({
             paymentReference,
             vippsShippingAddress,
           },
-          'Failed to update user address, but order was created successfully'
+          'Failed to update user address, but order was created successfully',
         );
       }
     }
@@ -1054,7 +1058,7 @@ export async function createOrderFromPayment({
                 phone_number: !!mobileNumber,
               },
             },
-            'Updated user name and phone from Vipps verified data'
+            'Updated user name and phone from Vipps verified data',
           );
         }
       } catch (error) {
@@ -1067,7 +1071,7 @@ export async function createOrderFromPayment({
             userId: effectiveUserId,
             paymentReference,
           },
-          'Failed to update user from Vipps data, but order was created successfully'
+          'Failed to update user from Vipps data, but order was created successfully',
         );
       }
     }
@@ -1102,7 +1106,7 @@ export async function createOrderFromPayment({
           paymentReference,
           hadOrder: !!transaction.order,
         },
-        'Transaction already exists (from webhook) - linking to order'
+        'Transaction already exists (from webhook) - linking to order',
       );
 
       transaction = await payload.update({
@@ -1125,7 +1129,7 @@ export async function createOrderFromPayment({
           orderId: order.id,
           paymentReference,
         },
-        'Orphaned transaction successfully linked to order'
+        'Orphaned transaction successfully linked to order',
       );
     } else {
       // Create new transaction
@@ -1139,7 +1143,7 @@ export async function createOrderFromPayment({
           status: transactionStatus,
           paymentReference,
         },
-        'Creating new transaction in database'
+        'Creating new transaction in database',
       );
 
       try {
@@ -1160,14 +1164,17 @@ export async function createOrderFromPayment({
       } catch (createError: any) {
         // Handle race condition: webhook and client callback both tried to create transaction
         // The unique constraint on paymentReference prevents duplicates
-        if (createError?.message?.includes('unique') || createError?.message?.includes('duplicate')) {
+        if (
+          createError?.message?.includes('unique') ||
+          createError?.message?.includes('duplicate')
+        ) {
           logger.warn(
             {
               paymentReference,
               orderId: order.id,
               createError: createError.message,
             },
-            'Transaction already exists (race condition) - retrieving existing transaction'
+            'Transaction already exists (race condition) - retrieving existing transaction',
           );
 
           // Retrieve the existing transaction that was created by webhook
@@ -1188,7 +1195,7 @@ export async function createOrderFromPayment({
                 paymentReference,
                 orderId: order.id,
               },
-              'CRITICAL: Unique constraint violation but transaction not found'
+              'CRITICAL: Unique constraint violation but transaction not found',
             );
             throw createError; // Re-throw original error
           }
@@ -1201,7 +1208,7 @@ export async function createOrderFromPayment({
               paymentReference,
               orderId: order.id,
             },
-            'Using existing transaction created by concurrent request (webhook/client race)'
+            'Using existing transaction created by concurrent request (webhook/client race)',
           );
         } else {
           // Different error - re-throw
@@ -1245,7 +1252,7 @@ export async function createOrderFromPayment({
         businessEventTimeMs: businessEventTime,
         totalTimeMs: totalTime,
       },
-      'Order, transaction and business event created successfully - cart will be cleared client-side'
+      'Order, transaction and business event created successfully - cart will be cleared client-side',
     );
 
     // Create business event for order auto-creation tracking
@@ -1255,11 +1262,11 @@ export async function createOrderFromPayment({
       paymentReference,
       order.id as string,
       paymentDetails.aggregate.authorizedAmount,
-      'callback' // This is called from client callback (SSE path)
+      'callback', // This is called from client callback (SSE path)
     ).catch((error) => {
       logger.error(
         { error, orderId: order.id, paymentReference },
-        'Failed to create order auto-created event (non-critical)'
+        'Failed to create order auto-created event (non-critical)',
       );
     });
 
@@ -1286,11 +1293,9 @@ export async function createOrderFromPayment({
         customerEmail: paymentDetails?.profile?.email || paymentDetails?.userDetails?.email,
         totalTimeMs: totalTime,
       },
-      'CRITICAL: Error creating order from payment - payment may be authorized but order not created'
+      'CRITICAL: Error creating order from payment - payment may be authorized but order not created',
     );
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to create order',
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to create order');
   }
 }
 
@@ -1299,9 +1304,7 @@ export async function createOrderFromPayment({
  * Used to skip SSE and show success immediately when revisiting the page
  * SECURITY: Validates that the session owns this payment reference
  */
-export async function checkExistingOrder(
-  paymentReference: string
-): Promise<
+export async function checkExistingOrder(paymentReference: string): Promise<
   ServerActionResult<{
     exists: boolean;
     orderId?: string;
@@ -1326,7 +1329,7 @@ export async function checkExistingOrder(
     if (!ownershipCheck.success) {
       logger.warn(
         { paymentReference },
-        'Session lost or unauthorized access - allowing normal flow with fallback recovery'
+        'Session lost or unauthorized access - allowing normal flow with fallback recovery',
       );
       // Don't block the flow - let the normal payment processing handle it
       // with cart recovery via paymentReference fallback
@@ -1356,7 +1359,7 @@ export async function checkExistingOrder(
     if (!transaction.order) {
       logger.warn(
         { paymentReference, transactionId: transaction.id },
-        'Transaction exists but no order created yet'
+        'Transaction exists but no order created yet',
       );
       return actionSuccess({ exists: false });
     }
@@ -1377,7 +1380,7 @@ export async function checkExistingOrder(
         transactionId: transaction.id,
         exists: true,
       },
-      'Found existing order for payment reference'
+      'Found existing order for payment reference',
     );
 
     return actionSuccess({
@@ -1396,13 +1399,16 @@ export async function checkExistingOrder(
         : undefined,
     });
   } catch (error) {
-    logger.error({
-      error,
-      errorName: error instanceof Error ? error.name : 'Unknown',
-      errorMessage: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      paymentReference,
-    }, 'Error checking existing order - proceeding with normal flow');
+    logger.error(
+      {
+        error,
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        paymentReference,
+      },
+      'Error checking existing order - proceeding with normal flow',
+    );
     // Return exists: false on error to allow normal flow to proceed
     return actionSuccess({ exists: false });
   }
@@ -1419,9 +1425,7 @@ export async function checkExistingOrder(
  *
  * SECURITY: Validates that the session owns this payment reference
  */
-export async function processPaymentAndCreateOrder(
-  paymentReference: string
-): Promise<
+export async function processPaymentAndCreateOrder(paymentReference: string): Promise<
   ServerActionResult<{
     orderId: string;
     transactionId: string;
@@ -1436,17 +1440,17 @@ export async function processPaymentAndCreateOrder(
   }>
 > {
   // CRITICAL: Log immediately when server action is invoked
-  console.log('[SERVER ACTION] processPaymentAndCreateOrder called with reference:', paymentReference);
+  console.log(
+    '[SERVER ACTION] processPaymentAndCreateOrder called with reference:',
+    paymentReference,
+  );
   logger.info({ paymentReference }, '🚀 SERVER ACTION INVOKED: processPaymentAndCreateOrder');
 
   try {
     // Validate payment ownership
     const ownershipCheck = await validatePaymentOwnership(paymentReference);
     if (!ownershipCheck.success) {
-      logger.warn(
-        { paymentReference },
-        'Unauthorized attempt to process payment'
-      );
+      logger.warn({ paymentReference }, 'Unauthorized attempt to process payment');
       return actionError('Unauthorized access');
     }
 
@@ -1459,10 +1463,7 @@ export async function processPaymentAndCreateOrder(
 
     const paymentDetails = await getPaymentDetails(vippsConfig, paymentReference);
 
-    logger.info(
-      { paymentReference, state: paymentDetails.state },
-      'Payment details retrieved'
-    );
+    logger.info({ paymentReference, state: paymentDetails.state }, 'Payment details retrieved');
 
     // Create order
     const orderResult = await createOrderFromPayment({
@@ -1489,15 +1490,16 @@ export async function processPaymentAndCreateOrder(
         : undefined,
     });
   } catch (error) {
-    logger.error({
-      error,
-      errorName: error instanceof Error ? error.name : 'Unknown',
-      errorMessage: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      paymentReference,
-    }, 'CRITICAL: Error processing payment and creating order');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to process payment'
+    logger.error(
+      {
+        error,
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        paymentReference,
+      },
+      'CRITICAL: Error processing payment and creating order',
     );
+    return actionError(error instanceof Error ? error.message : 'Failed to process payment');
   }
 }

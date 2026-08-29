@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Logger } from '@eventuras/logger';
-
 import {
   addToCart as addToCartAction,
   clearCart as clearCartAction,
@@ -11,7 +9,6 @@ import {
   removeFromCart as removeFromCartAction,
   updateCartItem as updateCartItemAction,
 } from '@/app/actions/cart';
-
 import type { Cart } from './types';
 
 const logger = Logger.create({
@@ -51,22 +48,23 @@ export function useSessionCart() {
       logger.debug(
         {
           itemCount: result.data.items.length,
-          totalQuantity: result.data.items.reduce((sum: number, item) => sum + item.quantity, 0)
+          totalQuantity: result.data.items.reduce((sum: number, item) => sum + item.quantity, 0),
         },
-        'Cart updated after add'
+        'Cart updated after add',
       );
     } else {
       logger.error(
         {
           errorMessage: result.error?.message,
           productId,
-          quantity
+          quantity,
         },
-        'Failed to add to cart'
+        'Failed to add to cart',
       );
     }
     return result;
-  };  const updateCartItem = async (productId: string, quantity: number) => {
+  };
+  const updateCartItem = async (productId: string, quantity: number) => {
     const result = await updateCartItemAction(productId, quantity);
     if (result.success) {
       setCart(result.data);
@@ -75,9 +73,9 @@ export function useSessionCart() {
         {
           errorMessage: result.error?.message,
           productId,
-          quantity
+          quantity,
         },
-        'Failed to update cart item'
+        'Failed to update cart item',
       );
     }
     return result;
@@ -91,9 +89,9 @@ export function useSessionCart() {
       logger.error(
         {
           errorMessage: result.error?.message,
-          productId
+          productId,
         },
-        'Failed to remove from cart'
+        'Failed to remove from cart',
       );
     }
     return result;
@@ -104,10 +102,7 @@ export function useSessionCart() {
     if (result.success) {
       setCart(null);
     } else {
-      logger.error(
-        { errorMessage: result.error?.message },
-        'Failed to clear cart'
-      );
+      logger.error({ errorMessage: result.error?.message }, 'Failed to clear cart');
     }
     return result;
   };

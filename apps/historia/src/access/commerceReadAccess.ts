@@ -1,7 +1,5 @@
 import type { Access, Where } from 'payload';
-
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';
-
 import { isSystemAdmin } from './isSystemAdmin';
 
 /**
@@ -22,10 +20,7 @@ export const ordersReadAccess: Access = ({ req }) => {
 
   if (commerceTenantIDs.length || adminTenantIDs.length) {
     const tenantIDs = [...commerceTenantIDs, ...adminTenantIDs];
-    const conditions = [
-      { user: { equals: req.user.id } },
-      { tenant: { in: tenantIDs } },
-    ];
+    const conditions = [{ user: { equals: req.user.id } }, { tenant: { in: tenantIDs } }];
     return { or: conditions } as unknown as Where;
   }
 

@@ -1,7 +1,6 @@
-import { Field } from "payload";
+import type { Field } from 'payload';
 
-export const startDate: Field =
-{
+export const startDate: Field = {
   name: 'startDate',
   type: 'date',
 };

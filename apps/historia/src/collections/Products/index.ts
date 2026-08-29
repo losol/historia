@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteCommerceManagers } from '@/access/siteRoleAccess';
@@ -98,7 +97,8 @@ export const Products: CollectionConfig = {
               name: 'price',
               type: 'group',
               admin: {
-                description: 'Prices are stored in minor units (øre/cents). Use the custom field to edit in major units (kr).',
+                description:
+                  'Prices are stored in minor units (øre/cents). Use the custom field to edit in major units (kr).',
               },
               fields: [
                 {
@@ -188,10 +188,7 @@ export const Products: CollectionConfig = {
         },
         {
           label: 'Meta',
-          fields: [
-            ...slugField(),
-            resourceId,
-          ],
+          fields: [...slugField(), resourceId],
         },
         seoTab(),
       ],

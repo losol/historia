@@ -1,21 +1,16 @@
 'use server';
 
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import {
-  createAndPersistSession,
-  getCurrentSession,
-} from '@eventuras/fides-auth-next';
+import { createAndPersistSession, getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
-
-import type { CartItem } from './types';
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import { getCurrentWebsiteId } from '../website';
+import type { CartItem } from './types';
 
 const logger = Logger.create({
   namespace: 'historia:carts:saveToDatabase',
@@ -144,8 +139,7 @@ export async function saveCartToDatabase(): Promise<
     logger.error({ error }, 'Error saving cart to database');
 
     // Provide user-friendly error message
-    const errorMessage =
-      error instanceof Error ? error.message : 'An unexpected error occurred';
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
 
     return actionError(`Failed to save cart: ${errorMessage}`);
   }

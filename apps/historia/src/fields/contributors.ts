@@ -1,4 +1,4 @@
-import { Field } from 'payload';
+import type { Field } from 'payload';
 
 export const contributors: Field = {
   name: 'contributors',
@@ -10,13 +10,13 @@ export const contributors: Field = {
       name: 'person',
       type: 'relationship',
       relationTo: 'persons',
-      required: true
+      required: true,
     },
     {
       name: 'role',
       type: 'text',
       required: false,
-      localized: true
-    }
-  ]
+      localized: true,
+    },
+  ],
 };

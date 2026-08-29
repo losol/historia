@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@payloadcms/ui';
-import { useDocumentInfo } from '@payloadcms/ui';
+import { Button, useDocumentInfo } from '@payloadcms/ui';
 
 export function PrintReceiptButton() {
   const { id } = useDocumentInfo();
@@ -15,11 +14,7 @@ export function PrintReceiptButton() {
   if (!id) return null;
 
   return (
-    <Button
-      buttonStyle="secondary"
-      size="small"
-      onClick={handlePrint}
-    >
+    <Button buttonStyle="secondary" size="small" onClick={handlePrint}>
       🧾 Print kvittering
     </Button>
   );

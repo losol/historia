@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
-
+import type React from 'react';
 import { ThemeToggle as RatioThemeToggle } from '@eventuras/ratio-ui/core/ThemeToggle';
-
 import { useTheme } from '@/providers/Theme';
 
 export interface ThemeToggleProps {

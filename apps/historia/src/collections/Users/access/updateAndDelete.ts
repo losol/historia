@@ -1,9 +1,7 @@
 import type { Access } from 'payload';
-
 import { isSystemAdmin } from '@/access/isSystemAdmin';
-
-import { isAccessingSelf } from './isAccessingSelf';
 import { getUserTenantIDs } from '../../../utilities/getUserTenantIDs';
+import { isAccessingSelf } from './isAccessingSelf';
 
 export const updateAndDeleteAccess: Access = ({ req, id }) => {
   const { user } = req;

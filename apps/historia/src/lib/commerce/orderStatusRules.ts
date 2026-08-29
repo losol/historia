@@ -18,7 +18,11 @@ export const EDITABLE_ORDER_STATUSES: readonly OrderStatus[] = ['pending', 'proc
 /**
  * Statuses that are considered "locked" and require system admin to edit
  */
-export const LOCKED_ORDER_STATUSES: readonly OrderStatus[] = ['on-hold', 'completed', 'canceled'] as const;
+export const LOCKED_ORDER_STATUSES: readonly OrderStatus[] = [
+  'on-hold',
+  'completed',
+  'canceled',
+] as const;
 
 /**
  * Check if an order status allows editing by commerce managers/admins.

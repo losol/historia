@@ -8,10 +8,7 @@ import { getCurrency } from '@/currencies';
 /**
  * Calculate price excluding VAT from total price including VAT
  */
-export function calculatePriceExcludingVat(
-  totalIncVat: number,
-  vatRate: number,
-): number {
+export function calculatePriceExcludingVat(totalIncVat: number, vatRate: number): number {
   return Math.round(totalIncVat / (1 + vatRate / 100));
 }
 
@@ -25,10 +22,7 @@ export function calculateVatAmount(priceExVat: number, vatRate: number): number 
 /**
  * Calculate total price including VAT
  */
-export function calculatePriceIncludingVat(
-  priceExVat: number,
-  vatRate: number,
-): number {
+export function calculatePriceIncludingVat(priceExVat: number, vatRate: number): number {
   return priceExVat + calculateVatAmount(priceExVat, vatRate);
 }
 
@@ -39,7 +33,7 @@ export function calculatePriceIncludingVat(
  */
 export function getCurrencyMultiplier(currencyCode: string): number {
   const currency = getCurrency(currencyCode);
-  return Math.pow(10, currency?.decimals ?? 2);
+  return 10 ** (currency?.decimals ?? 2);
 }
 
 /**
@@ -65,9 +59,6 @@ export function toMinorUnits(amount: number, currencyCode: string): number {
 /**
  * Calculate line total (price * quantity) in minor units
  */
-export function calculateLineTotal(
-  pricePerUnit: number,
-  quantity: number,
-): number {
+export function calculateLineTotal(pricePerUnit: number, quantity: number): number {
   return pricePerUnit * quantity;
 }

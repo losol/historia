@@ -1,14 +1,12 @@
 'use server';
 
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
-  ServerActionResult,
+  type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
 import { Logger } from '@eventuras/logger';
-
+import { getPayload } from 'payload';
 import config from '@/payload.config';
 
 const logger = Logger.create({
@@ -27,13 +25,10 @@ const logger = Logger.create({
 export async function createPaymentFailureEvent(
   reference: string,
   failureReason: string,
-  paymentDetails?: Record<string, unknown>
+  paymentDetails?: Record<string, unknown>,
 ): Promise<ServerActionResult<void>> {
   try {
-    logger.info(
-      { reference, failureReason },
-      'Creating business event for failed payment'
-    );
+    logger.info({ reference, failureReason }, 'Creating business event for failed payment');
 
     const payload = await getPayload({ config });
 
@@ -53,21 +48,16 @@ export async function createPaymentFailureEvent(
       },
     });
 
-    logger.info(
-      { reference, failureReason },
-      'Business event created for failed payment'
-    );
+    logger.info({ reference, failureReason }, 'Business event created for failed payment');
 
     return actionSuccess(undefined);
   } catch (error) {
     logger.error(
       { reference, failureReason, error },
-      'Failed to create business event for failed payment'
+      'Failed to create business event for failed payment',
     );
 
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to create business event'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to create business event');
   }
 }
 
@@ -85,12 +75,12 @@ export async function createOrderAutoCreatedEvent(
   reference: string,
   orderId: string,
   amount: { value: number; currency: string },
-  source: 'webhook' | 'callback'
+  source: 'webhook' | 'callback',
 ): Promise<ServerActionResult<void>> {
   try {
     logger.info(
       { reference, orderId, source },
-      `Creating business event for order auto-created by ${source}`
+      `Creating business event for order auto-created by ${source}`,
     );
 
     const payload = await getPayload({ config });
@@ -114,18 +104,16 @@ export async function createOrderAutoCreatedEvent(
 
     logger.info(
       { reference, orderId, source },
-      `Business event created for order auto-created by ${source}`
+      `Business event created for order auto-created by ${source}`,
     );
 
     return actionSuccess(undefined);
   } catch (error) {
     logger.error(
       { reference, orderId, source, error },
-      'Failed to create business event for order auto-creation'
+      'Failed to create business event for order auto-creation',
     );
 
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to create business event'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to create business event');
   }
 }

@@ -1,9 +1,11 @@
-import { getLocalizedCollectionName, getOriginalCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
-
+import {
+  getLocalizedCollectionName,
+  getOriginalCollectionName,
+} from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import canUseDOM from './canUseDOM';
 
 export const getServerSideURL = () => {
-  return process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000';;
+  return process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000';
 };
 
 export const getClientSideURL = () => {
@@ -18,7 +20,6 @@ export const getClientSideURL = () => {
 
   return process.env.NEXT_PUBLIC_CMS_URL || '';
 };
-
 
 export interface ResourceDoc {
   locale: string;

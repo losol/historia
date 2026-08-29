@@ -1,8 +1,6 @@
-import type { CollectionAfterChangeHook } from 'payload';
-
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
-
+import type { CollectionAfterChangeHook } from 'payload';
 import { formatPhoneForDisplay } from '@/lib/utils/formatPhone';
 import type { Order, Product, User, Website } from '@/payload-types';
 
@@ -31,11 +29,13 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
   if (operation === 'create') {
     // Send "order-received" when order is created
     shouldSendOrderReceived = true;
-    logger.info({ orderId: doc.id, status: doc.status }, 'Sending order received email (new order)');
+    logger.info(
+      { orderId: doc.id, status: doc.status },
+      'Sending order received email (new order)',
+    );
   } else if (operation === 'update') {
     // Send "order-confirmation" when order status changes to 'processing' (successful payment)
-    const isNewlyProcessing =
-      doc.status === 'processing' && previousDoc?.status !== 'processing';
+    const isNewlyProcessing = doc.status === 'processing' && previousDoc?.status !== 'processing';
 
     if (isNewlyProcessing) {
       shouldSendOrderConfirmation = true;
@@ -51,13 +51,12 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
         currentStatus: doc.status,
         previousStatus: previousDoc?.status,
       },
-      'Skipping order emails - no trigger conditions met'
+      'Skipping order emails - no trigger conditions met',
     );
     return doc;
   }
 
   try {
-
     // Get locale from request, fallback to CMS default
     const defaultLocale = (process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no') as 'no' | 'en';
     const requestLocale = (req.locale || defaultLocale) as 'no' | 'en';
@@ -107,21 +106,20 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
 
       // Get sales contact emails
       if (website.contactPoints) {
-        const salesContacts = website.contactPoints.filter(
-          (cp) => cp.contactType === 'sales',
-        );
+        const salesContacts = website.contactPoints.filter((cp) => cp.contactType === 'sales');
 
         logger.info(
           { websiteId: tenantId, salesContactsCount: salesContacts.length },
-          'Found sales contacts for website'
+          'Found sales contacts for website',
         );
 
         for (const contact of salesContacts) {
           // Fetch user directly to get email (afterRead hook censors it from contactPoints)
           if (contact.user) {
-            const userId = typeof contact.user === 'object' && 'id' in contact.user
-              ? contact.user.id
-              : contact.user;
+            const userId =
+              typeof contact.user === 'object' && 'id' in contact.user
+                ? contact.user.id
+                : contact.user;
 
             try {
               const user = (await payload.findByID({
@@ -134,10 +132,7 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
                 logger.debug({ email: user.email }, 'Added sales contact email');
               }
             } catch (error) {
-              logger.error(
-                { error, userId },
-                'Failed to fetch sales contact user'
-              );
+              logger.error({ error, userId }, 'Failed to fetch sales contact user');
             }
           }
         }
@@ -147,7 +142,7 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
 
       logger.info(
         { websiteId: tenantId, salesEmailsCount: salesEmails.length, salesEmails },
-        'Sales emails to notify'
+        'Sales emails to notify',
       );
     }
 
@@ -227,27 +222,37 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
 
     logger.info(
       { orderId: doc.id, email: doc.userEmail, templateType },
-      `${shouldSendOrderReceived ? 'Order received' : 'Order confirmation'} email sent successfully`
+      `${shouldSendOrderReceived ? 'Order received' : 'Order confirmation'} email sent successfully`,
     );
 
     // Send notification to sales contacts when new order is received
     if (shouldSendOrderReceived && salesEmails.length > 0) {
       try {
         // Render the sales notification email
-        const salesEmailHtml = notitiaTemplates.render('email', 'order-received', {
-          ...templateData,
-          isCopy: true, // Show the copy banner for sales
-        }, {
-          locale: salesEmailLocale,
-        });
+        const salesEmailHtml = notitiaTemplates.render(
+          'email',
+          'order-received',
+          {
+            ...templateData,
+            isCopy: true, // Show the copy banner for sales
+          },
+          {
+            locale: salesEmailLocale,
+          },
+        );
 
         // Send to all sales contacts
-        const salesSubject = notitiaTemplates.getSubject('email', 'order-received', {
-          ...templateData,
-          isCopy: true,
-        }, {
-          locale: salesEmailLocale,
-        });
+        const salesSubject = notitiaTemplates.getSubject(
+          'email',
+          'order-received',
+          {
+            ...templateData,
+            isCopy: true,
+          },
+          {
+            locale: salesEmailLocale,
+          },
+        );
 
         for (const salesEmail of salesEmails) {
           await payload.sendEmail({

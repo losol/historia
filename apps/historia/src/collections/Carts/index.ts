@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { cartsAccess } from './access';
 import { beforeChangeCart } from './hooks/beforeChange';
 
@@ -28,7 +27,7 @@ export const Carts: CollectionConfig = {
   access: cartsAccess,
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['id', 'paymentReference','createdAt', 'customer', 'updatedAt'],
+    defaultColumns: ['id', 'paymentReference', 'createdAt', 'customer', 'updatedAt'],
     group: 'Commerce',
     description: 'Shopping carts saved at payment initiation for secure validation',
   },

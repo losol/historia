@@ -1,5 +1,4 @@
-import React from 'react';
-
+import type React from 'react';
 import RichText from '@/components/RichText';
 import type { InstructionBlock as InstructionBlockType, Media } from '@/payload-types';
 

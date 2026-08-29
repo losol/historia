@@ -1,8 +1,6 @@
 import type { CollectionConfig } from 'payload';
-
 import resourceId from '@/fields/resourceId';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
-
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { siteEditors } from '../access/siteRoleAccess';
@@ -218,7 +216,8 @@ export const Sources: CollectionConfig = {
                   type: 'text',
                   label: 'Journal/Book Title',
                   admin: {
-                    description: 'Title of journal, magazine, or edited book containing this article',
+                    description:
+                      'Title of journal, magazine, or edited book containing this article',
                   },
                 },
                 {

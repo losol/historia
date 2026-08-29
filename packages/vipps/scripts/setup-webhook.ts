@@ -21,10 +21,9 @@
  */
 
 import * as readline from 'node:readline';
-
+import type { VippsConfig } from '../src/vipps-core';
 import { registerWebhook } from '../src/webhooks-v1/client';
 import type { WebhookEventType } from '../src/webhooks-v1/types';
-import type { VippsConfig } from '../src/vipps-core';
 
 const rl = readline.createInterface({
   input: process.stdin,

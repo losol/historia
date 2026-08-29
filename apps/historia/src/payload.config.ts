@@ -1,7 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
@@ -9,9 +8,7 @@ import * as Sentry from '@sentry/nextjs';
 import type { APIError } from 'payload';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
-
 import { defaultLexical } from '@/fields/defaultLexical';
-
 import { Articles } from './collections/Articles';
 import { BusinessEvents } from './collections/BusinessEvents';
 import { Carts } from './collections/Carts';
@@ -41,18 +38,24 @@ import { allowedOrigins } from './config/allowed-origins';
 import { migrations } from './migrations';
 import { plugins } from './plugins';
 
-const locales = process.env.NEXT_PUBLIC_CMS_LOCALES ? process.env.NEXT_PUBLIC_CMS_LOCALES.split(',') : ['en'];
+const locales = process.env.NEXT_PUBLIC_CMS_LOCALES
+  ? process.env.NEXT_PUBLIC_CMS_LOCALES.split(',')
+  : ['en'];
 const defaultLocale = process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE ?? 'en';
 
 // Detect if we're in build mode (no database needed)
-const isBuildMode = process.env.NEXT_PHASE === 'phase-production-build' || process.env.PAYLOAD_DROP_DATABASE === 'true';
+const isBuildMode =
+  process.env.NEXT_PHASE === 'phase-production-build' ||
+  process.env.PAYLOAD_DROP_DATABASE === 'true';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const cmsDatabaseUrl = process.env.CMS_DATABASE_URL || 'file:./historia.db';
 // Use SQLite during build mode to avoid needing PostgreSQL connection
-const isPostgres = !isBuildMode && (cmsDatabaseUrl.startsWith('postgres://') || cmsDatabaseUrl.startsWith('postgresql://'));
+const isPostgres =
+  !isBuildMode &&
+  (cmsDatabaseUrl.startsWith('postgres://') || cmsDatabaseUrl.startsWith('postgresql://'));
 // Use a temporary SQLite database during build
 const buildDatabaseUrl = isBuildMode ? 'file:./.historia-build.db' : cmsDatabaseUrl;
 
@@ -68,7 +71,7 @@ if (smtpEnabled) {
   if (missingCredentials.length > 0) {
     throw new Error(
       `SMTP is enabled (FEATURE_SMTP=enabled) but required credentials are missing: ${missingCredentials.join(', ')}. ` +
-      'Either provide the missing environment variables or disable SMTP by removing FEATURE_SMTP.'
+        'Either provide the missing environment variables or disable SMTP by removing FEATURE_SMTP.',
     );
   }
 }
@@ -153,24 +156,53 @@ export default buildConfig({
   },
   db: isPostgres
     ? postgresAdapter({
-      idType: 'uuid',
-      pool: {
-        connectionString: cmsDatabaseUrl,
-      },
-      // Never auto db push in production, even if HISTORIA_DB_DEV_PUSH is set
-      push: process.env.NODE_ENV === 'production' ? false : process.env.HISTORIA_DB_DEV_PUSH === 'true',
-      // Run migrations at runtime in production
-      // https://payloadcms.com/docs/database/migrations#running-migrations-in-production
-      prodMigrations: migrations,
-    })
+        idType: 'uuid',
+        pool: {
+          connectionString: cmsDatabaseUrl,
+        },
+        // Never auto db push in production, even if HISTORIA_DB_DEV_PUSH is set
+        push:
+          process.env.NODE_ENV === 'production'
+            ? false
+            : process.env.HISTORIA_DB_DEV_PUSH === 'true',
+        // Run migrations at runtime in production
+        // https://payloadcms.com/docs/database/migrations#running-migrations-in-production
+        prodMigrations: migrations,
+      })
     : sqliteAdapter({
-      idType: 'uuid',
-      client: {
-        url: buildDatabaseUrl,
-      },
-      push: true,
-    }),
-  collections: [Articles, BusinessEvents, Carts, Cases, Happenings, Instructions, Licenses, Media, MediaCollections, Notes, Orders, Organizations, Pages, Persons, Places, Products, Quotes, Shipments, Sources, Terms, Timelines, Topics, Transactions, Users, Websites],
+        idType: 'uuid',
+        client: {
+          url: buildDatabaseUrl,
+        },
+        push: true,
+      }),
+  collections: [
+    Articles,
+    BusinessEvents,
+    Carts,
+    Cases,
+    Happenings,
+    Instructions,
+    Licenses,
+    Media,
+    MediaCollections,
+    Notes,
+    Orders,
+    Organizations,
+    Pages,
+    Persons,
+    Places,
+    Products,
+    Quotes,
+    Shipments,
+    Sources,
+    Terms,
+    Timelines,
+    Topics,
+    Transactions,
+    Users,
+    Websites,
+  ],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   editor: defaultLexical,

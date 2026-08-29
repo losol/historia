@@ -1,30 +1,28 @@
 // Main exports
-export { NotitiaTemplates, createNotitiaTemplates, notitiaTemplates } from './NotitiaTemplates';
-
-// Types
-export type {
-  Locale,
-  NotificationChannel,
-  TemplateType,
-  TemplateIdentifier,
-  BaseTemplateParams,
-  Template,
-  RenderedTemplate,
-  TemplateRegistry,
-  RenderOptions,
-} from './types';
-
+export { createNotitiaTemplates, NotitiaTemplates, notitiaTemplates } from './NotitiaTemplates';
 // Default templates
 export {
-  defaultTemplates,
   defaultEmailTemplates,
   defaultSmsTemplates,
+  defaultTemplates,
   getDefaultTemplate,
-  hasDefaultTemplate,
   getDefaultTemplateKeys,
-  localeTemplates,
   getTemplatesForLocale,
+  hasDefaultTemplate,
+  localeTemplates,
   templatesEnUS,
   templatesNbNO,
   templatesNnNO,
 } from './templates';
+// Types
+export type {
+  BaseTemplateParams,
+  Locale,
+  NotificationChannel,
+  RenderedTemplate,
+  RenderOptions,
+  Template,
+  TemplateIdentifier,
+  TemplateRegistry,
+  TemplateType,
+} from './types';

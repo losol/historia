@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { toast, useAuth } from '@payloadcms/ui';
 import { useRouter } from 'next/navigation';
-
 import { cancelOrderPayment } from '@/app/actions/cancelPayment';
 
 interface CancelPaymentButtonProps {
@@ -33,7 +32,7 @@ export function CancelPaymentButton({ orderId, orderStatus }: Readonly<CancelPay
 
     if (
       !confirm(
-        'Cancel this payment?\n\nThis will:\n- Cancel the authorized payment in Vipps\n- Mark the order as canceled\n- Release the reserved amount\n\nThis action cannot be undone.'
+        'Cancel this payment?\n\nThis will:\n- Cancel the authorized payment in Vipps\n- Mark the order as canceled\n- Release the reserved amount\n\nThis action cannot be undone.',
       )
     ) {
       return;

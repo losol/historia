@@ -20,7 +20,7 @@
 
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 export interface VippsLoginButtonProps {
   /**
@@ -95,7 +95,9 @@ export const VippsLoginButton: React.FC<VippsLoginButtonProps> = ({
         {buttonText}
       </button>
       {helperText && (
-        <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#666', textAlign: 'center' }}>
+        <p
+          style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#666', textAlign: 'center' }}
+        >
           {helperText}
         </p>
       )}

@@ -1,8 +1,6 @@
-import type { CollectionAfterChangeHook } from 'payload';
-
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
-
+import type { CollectionAfterChangeHook } from 'payload';
 import type { Order, Product, Shipment, User, Website } from '@/payload-types';
 
 const logger = Logger.create({

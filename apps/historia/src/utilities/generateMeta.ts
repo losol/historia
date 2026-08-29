@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-
-import { getServerSideURL } from './getURL';
 import type { Article, Config, Media, Page } from '../payload-types';
+import { getServerSideURL } from './getURL';
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL();
@@ -34,6 +33,6 @@ export const generateMeta = async (args: {
       title,
       description: description,
       images: ogImage,
-    }
+    },
   };
 };

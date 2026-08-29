@@ -1,9 +1,6 @@
-import type { Payload } from 'payload';
-
 import { Logger } from '@eventuras/logger';
-
+import type { Payload } from 'payload';
 import type { Order } from '@/payload-types';
-
 import { formatPackingListAsHtml } from './packingListGenerator';
 
 const logger = Logger.create({
@@ -47,9 +44,10 @@ export class EmailPackingNotifier implements PackingNotifier {
       return;
     }
 
-    const subject = locale === 'nb-NO'
-      ? `📦 Ny ordre å pakke - ${order.id}`
-      : `📦 New order to pack - ${order.id}`;
+    const subject =
+      locale === 'nb-NO'
+        ? `📦 Ny ordre å pakke - ${order.id}`
+        : `📦 New order to pack - ${order.id}`;
 
     const htmlContent = formatPackingListAsHtml(order, customerName, customerPhone);
 
@@ -61,14 +59,11 @@ export class EmailPackingNotifier implements PackingNotifier {
           html: htmlContent,
         });
 
-        logger.info(
-          { orderId: order.id, email: target.email },
-          'Packing notification sent'
-        );
+        logger.info({ orderId: order.id, email: target.email }, 'Packing notification sent');
       } catch (error) {
         logger.error(
           { error, orderId: order.id, email: target.email },
-          'Failed to send packing notification'
+          'Failed to send packing notification',
         );
         // Don't throw - continue with other targets
       }

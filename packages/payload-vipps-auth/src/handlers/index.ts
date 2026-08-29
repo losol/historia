@@ -2,7 +2,7 @@
  * API Route Handlers
  */
 
-export { handleVippsLogin } from './login';
 export { handleVippsCallback } from './callback';
-export { handleVippsSession } from './session';
+export { handleVippsLogin } from './login';
 export type { VippsSessionOptions } from './session';
+export { handleVippsSession } from './session';

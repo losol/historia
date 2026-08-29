@@ -23,7 +23,7 @@ if (isSentryEnabled && sentryDsn) {
   console.log('[Sentry] Client-side initialized successfully');
 } else {
   console.log(
-    `[Sentry] Client-side disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!sentryDsn})`
+    `[Sentry] Client-side disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!sentryDsn})`,
   );
 }
 

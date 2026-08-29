@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Button, toast } from '@payloadcms/ui';
 import Link from 'next/link';
-
 import { getSalesReport, type SalesReportData } from '@/app/actions/salesReport';
 import {
   formatCurrency,
@@ -11,7 +10,6 @@ import {
   type OrderWithTransactions,
 } from '@/lib/reports/salesReportHelpers';
 import type { Product, User } from '@/payload-types';
-
 import styles from './SalesReportView.module.css';
 
 function getProductName(item: OrderWithTransactions['items'][0]): string {
@@ -39,7 +37,10 @@ function getCustomerName(customer: OrderWithTransactions['customer']): string | 
   return parts.length > 0 ? parts.join(' ') : null;
 }
 
-function ReceiptCard({ order, currency }: Readonly<{ order: OrderWithTransactions; currency: string }>) {
+function ReceiptCard({
+  order,
+  currency,
+}: Readonly<{ order: OrderWithTransactions; currency: string }>) {
   const isTaxExempt = order.taxExempt === true;
   const customerName = getCustomerName(order.customer);
   const addr = order.shippingAddress;
@@ -67,9 +68,7 @@ function ReceiptCard({ order, currency }: Readonly<{ order: OrderWithTransaction
         <div>
           <h3 className={styles.receiptTitle}>KVITTERING</h3>
           <p className={styles.receiptOrderId}>
-            <Link href={`/admin/collections/orders/${order.id}`}>
-              Ordre #{order.id}
-            </Link>
+            <Link href={`/admin/collections/orders/${order.id}`}>Ordre #{order.id}</Link>
           </p>
         </div>
         <div className={styles.receiptHeaderRight}>
@@ -92,9 +91,16 @@ function ReceiptCard({ order, currency }: Readonly<{ order: OrderWithTransaction
           <p>{order.userEmail}</p>
           {addr && (
             <address className={styles.receiptAddress}>
-              {addr.addressLine1}<br />
-              {addr.addressLine2 && <>{addr.addressLine2}<br /></>}
-              {addr.postalCode} {addr.city}<br />
+              {addr.addressLine1}
+              <br />
+              {addr.addressLine2 && (
+                <>
+                  {addr.addressLine2}
+                  <br />
+                </>
+              )}
+              {addr.postalCode} {addr.city}
+              <br />
               {addr.country || 'Norge'}
             </address>
           )}
@@ -120,9 +126,13 @@ function ReceiptCard({ order, currency }: Readonly<{ order: OrderWithTransaction
                 <td>{index + 1}</td>
                 <td>{getProductName(item)}</td>
                 <td className={styles.rightAlign}>{item.quantity}</td>
-                <td className={styles.rightAlign}>{formatCurrency(item.price?.amountExVat ?? 0, currency)}</td>
+                <td className={styles.rightAlign}>
+                  {formatCurrency(item.price?.amountExVat ?? 0, currency)}
+                </td>
                 <td className={styles.rightAlign}>{vatRate}%</td>
-                <td className={styles.rightAlign}>{formatCurrency(item.lineTotal ?? 0, currency)}</td>
+                <td className={styles.rightAlign}>
+                  {formatCurrency(item.lineTotal ?? 0, currency)}
+                </td>
               </tr>
             );
           })}
@@ -161,17 +171,17 @@ function ReceiptCard({ order, currency }: Readonly<{ order: OrderWithTransaction
               {order.resolvedTransactions.map((txn) => {
                 const statusKey = `status_${txn.status}` as keyof typeof styles;
                 return (
-                <tr key={txn.id}>
-                  <td>{new Date(txn.createdAt).toLocaleDateString('nb-NO')}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${styles[statusKey] || ''}`}>
-                      {getStatusLabel(txn.status)}
-                    </span>
-                  </td>
-                  <td>{txn.paymentMethod}</td>
-                  <td className={styles.receiptRef}>{txn.paymentReference}</td>
-                  <td className={styles.rightAlign}>{formatCurrency(txn.amount, currency)}</td>
-                </tr>
+                  <tr key={txn.id}>
+                    <td>{new Date(txn.createdAt).toLocaleDateString('nb-NO')}</td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[statusKey] || ''}`}>
+                        {getStatusLabel(txn.status)}
+                      </span>
+                    </td>
+                    <td>{txn.paymentMethod}</td>
+                    <td className={styles.receiptRef}>{txn.paymentReference}</td>
+                    <td className={styles.rightAlign}>{formatCurrency(txn.amount, currency)}</td>
+                  </tr>
                 );
               })}
             </tbody>
@@ -236,7 +246,7 @@ const presetLabels: Record<DatePreset, string> = {
   'last-week': 'Siste 7 dager',
   'last-month': 'Forrige måned',
   'year-to-date': 'Hittil i år',
-  'custom': 'Egendefinert',
+  custom: 'Egendefinert',
 };
 
 export function SalesReportView() {
@@ -311,7 +321,8 @@ export function SalesReportView() {
 
       {reportData && (
         <p className={styles.dateRangeDisplay}>
-          Periode: {new Date(reportData.dateRange.startDate).toLocaleDateString('nb-NO')} - {new Date(reportData.dateRange.endDate).toLocaleDateString('nb-NO')}
+          Periode: {new Date(reportData.dateRange.startDate).toLocaleDateString('nb-NO')} -{' '}
+          {new Date(reportData.dateRange.endDate).toLocaleDateString('nb-NO')}
         </p>
       )}
 
@@ -352,7 +363,11 @@ export function SalesReportView() {
             </div>
           </div>
         )}
-        <Button onClick={handleGenerateReport} disabled={loading || (datePreset === 'custom' && !isValidDateRange)} buttonStyle="primary">
+        <Button
+          onClick={handleGenerateReport}
+          disabled={loading || (datePreset === 'custom' && !isValidDateRange)}
+          buttonStyle="primary"
+        >
           {loading ? 'Genererer...' : 'Generer rapport'}
         </Button>
       </div>
@@ -425,7 +440,10 @@ export function SalesReportView() {
               <div className={styles.summaryCard}>
                 <span className={styles.summaryLabel}>Autorisert</span>
                 <span className={styles.summaryValue}>
-                  {formatCurrency(reportData.transactionSummary.totalAuthorized, reportData.currency)}
+                  {formatCurrency(
+                    reportData.transactionSummary.totalAuthorized,
+                    reportData.currency,
+                  )}
                 </span>
               </div>
               <div className={styles.summaryCard}>

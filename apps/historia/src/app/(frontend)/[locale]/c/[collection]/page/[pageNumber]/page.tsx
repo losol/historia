@@ -1,32 +1,30 @@
-import React from 'react'
-import configPromise from '@payload-config'
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next/types'
-import { getPayload } from 'payload'
+import React from 'react';
+import configPromise from '@payload-config';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next/types';
+import { getPayload } from 'payload';
+import { CollectionArchive } from '@/components/CollectionArchive';
+import { PageRange } from '@/components/PageRange';
+import { Pagination } from '@/components/Pagination';
+import { generateMeta } from '@/lib/seo';
+import { getCurrentWebsite } from '@/lib/website';
+import PageClient from './page.client';
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import { PageRange } from '@/components/PageRange'
-import { Pagination } from '@/components/Pagination'
-import { generateMeta } from '@/lib/seo'
-import { getCurrentWebsite } from '@/lib/website'
-
-import PageClient from './page.client'
-
-export const revalidate = 600
+export const revalidate = 600;
 
 type Args = {
   params: Promise<{
-    pageNumber: string
-  }>
-}
+    pageNumber: string;
+  }>;
+};
 
 export default async function Page({ params: paramsPromise }: Readonly<Args>) {
-  const { pageNumber } = await paramsPromise
-  const payload = await getPayload({ config: configPromise })
+  const { pageNumber } = await paramsPromise;
+  const payload = await getPayload({ config: configPromise });
 
-  const sanitizedPageNumber = Number(pageNumber)
+  const sanitizedPageNumber = Number(pageNumber);
 
-  if (!Number.isInteger(sanitizedPageNumber)) notFound()
+  if (!Number.isInteger(sanitizedPageNumber)) notFound();
 
   const articles = await payload.find({
     collection: 'articles',
@@ -34,7 +32,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     limit: 12,
     page: sanitizedPageNumber,
     overrideAccess: false,
-  })
+  });
 
   return (
     <div className="pt-24 pb-24">
@@ -54,7 +52,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
         />
       </div>
 
-      <CollectionArchive docs={articles.docs} relationTo='articles' />
+      <CollectionArchive docs={articles.docs} relationTo="articles" />
 
       <div className="container">
         {articles?.page && articles?.totalPages > 1 && (
@@ -62,38 +60,39 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { pageNumber } = await paramsPromise
-  const website = await getCurrentWebsite()
+  const { pageNumber } = await paramsPromise;
+  const website = await getCurrentWebsite();
 
   const doc = {
     title: `Articles - Page ${pageNumber || ''}`,
-  }
+  };
 
-  return generateMeta({ doc, website })
+  return generateMeta({ doc, website });
 }
 
-export async function generateStaticParams() {  // Skip static generation during build to avoid database queries
+export async function generateStaticParams() {
+  // Skip static generation during build to avoid database queries
   // Pages will be generated on-demand at runtime (ISR)
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return [];
   }
-  const payload = await getPayload({ config: configPromise })
+  const payload = await getPayload({ config: configPromise });
   const { totalDocs } = await payload.count({
     collection: 'articles',
     overrideAccess: false,
-  })
+  });
 
-  const totalPages = Math.ceil(totalDocs / 10)
+  const totalPages = Math.ceil(totalDocs / 10);
 
-  const pages: { pageNumber: string }[] = []
+  const pages: { pageNumber: string }[] = [];
 
   for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) })
+    pages.push({ pageNumber: String(i) });
   }
 
-  return pages
+  return pages;
 }

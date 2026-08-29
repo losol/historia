@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { publishedOnly } from '@/access/publishedOnly';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -19,10 +18,8 @@ import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
 import { seoTab } from '@/lib/payload-plugin-seo';
-
-import { revalidateArticle } from './hooks/revalidateArticle';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
-
+import { revalidateArticle } from './hooks/revalidateArticle';
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -52,7 +49,7 @@ export const Articles: CollectionConfig = {
         slug: typeof data?.slug === 'string' ? data.slug : '',
         resourceId: typeof data?.resourceId === 'string' ? data.resourceId : undefined,
         collection: 'articles',
-        req
+        req,
       });
 
       return path;
@@ -65,12 +62,7 @@ export const Articles: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          fields: [
-            title,
-            image,
-            lead,
-            storyField([Content, Image, Product]),
-          ]
+          fields: [title, image, lead, storyField([Content, Image, Product])],
         },
         {
           label: 'Meta',
@@ -96,6 +88,6 @@ export const Articles: CollectionConfig = {
       autosave: {
         interval: 1000,
       },
-    }
-  }
+    },
+  },
 };

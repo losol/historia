@@ -5,11 +5,9 @@
  */
 
 import type { Metadata } from 'next';
-
 import type { SEODocument } from '@/lib/payload-plugin-seo';
 import type { Website } from '@/payload-types';
 import { getServerSideURL } from '@/utilities/getURL';
-
 import { extractImage, getImageURL } from './utils';
 
 export interface GenerateMetaOptions {
@@ -55,9 +53,7 @@ export interface GenerateMetaOptions {
  * }
  * ```
  */
-export async function generateMeta(
-  options: GenerateMetaOptions
-): Promise<Metadata> {
+export async function generateMeta(options: GenerateMetaOptions): Promise<Metadata> {
   const { doc, website, baseUrl } = options;
 
   const serverUrl = baseUrl || getServerSideURL();
@@ -74,9 +70,7 @@ export async function generateMeta(
     doc.meta?.description ||
     doc.lead ||
     doc.excerpt ||
-    (typeof website?.meta?.description === 'string'
-      ? website.meta.description
-      : null) ||
+    (typeof website?.meta?.description === 'string' ? website.meta.description : null) ||
     undefined;
 
   // Image fallback chain
@@ -92,9 +86,7 @@ export async function generateMeta(
   let canonicalUrl: string | undefined;
   if (doc.slug && doc.locale) {
     const domain =
-      website?.domains && website.domains.length > 0
-        ? website.domains[0]
-        : new URL(serverUrl).host;
+      website?.domains && website.domains.length > 0 ? website.domains[0] : new URL(serverUrl).host;
 
     // Build URL based on collection type
     if (doc.resourceId) {
@@ -113,11 +105,15 @@ export async function generateMeta(
     openGraph: {
       title,
       description: description || undefined,
-      images: imageData ? [{
-        url: imageData.url,
-        width: imageData.width,
-        height: imageData.height,
-      }] : undefined,
+      images: imageData
+        ? [
+            {
+              url: imageData.url,
+              width: imageData.width,
+              height: imageData.height,
+            },
+          ]
+        : undefined,
       url: canonicalUrl,
     },
     twitter: {

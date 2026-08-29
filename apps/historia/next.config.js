@@ -1,8 +1,10 @@
-import { withPayload } from '@payloadcms/next/withPayload'
-import { withSentryConfig } from '@sentry/nextjs'
-
-import redirects from './redirects.js'
-import { allowedOrigins, getAllowedDomainsFromAllowedOrigins } from './src/config/allowed-origins.ts'
+import { withPayload } from '@payloadcms/next/withPayload';
+import { withSentryConfig } from '@sentry/nextjs';
+import redirects from './redirects.js';
+import {
+  allowedOrigins,
+  getAllowedDomainsFromAllowedOrigins,
+} from './src/config/allowed-origins.ts';
 
 const cmsUrlCandidates = [
   // Prefer explicit configuration (custom domain) when present
@@ -16,9 +18,9 @@ const cmsUrlCandidates = [
 
   // Local development default
   'http://localhost:3100',
-].filter(Boolean)
+].filter(Boolean);
 
-const allowedImageDomains = getAllowedDomainsFromAllowedOrigins(allowedOrigins) || []
+const allowedImageDomains = getAllowedDomainsFromAllowedOrigins(allowedOrigins) || [];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -47,17 +49,17 @@ const nextConfig = {
       })),
       // Always allow the CMS URL(s)
       ...cmsUrlCandidates.map((item) => {
-        const url = new URL(item)
+        const url = new URL(item);
         return {
           hostname: url.hostname,
           protocol: url.protocol.replace(':', ''),
-        }
+        };
       }),
     ],
   },
   reactStrictMode: true,
   redirects,
-}
+};
 
 // Compose the configurations: Sentry wraps Payload
 export default withSentryConfig(withPayload(nextConfig), {
@@ -96,4 +98,4 @@ export default withSentryConfig(withPayload(nextConfig), {
       removeDebugLogging: true,
     },
   },
-})
+});

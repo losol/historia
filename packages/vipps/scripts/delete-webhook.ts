@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+
 /**
  * Vipps Webhook Deletion Script
  *
@@ -15,8 +16,8 @@
  *   VIPPS_USE_TEST_MODE (optional, defaults to true)
  */
 
-import { deleteWebhook } from '../src/webhooks-v1/client';
 import type { VippsConfig } from '../src/vipps-core';
+import { deleteWebhook } from '../src/webhooks-v1/client';
 
 async function main() {
   const webhookId = process.argv[2];

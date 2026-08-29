@@ -3,7 +3,14 @@ import type { Image, Media } from '@/payload-types';
 /**
  * Size preference for image URL retrieval
  */
-export type ImageSize = 'thumbnail' | 'square' | 'landscape' | 'socialShare' | 'verticalStory' | 'banner' | 'original';
+export type ImageSize =
+  | 'thumbnail'
+  | 'square'
+  | 'landscape'
+  | 'socialShare'
+  | 'verticalStory'
+  | 'banner'
+  | 'original';
 
 /**
  * Extract the best available image URL from a Payload CMS image object.
@@ -101,9 +108,7 @@ export function getImageUrl(
  * }
  * ```
  */
-export function getImageCaption(
-  image: Image | null | undefined,
-): Image['caption'] | null {
+export function getImageCaption(image: Image | null | undefined): Image['caption'] | null {
   if (!image || typeof image !== 'object') {
     return null;
   }
@@ -127,17 +132,15 @@ export function getImageCaption(
  * const alt = getImageAlt(product.image, product.title);
  * ```
  */
-export function getImageAlt(
-  image: Image | null | undefined,
-  fallback: string = '',
-): string {
+export function getImageAlt(image: Image | null | undefined, fallback: string = ''): string {
   if (!image || typeof image !== 'object') {
     return fallback;
   }
 
-  const media = 'media' in image && image.media && typeof image.media === 'object'
-    ? (image.media as Media)
-    : null;
+  const media =
+    'media' in image && image.media && typeof image.media === 'object'
+      ? (image.media as Media)
+      : null;
 
   // Try to get alt text from caption (most specific - per-usage context)
   if ('caption' in image && image.caption) {
@@ -206,7 +209,13 @@ export function getImageProps(
   let width: number | undefined;
   let height: number | undefined;
 
-  if (image && typeof image === 'object' && 'media' in image && image.media && typeof image.media === 'object') {
+  if (
+    image &&
+    typeof image === 'object' &&
+    'media' in image &&
+    image.media &&
+    typeof image.media === 'object'
+  ) {
     const media = image.media as Media;
 
     // Get dimensions from preferred size

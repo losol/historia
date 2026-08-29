@@ -1,5 +1,4 @@
 import type { FieldAccess } from 'payload';
-
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 
 /**

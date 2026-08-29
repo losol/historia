@@ -2,8 +2,8 @@
  * Configuration utilities for Vipps Auth Plugin
  */
 
-import { Logger } from '@eventuras/logger';
 import { VippsEnvironments } from '@eventuras/fides-auth/providers/vipps';
+import { Logger } from '@eventuras/logger';
 import type { ResolvedVippsAuthConfig, VippsAuthPluginConfig } from './types';
 
 const logger = Logger.create({
@@ -23,7 +23,8 @@ export function resolveConfig(config: VippsAuthPluginConfig): ResolvedVippsAuthC
 
   // Map environment to Vipps API URL
   const environment = config.environment || 'test';
-  const apiUrl = environment === 'production' ? VippsEnvironments.Production : VippsEnvironments.Test;
+  const apiUrl =
+    environment === 'production' ? VippsEnvironments.Production : VippsEnvironments.Test;
 
   // Validate required fields
   if (!clientId) {
@@ -56,7 +57,7 @@ export function resolveConfig(config: VippsAuthPluginConfig): ResolvedVippsAuthC
       disableLocalStrategy: resolved.disableLocalStrategy,
       hasCustomMapper: !!resolved.mapVippsUser,
     },
-    'Vipps auth configuration resolved'
+    'Vipps auth configuration resolved',
   );
 
   return resolved;

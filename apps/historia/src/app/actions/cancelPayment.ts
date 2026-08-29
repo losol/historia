@@ -1,8 +1,5 @@
 'use server';
 
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
-
 import {
   actionError,
   actionSuccess,
@@ -10,7 +7,8 @@ import {
 } from '@eventuras/core-nextjs/actions';
 import { Logger } from '@eventuras/logger';
 import { cancelPayment } from '@eventuras/vipps/epayment-v1';
-
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import { getVippsConfig } from '@/lib/vipps/config';
 import type { Transaction } from '@/payload-types';
 
@@ -83,13 +81,13 @@ export async function cancelOrderPayment(
     // 3. Check if payment can be cancelled
     if (transaction.status !== 'authorized') {
       return actionError(
-        `Cannot cancel payment with status "${transaction.status}". Only authorized payments can be cancelled.`
+        `Cannot cancel payment with status "${transaction.status}". Only authorized payments can be cancelled.`,
       );
     }
 
     logger.info(
       { orderId, transactionId: transaction.id, paymentReference, status: transaction.status },
-      'Found authorized transaction'
+      'Found authorized transaction',
     );
 
     // 4. Cancel payment via Vipps
@@ -103,17 +101,17 @@ export async function cancelOrderPayment(
 
       logger.info(
         { orderId, transactionId: transaction.id, paymentReference },
-        'Payment cancelled successfully via Vipps'
+        'Payment cancelled successfully via Vipps',
       );
     } catch (error) {
       logger.error(
         { error, orderId, transactionId: transaction.id, paymentReference },
-        'Failed to cancel payment via Vipps'
+        'Failed to cancel payment via Vipps',
       );
       return actionError(
         error instanceof Error
           ? `Failed to cancel payment: ${error.message}`
-          : 'Failed to cancel payment'
+          : 'Failed to cancel payment',
       );
     }
 
@@ -168,8 +166,6 @@ export async function cancelOrderPayment(
     return actionSuccess(undefined, 'Payment cancelled successfully!');
   } catch (error) {
     logger.error({ error, orderId }, 'Error cancelling payment');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to cancel payment'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to cancel payment');
   }
 }

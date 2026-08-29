@@ -1,8 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -37,7 +35,7 @@ export const Media: CollectionConfig = {
       name: 'attributionUrl',
       type: 'text',
       admin: {
-        description: 'A URL to the original source of the media.'
+        description: 'A URL to the original source of the media.',
       },
     },
     {
@@ -49,7 +47,7 @@ export const Media: CollectionConfig = {
         description: 'Optional: organize media into collections',
       },
     },
-    relatedContent
+    relatedContent,
   ],
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload

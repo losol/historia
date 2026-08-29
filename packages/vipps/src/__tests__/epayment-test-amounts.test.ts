@@ -14,14 +14,14 @@
  * 2. Test user must have manually approved at least ONE payment in MT app (one-time requirement)
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { createPayment, forceApprovePayment, getPaymentDetails } from '../epayment-v1/client';
 import type { CreatePaymentRequest } from '../epayment-v1/types';
 import {
-  hasTestConfig,
-  getTestConfig,
   generateTestReference,
+  getTestConfig,
   getTestPhoneNumber,
+  hasTestConfig,
   waitForPaymentState,
 } from './test-utils';
 
@@ -49,10 +49,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
   /**
    * Helper to create a payment with a specific test amount
    */
-  async function createTestPayment(
-    amountValue: number,
-    description: string
-  ) {
+  async function createTestPayment(amountValue: number, description: string) {
     const reference = generateTestReference(`test-${amountValue}`);
 
     const request: CreatePaymentRequest = {
@@ -82,7 +79,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
     it('should successfully create and approve a payment with normal amount', async () => {
       const { reference, response } = await createTestPayment(
         10000, // 100 NOK
-        'Normal payment test'
+        'Normal payment test',
       );
 
       expect(response).toBeDefined();
@@ -97,7 +94,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
         () => getPaymentDetails(config!, reference),
         'AUTHORIZED',
         20,
-        1000
+        1000,
       );
 
       const details = await getPaymentDetails(config!, reference);
@@ -107,7 +104,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
     it('should create and approve payment with minimum amount (1 NOK)', async () => {
       const { reference, response } = await createTestPayment(
         100, // 1 NOK (minimum)
-        'Minimum amount test'
+        'Minimum amount test',
       );
 
       expect(response).toBeDefined();
@@ -121,7 +118,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
         () => getPaymentDetails(config!, reference),
         'AUTHORIZED',
         20,
-        1000
+        1000,
       );
 
       const details = await getPaymentDetails(config!, reference);
@@ -133,7 +130,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
     it('should create payment and fail approval due to limit', async () => {
       const { reference, response } = await createTestPayment(
         184,
-        'Test Amount 184: Withdrawal limit exceeded'
+        'Test Amount 184: Withdrawal limit exceeded',
       );
 
       expect(response).toBeDefined();
@@ -144,12 +141,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
         await forceApprovePayment(config!, reference, phoneNumber);
 
         // If approve succeeds, payment should eventually be ABORTED
-        await waitForPaymentState(
-          () => getPaymentDetails(config!, reference),
-          'ABORTED',
-          20,
-          1000
-        );
+        await waitForPaymentState(() => getPaymentDetails(config!, reference), 'ABORTED', 20, 1000);
 
         const details = await getPaymentDetails(config!, reference);
         expect(details.state).toBe('ABORTED');
@@ -162,10 +154,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
 
   describe('Test Amount 186 - Expired Card', () => {
     it('should create payment and fail approval with expired card', async () => {
-      const { reference, response } = await createTestPayment(
-        186,
-        'Test Amount 186: Expired card'
-      );
+      const { reference, response } = await createTestPayment(186, 'Test Amount 186: Expired card');
 
       expect(response).toBeDefined();
       expect(response.reference).toBe(reference);
@@ -175,12 +164,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
         await forceApprovePayment(config!, reference, phoneNumber);
 
         // If approve succeeds, payment should eventually be ABORTED
-        await waitForPaymentState(
-          () => getPaymentDetails(config!, reference),
-          'ABORTED',
-          20,
-          1000
-        );
+        await waitForPaymentState(() => getPaymentDetails(config!, reference), 'ABORTED', 20, 1000);
 
         const details = await getPaymentDetails(config!, reference);
         expect(details.state).toBe('ABORTED');
@@ -193,10 +177,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
 
   describe('Payment Status Retrieval', () => {
     it('should retrieve payment details after creation and approval', async () => {
-      const { reference } = await createTestPayment(
-        10000,
-        'Payment details test'
-      );
+      const { reference } = await createTestPayment(10000, 'Payment details test');
 
       // Force approve the payment
       await forceApprovePayment(config!, reference, phoneNumber);
@@ -206,7 +187,7 @@ describeIf('Vipps ePayment API - Test Amounts', () => {
         () => getPaymentDetails(config!, reference),
         'AUTHORIZED',
         20,
-        1000
+        1000,
       );
 
       // Get payment details

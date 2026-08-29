@@ -1,11 +1,13 @@
 'use server';
 
+import {
+  actionError,
+  actionSuccess,
+  type ServerActionResult,
+} from '@eventuras/core-nextjs/actions';
+import { Logger } from '@eventuras/logger';
 import config from '@payload-config';
 import { getPayload } from 'payload';
-
-import { actionError, actionSuccess, ServerActionResult } from '@eventuras/core-nextjs/actions';
-import { Logger } from '@eventuras/logger';
-
 import type { Order } from '@/payload-types';
 
 const logger = Logger.create({
@@ -85,7 +87,7 @@ export async function getPackingQueue(): Promise<ServerActionResult<Order[]>> {
  * Mark order as ready to ship by creating a shipment
  */
 export async function markOrderPacked(
-  orderId: string
+  orderId: string,
 ): Promise<ServerActionResult<{ shipmentId: string }>> {
   try {
     logger.info({ orderId }, 'Marking order as packed');
@@ -136,14 +138,9 @@ export async function markOrderPacked(
 
     logger.info({ orderId, shipmentId: shipment.id }, 'Order marked as packed');
 
-    return actionSuccess(
-      { shipmentId: shipment.id },
-      'Order marked as ready to ship'
-    );
+    return actionSuccess({ shipmentId: shipment.id }, 'Order marked as ready to ship');
   } catch (error) {
     logger.error({ error, orderId }, 'Failed to mark order as packed');
-    return actionError(
-      error instanceof Error ? error.message : 'Failed to mark order as packed'
-    );
+    return actionError(error instanceof Error ? error.message : 'Failed to mark order as packed');
   }
 }

@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -79,7 +78,8 @@ export const Timelines: CollectionConfig = {
               localized: true,
               label: 'Summary',
               admin: {
-                description: 'Brief summary for timeline tooltips and previews (max 300 characters)',
+                description:
+                  'Brief summary for timeline tooltips and previews (max 300 characters)',
               },
             },
 

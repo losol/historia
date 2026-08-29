@@ -1,5 +1,4 @@
 import type { CollectionBeforeChangeHook } from 'payload';
-
 import type { Order, Product } from '@/payload-types';
 
 /**
@@ -36,10 +35,10 @@ export const populateOrderPrices: CollectionBeforeChangeHook<Order> = async ({
       }
 
       // Fetch product from database
-      const product = await req.payload.findByID({
+      const product = (await req.payload.findByID({
         collection: 'products',
         id: productId,
-      }) as Product;
+      })) as Product;
 
       if (!product?.price) {
         return item;

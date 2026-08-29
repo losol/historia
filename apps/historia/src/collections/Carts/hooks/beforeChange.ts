@@ -1,9 +1,6 @@
 import crypto from 'node:crypto';
-
-import type { CollectionBeforeChangeHook } from 'payload';
-
 import { Logger } from '@eventuras/logger';
-
+import type { CollectionBeforeChangeHook } from 'payload';
 import { checkRateLimit } from '../rateLimit';
 
 const logger = Logger.create({
@@ -23,11 +20,7 @@ const logger = Logger.create({
  * Inspired by Payload's e-commerce plugin:
  * @see https://github.com/payloadcms/payload/blob/main/packages/plugin-ecommerce/src/collections/carts/beforeChange.ts
  */
-export const beforeChangeCart: CollectionBeforeChangeHook = async ({
-  data,
-  operation,
-  req,
-}) => {
+export const beforeChangeCart: CollectionBeforeChangeHook = async ({ data, operation, req }) => {
   // 1. Generate secret for guest cart access on creation
   if (operation === 'create' && !data.customer && !data.secret) {
     // Generate a cryptographically secure random string (40 characters)

@@ -1,9 +1,7 @@
 import type { CollectionConfig } from 'payload';
-
 import resourceId from '@/fields/resourceId';
 import { richText } from '@/fields/richText';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
-
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { siteEditors } from '../access/siteRoleAccess';
@@ -132,7 +130,8 @@ export const Quotes: CollectionConfig = {
               relationTo: 'persons',
               label: 'Author',
               admin: {
-                description: 'Person who said/wrote this. For complex sources with multiple contributors, create a Source entry.',
+                description:
+                  'Person who said/wrote this. For complex sources with multiple contributors, create a Source entry.',
               },
             },
 
@@ -143,7 +142,8 @@ export const Quotes: CollectionConfig = {
               label: 'Attribution',
               localized: true,
               admin: {
-                description: 'Use when author is not in database (e.g., "World Health Organization", "Anonymous", "Often attributed to Mark Twain")',
+                description:
+                  'Use when author is not in database (e.g., "World Health Organization", "Anonymous", "Often attributed to Mark Twain")',
                 condition: (data) => !data.author,
               },
             },

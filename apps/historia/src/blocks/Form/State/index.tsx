@@ -1,29 +1,27 @@
-import React from 'react'
-import type { Control, FieldErrorsImpl, FieldValues } from 'react-hook-form'
-import { Controller } from 'react-hook-form'
-import type { StateField } from '@payloadcms/plugin-form-builder/types'
-
-import { Label } from '@/components/ui/label'
+import type React from 'react';
+import type { Control, FieldErrorsImpl, FieldValues } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
+import type { StateField } from '@payloadcms/plugin-form-builder/types';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-
-import { stateOptions } from './options'
-import { FieldError } from '../Error'
-import { Width } from '../Width'
+} from '@/components/ui/select';
+import { FieldError } from '../Error';
+import { Width } from '../Width';
+import { stateOptions } from './options';
 
 export const State: React.FC<
   StateField & {
-    control: Control<FieldValues, any>
+    control: Control<FieldValues, any>;
     errors: Partial<
       FieldErrorsImpl<{
-        [x: string]: any
+        [x: string]: any;
       }>
-    >
+    >;
   }
 > = ({ name, control, errors, label, required, width }) => {
   return (
@@ -34,7 +32,7 @@ export const State: React.FC<
         defaultValue=""
         name={name}
         render={({ field: { onChange, value } }) => {
-          const controlledValue = stateOptions.find((t) => t.value === value)
+          const controlledValue = stateOptions.find((t) => t.value === value);
 
           return (
             <Select onValueChange={(val) => onChange(val)} value={controlledValue?.value}>
@@ -47,15 +45,15 @@ export const State: React.FC<
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>
-                  )
+                  );
                 })}
               </SelectContent>
             </Select>
-          )
+          );
         }}
         rules={{ required }}
       />
       {required && errors[name] && <FieldError />}
     </Width>
-  )
-}
+  );
+};

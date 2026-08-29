@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
@@ -15,10 +14,8 @@ import { startDate } from '@/fields/startDate';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { seoTab } from '@/lib/payload-plugin-seo';
-
-import { revalidateDelete, revalidatePage } from './hooks/revalidateCase';
 import { populatePublishedAt } from '../../hooks/populatePublishedAt';
-
+import { revalidateDelete, revalidatePage } from './hooks/revalidateCase';
 
 export const Cases: CollectionConfig<'cases'> = {
   slug: 'cases',
@@ -39,23 +36,11 @@ export const Cases: CollectionConfig<'cases'> = {
       tabs: [
         {
           label: 'Content',
-          fields: [
-            title,
-            lead,
-            image,
-            storyField(),
-            startDate,
-            endDate,
-            partners,
-          ],
+          fields: [title, lead, image, storyField(), startDate, endDate, partners],
         },
         {
           label: 'Meta',
-          fields: [
-            ...slugField(),
-            resourceId,
-            publishedAt,
-          ],
+          fields: [...slugField(), resourceId, publishedAt],
         },
         seoTab(),
       ],

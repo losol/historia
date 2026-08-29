@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-
 import { admins } from '@/access/admins';
 import { ordersReadAccess } from '@/access/commerceReadAccess';
 import { siteCommerceManagers } from '@/access/siteRoleAccess';
@@ -7,7 +6,6 @@ import { accessOR } from '@/access/utils/accessOR';
 import { addressGroup } from '@/fields/address';
 import { orderItemsField } from '@/fields/orderItemsField';
 import { ordersUpdateAccess } from '@/lib/commerce';
-
 import { populateOrderPrices } from './Orders/hooks/populateOrderPrices';
 import { sendOrderStatus } from './Orders/hooks/sendOrderStatus';
 
@@ -21,7 +19,15 @@ export const Orders: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['id', 'userEmail', 'status', 'totalAmount', 'currency', 'taxExempt', 'createdAt'],
+    defaultColumns: [
+      'id',
+      'userEmail',
+      'status',
+      'totalAmount',
+      'currency',
+      'taxExempt',
+      'createdAt',
+    ],
     group: 'Commerce',
     components: {
       edit: {

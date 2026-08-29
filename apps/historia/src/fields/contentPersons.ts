@@ -1,4 +1,4 @@
-import { Field } from 'payload';
+import type { Field } from 'payload';
 
 export const contentPersons: Field = {
   name: 'contentPersons',
@@ -6,6 +6,6 @@ export const contentPersons: Field = {
   relationTo: 'persons',
   hasMany: true,
   admin: {
-    description: 'The people in the content.'
+    description: 'The people in the content.',
   },
 };

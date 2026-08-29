@@ -1,6 +1,5 @@
 import { formatPhoneForDisplay } from '@/lib/utils/formatPhone';
 import type { Order } from '@/payload-types';
-
 import {
   formatOrderDate,
   getLineTotalMinor,
@@ -16,7 +15,11 @@ import {
  * Format packing list as plain text
  * Simple, readable format for email or printing
  */
-export function formatPackingListAsText(order: Order, customerName?: string, customerPhone?: string): string {
+export function formatPackingListAsText(
+  order: Order,
+  customerName?: string,
+  customerPhone?: string,
+): string {
   const lines: string[] = [];
 
   // Header
@@ -61,7 +64,10 @@ export function formatPackingListAsText(order: Order, customerName?: string, cus
   // Shipping address
   const shippingAddress = order.shippingAddress;
   if (shippingAddress) {
-    lines.push('LEVERINGSADRESSE / SHIPPING ADDRESS:', '───────────────────────────────────────────────────────────');
+    lines.push(
+      'LEVERINGSADRESSE / SHIPPING ADDRESS:',
+      '───────────────────────────────────────────────────────────',
+    );
     if (shippingAddress.addressLine1) {
       lines.push(`              ${shippingAddress.addressLine1}`);
     }
@@ -115,7 +121,10 @@ export function formatPackingListAsText(order: Order, customerName?: string, cus
   );
 
   // Packing checklist
-  lines.push('PAKKELISTE / PACKING CHECKLIST:', '───────────────────────────────────────────────────────────');
+  lines.push(
+    'PAKKELISTE / PACKING CHECKLIST:',
+    '───────────────────────────────────────────────────────────',
+  );
   items.forEach((item) => {
     lines.push(`☐ ${item.quantity ?? 1}x ${getProductName(item)}`);
   });
@@ -128,20 +137,25 @@ export function formatPackingListAsText(order: Order, customerName?: string, cus
  * Format packing list as simple HTML
  * Clean, readable format for email
  */
-export function formatPackingListAsHtml(order: Order, customerName?: string, customerPhone?: string): string {
+export function formatPackingListAsHtml(
+  order: Order,
+  customerName?: string,
+  customerPhone?: string,
+): string {
   const currency = order.currency ?? 'NOK';
   const orderItems = order.items ?? [];
   const isTaxExempt = order.taxExempt === true;
 
-  const items = orderItems.map((item, index) => {
-    const productName = sanitizeForHtml(getProductName(item));
-    const quantity = item.quantity ?? 1;
-    const priceExVat = getPriceExVatMinor(item);
-    const vatRate = getVatRate(item, isTaxExempt);
-    const priceIncVat = getPriceIncVatMinor(item, isTaxExempt);
-    const lineTotal = getLineTotalMinor(item, isTaxExempt);
+  const items = orderItems
+    .map((item, index) => {
+      const productName = sanitizeForHtml(getProductName(item));
+      const quantity = item.quantity ?? 1;
+      const priceExVat = getPriceExVatMinor(item);
+      const vatRate = getVatRate(item, isTaxExempt);
+      const priceIncVat = getPriceIncVatMinor(item, isTaxExempt);
+      const lineTotal = getLineTotalMinor(item, isTaxExempt);
 
-    return `
+      return `
     <tr style="border-bottom: 1px solid #e5e7eb;">
       <td style="padding: 12px 8px; text-align: left;">${index + 1}. ${productName}</td>
       <td style="padding: 12px 8px; text-align: center; font-weight: 600;">${quantity}</td>
@@ -151,16 +165,23 @@ export function formatPackingListAsHtml(order: Order, customerName?: string, cus
       <td style="padding: 12px 8px; text-align: right; font-weight: 600;">${currency} ${toMajorUnits(lineTotal).toFixed(2)}</td>
     </tr>
   `;
-  }).join('');
+    })
+    .join('');
 
-  const checklist = orderItems.map((item) => `
+  const checklist = orderItems
+    .map(
+      (item) => `
     <li style="margin-bottom: 8px;">☐ ${item.quantity ?? 1}x ${sanitizeForHtml(getProductName(item))}</li>
-  `).join('');
+  `,
+    )
+    .join('');
 
   const shippingAddress = order.shippingAddress;
   let shippingHtml = '';
   if (shippingAddress) {
-    const addressLine2Html = shippingAddress.addressLine2 ? `${sanitizeForHtml(shippingAddress.addressLine2)}<br>` : '';
+    const addressLine2Html = shippingAddress.addressLine2
+      ? `${sanitizeForHtml(shippingAddress.addressLine2)}<br>`
+      : '';
     const country = sanitizeForHtml(shippingAddress.country) || 'NO';
     shippingHtml = `
     <div style="margin-bottom: 24px;">
@@ -215,18 +236,26 @@ export function formatPackingListAsHtml(order: Order, customerName?: string, cus
             <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">Status:</td>
             <td style="padding: 4px 0; text-align: right;"><span style="padding: 4px 12px; background: #fef3c7; color: #92400e; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase;">${sanitizeForHtml(order.status)}</span></td>
           </tr>
-          ${isTaxExempt ? `
+          ${
+            isTaxExempt
+              ? `
           <tr>
             <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">MVA-fritatt:</td>
             <td style="padding: 4px 0; text-align: right;"><span style="padding: 4px 12px; background: #fef2f2; color: #dc2626; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase;">⚠️ JA</span></td>
           </tr>
-          ` : ''}
-          ${isTaxExempt && order.taxExemptReason ? `
+          `
+              : ''
+          }
+          ${
+            isTaxExempt && order.taxExemptReason
+              ? `
           <tr>
             <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">Årsak:</td>
             <td style="padding: 4px 0; text-align: right; color: #dc2626;">${sanitizeForHtml(order.taxExemptReason)}</td>
           </tr>
-          ` : ''}
+          `
+              : ''
+          }
         </table>
       </div>
 

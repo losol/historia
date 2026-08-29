@@ -1,10 +1,9 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { Navbar } from '@eventuras/ratio-ui/core/Navbar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { Navbar } from '@eventuras/ratio-ui/core/Navbar';
-
 import { CartButton } from '@/components/CartButton';
 import { useLocale } from '@/hooks/useLocale';
 import { useHeaderTheme } from '@/providers/HeaderTheme';

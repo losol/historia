@@ -7,7 +7,7 @@
  * @see https://developer.vippsmobilepay.com/docs/APIs/webhooks-api/request-authentication/
  */
 
-import { createHmac, createHash } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import type { WebhookPayload } from './types';
 
 /**
@@ -192,4 +192,3 @@ export function extractSignature(authHeader: string): string | null {
   const match = /Signature=([^&]+)/.exec(authHeader);
   return match?.[1] ?? null;
 }
-

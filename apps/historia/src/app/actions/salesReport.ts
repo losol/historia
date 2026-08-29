@@ -1,14 +1,14 @@
 'use server';
 
+import {
+  actionError,
+  actionSuccess,
+  type ServerActionResult,
+} from '@eventuras/core-nextjs/actions';
+import { Logger } from '@eventuras/logger';
 import config from '@payload-config';
 import { headers } from 'next/headers';
-import { getPayload, Where } from 'payload';
-
-import { actionError, actionSuccess, ServerActionResult } from '@eventuras/core-nextjs/actions';
-import { Logger } from '@eventuras/logger';
-
-import type { User } from '@/payload-types';
-
+import { getPayload, type Where } from 'payload';
 import {
   calculateProductSummary,
   calculateTransactionSummary,
@@ -17,6 +17,7 @@ import {
   type ProductSummaryLine,
   type TransactionSummary,
 } from '@/lib/reports/salesReportHelpers';
+import type { User } from '@/payload-types';
 
 const logger = Logger.create({
   namespace: 'historia:sales-report',
@@ -39,7 +40,7 @@ export interface SalesReportParams {
 }
 
 export async function getSalesReport(
-  params: SalesReportParams
+  params: SalesReportParams,
 ): Promise<ServerActionResult<SalesReportData>> {
   try {
     const payload = await getPayload({ config });

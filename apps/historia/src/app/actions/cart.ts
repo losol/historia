@@ -3,16 +3,11 @@
 import {
   actionError,
   actionSuccess,
-  ServerActionResult,
+  type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
 import type { Session } from '@eventuras/fides-auth-next';
-import {
-  createSession,
-  getCurrentSession,
-  setSessionCookie,
-} from '@eventuras/fides-auth-next';
+import { createSession, getCurrentSession, setSessionCookie } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
-
 import type { Cart, CartItem, CustomerInfo, SessionData } from '@/lib/cart/types';
 
 const logger = Logger.create({
@@ -42,10 +37,7 @@ export async function getCart(): Promise<Cart | null> {
       return null;
     }
 
-    logger.debug(
-      { itemCount: session.data.cart.items.length },
-      'Retrieved cart from session'
-    );
+    logger.debug({ itemCount: session.data.cart.items.length }, 'Retrieved cart from session');
     return session.data.cart;
   } catch (error) {
     logger.error({ error }, 'Error getting cart');
@@ -58,7 +50,7 @@ export async function getCart(): Promise<Cart | null> {
  */
 export async function addToCart(
   productId: string,
-  quantity: number
+  quantity: number,
 ): Promise<ServerActionResult<Cart>> {
   try {
     logger.info({ productId, quantity }, 'Adding item to cart');
@@ -76,7 +68,7 @@ export async function addToCart(
     // Find if item already exists in cart
     const existingItems = existingCart?.items || [];
     const existingItemIndex = existingItems.findIndex(
-      (item: CartItem) => item.productId === productId
+      (item: CartItem) => item.productId === productId,
     );
 
     let updatedItems: CartItem[];
@@ -89,7 +81,7 @@ export async function addToCart(
       };
       logger.info(
         { productId, newQuantity: updatedItems[existingItemIndex].quantity },
-        'Updated existing cart item'
+        'Updated existing cart item',
       );
     } else {
       // Add new item
@@ -121,10 +113,7 @@ export async function addToCart(
       throw sessionError;
     }
 
-    logger.info(
-      { itemCount: updatedCart.items.length },
-      'Cart updated successfully'
-    );
+    logger.info({ itemCount: updatedCart.items.length }, 'Cart updated successfully');
     return actionSuccess(updatedCart);
   } catch (error) {
     logger.error({ error, productId, quantity }, 'Error adding to cart');
@@ -137,7 +126,7 @@ export async function addToCart(
  */
 export async function updateCartItem(
   productId: string,
-  quantity: number
+  quantity: number,
 ): Promise<ServerActionResult<Cart>> {
   try {
     logger.info({ productId, quantity }, 'Updating cart item');
@@ -159,7 +148,7 @@ export async function updateCartItem(
     }
 
     const updatedItems = existingCart.items.map((item: CartItem) =>
-      item.productId === productId ? { productId, quantity } : item
+      item.productId === productId ? { productId, quantity } : item,
     );
 
     const updatedCart: Cart = {
@@ -191,9 +180,7 @@ export async function updateCartItem(
 /**
  * Remove an item from the cart
  */
-export async function removeFromCart(
-  productId: string
-): Promise<ServerActionResult<Cart>> {
+export async function removeFromCart(productId: string): Promise<ServerActionResult<Cart>> {
   try {
     logger.info({ productId }, 'Removing item from cart');
 
@@ -205,7 +192,7 @@ export async function removeFromCart(
     }
 
     const updatedItems = existingCart.items.filter(
-      (item: CartItem) => item.productId !== productId
+      (item: CartItem) => item.productId !== productId,
     );
 
     const updatedCart: Cart = {
@@ -226,10 +213,7 @@ export async function removeFromCart(
     const jwt = await createSession(updatedSession);
     await setSessionCookie(jwt);
 
-    logger.info(
-      { productId, remainingItems: updatedItems.length },
-      'Item removed from cart'
-    );
+    logger.info({ productId, remainingItems: updatedItems.length }, 'Item removed from cart');
     return actionSuccess(updatedCart);
   } catch (error) {
     logger.error({ error, productId }, 'Error removing from cart');
@@ -272,7 +256,7 @@ export async function clearCart(): Promise<ServerActionResult<void>> {
  * SECURITY: Adds reference to encrypted session for access control
  */
 export async function setCartPaymentReference(
-  reference: string
+  reference: string,
 ): Promise<ServerActionResult<void>> {
   try {
     logger.info({ reference }, 'Setting payment reference in cart');
@@ -311,7 +295,7 @@ export async function setCartPaymentReference(
 
     logger.info(
       { reference, totalReferences: paymentReferences.length },
-      'Payment reference set and added to session'
+      'Payment reference set and added to session',
     );
     return actionSuccess(undefined);
   } catch (error) {
@@ -338,7 +322,7 @@ export async function getCartItemCount(): Promise<number> {
  * Called when customer_information_changed event fires in Vipps Checkout
  */
 export async function updateCartCustomerInfo(
-  customerInfo: CustomerInfo
+  customerInfo: CustomerInfo,
 ): Promise<ServerActionResult<Cart>> {
   try {
     logger.info({ customerInfo }, 'Updating customer information in cart');
@@ -367,8 +351,11 @@ export async function updateCartCustomerInfo(
     await setSessionCookie(jwt);
 
     logger.info(
-      { hasEmail: !!customerInfo.email, hasName: !!(customerInfo.firstName || customerInfo.lastName) },
-      'Customer information updated successfully'
+      {
+        hasEmail: !!customerInfo.email,
+        hasName: !!(customerInfo.firstName || customerInfo.lastName),
+      },
+      'Customer information updated successfully',
     );
     return actionSuccess(updatedCart);
   } catch (error) {

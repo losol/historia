@@ -21,7 +21,7 @@ import type { Media } from '@/payload-types';
  */
 export function getImageURL(
   image: Media | string | null | undefined,
-  baseUrl?: string
+  baseUrl?: string,
 ): { url: string; width: number; height: number } | null {
   if (!image || typeof image === 'string') {
     return null;
@@ -110,11 +110,7 @@ export function extractImage(doc: {
     if (isMediaObject(doc.image)) {
       return doc.image;
     }
-    if (
-      typeof doc.image === 'object' &&
-      'media' in doc.image &&
-      isMediaObject(doc.image.media)
-    ) {
+    if (typeof doc.image === 'object' && 'media' in doc.image && isMediaObject(doc.image.media)) {
       return doc.image.media;
     }
   }

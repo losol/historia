@@ -36,7 +36,14 @@ export interface TemplateIdentifier {
  * Base template parameters that all templates can use
  */
 export interface BaseTemplateParams {
-  [key: string]: string | number | boolean | undefined | null | BaseTemplateParams | BaseTemplateParams[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | undefined
+    | null
+    | BaseTemplateParams
+    | BaseTemplateParams[];
 }
 
 /**

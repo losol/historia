@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-
 import { logStartupConfig } from './utilities/logStartupConfig';
 
 export async function register() {

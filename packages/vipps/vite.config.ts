@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import { defineVanillaLibConfig } from '@eventuras/vite-config/vanilla-lib';
+import { defineConfig } from 'vite';
 
 export default defineConfig(
   defineVanillaLibConfig({
@@ -9,5 +9,5 @@ export default defineConfig(
       'webhooks-v1/index': './src/webhooks-v1/index.ts',
     },
     external: ['crypto'],
-  })
+  }),
 );

@@ -1,7 +1,7 @@
 import type { Locale, Template, TemplateRegistry } from '../types';
 import { defaultEmailTemplates } from './email';
-import { defaultSmsTemplates } from './sms';
 import { getTemplatesForLocale } from './locales';
+import { defaultSmsTemplates } from './sms';
 
 /**
  * Combined default templates (en-US for backward compatibility)
@@ -15,13 +15,17 @@ export const defaultTemplates: TemplateRegistry = {
  * Export individual template collections
  */
 export { defaultEmailTemplates } from './email';
-export { defaultSmsTemplates } from './sms';
-
 /**
  * Export locale-specific templates
  */
-export { localeTemplates, getTemplatesForLocale } from './locales';
-export { templatesEnUS, templatesNbNO, templatesNnNO } from './locales';
+export {
+  getTemplatesForLocale,
+  localeTemplates,
+  templatesEnUS,
+  templatesNbNO,
+  templatesNnNO,
+} from './locales';
+export { defaultSmsTemplates } from './sms';
 
 /**
  * Get a default template by key

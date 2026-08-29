@@ -1,5 +1,4 @@
 import type { Block } from 'payload';
-
 import { url } from '@/fields/url';
 
 export const Nav: Block = {

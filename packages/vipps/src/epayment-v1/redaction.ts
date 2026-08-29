@@ -59,7 +59,7 @@ function mergeValue(fresh: unknown, previous: unknown): unknown {
  */
 export function mergeExpiredPaymentDetails(
   fresh: PaymentDetails,
-  previous: unknown
+  previous: unknown,
 ): PaymentDetails {
   return mergeValue(fresh, previous) as PaymentDetails;
 }

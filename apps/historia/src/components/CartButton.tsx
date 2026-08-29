@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { useCart } from '@/lib/cart';
-
 import { CartDrawer } from './cart/CartDrawer';
 
 interface CartButtonProps {

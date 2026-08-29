@@ -1,21 +1,17 @@
-import React from 'react';
-import { DefaultNodeTypes, SerializedBlockNode } from '@payloadcms/richtext-lexical';
-import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+import type React from 'react';
+import type { DefaultNodeTypes, SerializedBlockNode } from '@payloadcms/richtext-lexical';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import {
-  JSXConvertersFunction,
+  type JSXConvertersFunction,
   LinkJSXConverter,
   RichText as RichTextWithoutBlocks,
 } from '@payloadcms/richtext-lexical/react';
-
 import { ImageBlock } from '@/blocks/Image/Component';
 import { headingConverter, internalDocToHref } from '@/lib/richtext/converters';
 import type { ImageBlock as ImageBlockProps } from '@/payload-types';
 import { cn } from '@/utilities/cn';
 
-
-type NodeTypes =
-  | DefaultNodeTypes
-  | SerializedBlockNode<ImageBlockProps>;
+type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageBlockProps>;
 
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => ({
   ...defaultConverters,

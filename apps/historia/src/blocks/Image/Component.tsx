@@ -1,7 +1,5 @@
-import React from 'react';
-
+import type React from 'react';
 import { Image } from '@eventuras/ratio-ui-next/Image';
-
 import RichText from '@/components/RichText';
 import type { ImageBlock as ImageBlockProps, Media } from '@/payload-types';
 

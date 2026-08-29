@@ -5,7 +5,6 @@
  */
 
 import type { VippsConfig } from '@eventuras/vipps/vipps-core';
-
 import { appConfig } from '@/config.server';
 
 /**

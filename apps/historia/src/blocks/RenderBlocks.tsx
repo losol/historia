@@ -1,6 +1,5 @@
-import React from 'react';
-
-import { ArchiveBlock } from "@/blocks/ArchiveBlock/Component";
+import type React from 'react';
+import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component';
 import { ContentBlock } from '@/blocks/Content/Component';
 import { FormBlock } from '@/blocks/Form/Component';
 import { ImageBlock } from '@/blocks/Image/Component';
@@ -9,7 +8,7 @@ import { InstructionSectionBlock } from '@/blocks/InstructionSection/Component';
 import { ProductsBlock } from '@/blocks/Product';
 import { ResourcesBlock } from '@/blocks/ResourcesBlock/Component';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: block registry holds components with differing prop types
 const blockComponents: Record<string, React.FC<any>> = {
   archive: ArchiveBlock,
   content: ContentBlock,

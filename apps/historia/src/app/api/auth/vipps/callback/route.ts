@@ -4,11 +4,9 @@
  * Handles OAuth callback, exchanges code for tokens, and creates user session
  */
 
+import { handleVippsCallback, resolveConfig } from '@eventuras/payload-vipps-auth';
 import config from '@payload-config';
 import { getPayload } from 'payload';
-
-import { handleVippsCallback, resolveConfig } from '@eventuras/payload-vipps-auth';
-
 import { getAllowedVippsLoginDomains, getPublicRequestOrigin } from '../_utils/request-origin';
 
 export async function GET(request: Request) {
