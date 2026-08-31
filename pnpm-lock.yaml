@@ -39,11 +39,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/payload-vipps-auth
       '@eventuras/ratio-ui':
-        specifier: ^2.19.0
-        version: 2.19.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^2.22.0
+        version: 2.22.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@eventuras/ratio-ui-next':
         specifier: ^0.2.0
-        version: 0.2.0(@eventuras/ratio-ui@2.19.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
+        version: 0.2.0(@eventuras/ratio-ui@2.22.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
       '@eventuras/vipps':
         specifier: workspace:*
         version: link:../../packages/vipps
@@ -150,8 +150,8 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
       lucide-react:
-        specifier: ^1.32.0
-        version: 1.32.0(react@19.2.8)
+        specifier: ^1.33.0
+        version: 1.33.0(react@19.2.8)
       nanoid:
         specifier: ^5.1.16
         version: 5.1.16
@@ -312,8 +312,8 @@ importers:
         specifier: workspace:*
         version: link:../vipps
       openid-client:
-        specifier: ^6.8.6
-        version: 6.8.6
+        specifier: ^6.8.7
+        version: 6.8.7
       uuid:
         specifier: ^14.0.2
         version: 14.0.2
@@ -364,8 +364,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1(@opentelemetry/api-logs@0.221.0)(@opentelemetry/api@1.9.1)(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))
       openid-client:
-        specifier: ^6.8.6
-        version: 6.8.6
+        specifier: ^6.8.7
+        version: 6.8.7
     devDependencies:
       '@eventuras/typescript-config':
         specifier: ^1.0.0
@@ -1269,8 +1269,8 @@ packages:
       '@eventuras/ratio-ui': ^2.7.0
       next: ^16.0.0
 
-  '@eventuras/ratio-ui@2.19.0':
-    resolution: {integrity: sha512-LPqUXysjRjvw54XKRYUfPtmU3OfI3UKN/Jv3L52CQSD7gvY7kBpoMOfZhM+7M6StXgsUTVgqSQuovrZwREh6kw==}
+  '@eventuras/ratio-ui@2.22.0':
+    resolution: {integrity: sha512-dT3YpaNb99Q9rcMhyhKNuKc1hpgVQk/jTwuYBRPEuEr5T8OvwfpUOZFKiXVLLJ1n/xYpcDxh3s72jEGK7uZsMw==}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
@@ -3500,6 +3500,11 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  baseline-browser-mapping@2.11.16:
+    resolution: {integrity: sha512-H/bNPUFHewJHyCTdjn1n3Pit5+2GmWT6mmeHImPX+8MA9NA6b67jO4gYmi4jTbCJb2otq34KMZnovndDPqJwhQ==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
   better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
@@ -3987,8 +3992,8 @@ packages:
   electron-to-chromium@1.5.409:
     resolution: {integrity: sha512-ChI4N44d0B4A6C8prnNjMOaGgE59fUyEVYcRYm2XEXIjMbbvF5i9UL1cblDbpGqiU0uS8FE8UcKxqZqTXdmzbQ==}
 
-  electron-to-chromium@1.5.411:
-    resolution: {integrity: sha512-gglkxzokjHfawpGxq75XdBV2/l3BAPzrsMs70qgaZdTW5rpV1tC4MdgJVP9fN126bODA4ZJQkn1wryEzJyQXIg==}
+  electron-to-chromium@1.5.412:
+    resolution: {integrity: sha512-z4rMe3esBzlzovKHj4gxJnsCGZRK5l4baUvm+gCGJBPE+gsyUMKsuU9tnEUtI1dOebXz1ytAPGjvXhmQ7rIPwA==}
 
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
@@ -5075,8 +5080,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.32.0:
-    resolution: {integrity: sha512-txX56hMFnRxPi1f9/nH69YN8uvAO6a7Y1KSWKjCDAtdD9+soEgmWuCt6iRm1pkxUZo2+YntSdsE1L6bIuKoY8Q==}
+  lucide-react@1.33.0:
+    resolution: {integrity: sha512-MTRwMy0ZlL8Ur/vOAiJ9XGHE+kFPC7brq6MxAm0GiGXEBj0qy0jA/pG4N675oSzciO/UCdX8T+5yUQdmDeTLxg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -5459,6 +5464,9 @@ packages:
 
   openid-client@6.8.6:
     resolution: {integrity: sha512-lsfMRH/GCgMiGCRnBRY3e70uogkgOessPaTOhP3rw/dxqNOZHwOazWx+m6jt5EVk3ecRFULl0TwWpk9Qnw3RKQ==}
+
+  openid-client@6.8.7:
+    resolution: {integrity: sha512-gtKthNu7evSBvTdrrlHb4F3Fi9dcwlb5QaITlCs+9mfpvuOi0Q3qtBf5+iY4sEP8hy1qCoAdxBNPDcmZeVSDzQ==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -7776,15 +7784,15 @@ snapshots:
       '@opentelemetry/api-logs': 0.221.0
       '@opentelemetry/sdk-logs': 0.221.0(@opentelemetry/api@1.9.1)
 
-  '@eventuras/ratio-ui-next@0.2.0(@eventuras/ratio-ui@2.19.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
+  '@eventuras/ratio-ui-next@0.2.0(@eventuras/ratio-ui@2.22.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
     dependencies:
-      '@eventuras/ratio-ui': 2.19.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@eventuras/ratio-ui': 2.22.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next: 16.3.1(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4)
 
-  '@eventuras/ratio-ui@2.19.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@eventuras/ratio-ui@2.22.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       clsx: 2.1.1
-      lucide-react: 1.32.0(react@19.2.8)
+      lucide-react: 1.33.0(react@19.2.8)
       react: 19.2.8
       react-aria-components: 1.20.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react-dom: 19.2.8(react@19.2.8)
@@ -10285,6 +10293,8 @@ snapshots:
 
   baseline-browser-mapping@2.11.15: {}
 
+  baseline-browser-mapping@2.11.16: {}
+
   better-path-resolve@1.0.0:
     dependencies:
       is-windows: 1.0.2
@@ -10336,9 +10346,9 @@ snapshots:
 
   browserslist@4.28.8:
     dependencies:
-      baseline-browser-mapping: 2.11.15
+      baseline-browser-mapping: 2.11.16
       caniuse-lite: 1.0.30001809
-      electron-to-chromium: 1.5.411
+      electron-to-chromium: 1.5.412
       node-releases: 2.0.53
       update-browserslist-db: 1.3.1(browserslist@4.28.8)
 
@@ -10651,7 +10661,7 @@ snapshots:
 
   electron-to-chromium@1.5.409: {}
 
-  electron-to-chromium@1.5.411: {}
+  electron-to-chromium@1.5.412: {}
 
   encodeurl@2.0.0: {}
 
@@ -11966,7 +11976,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.32.0(react@19.2.8):
+  lucide-react@1.33.0(react@19.2.8):
     dependencies:
       react: 19.2.8
 
@@ -12445,6 +12455,11 @@ snapshots:
       wrappy: 1.0.2
 
   openid-client@6.8.6:
+    dependencies:
+      jose: 6.2.9
+      oauth4webapi: 3.8.7
+
+  openid-client@6.8.7:
     dependencies:
       jose: 6.2.9
       oauth4webapi: 3.8.7
