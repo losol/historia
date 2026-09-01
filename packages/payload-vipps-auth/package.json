@@ -27,7 +27,7 @@
     "@eventuras/fides-auth": "^0.14.0",
     "@eventuras/logger": "^0.8.1",
     "@eventuras/vipps": "workspace:*",
-    "openid-client": "^6.8.6",
+    "openid-client": "^6.8.7",
     "uuid": "^14.0.2"
   },
   "devDependencies": {
@@ -37,7 +37,7 @@
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.18",
     "@types/uuid": "^11.0.0",
-    "next": "^16.3.1",
+    "next": "^16.3.2",
     "payload": "3.88.0",
     "react": "^19.2.5",
     "typescript": "^6.0.2",
