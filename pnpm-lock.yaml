@@ -45,8 +45,8 @@ importers:
         specifier: ^2.23.0
         version: 2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@eventuras/ratio-ui-next':
-        specifier: ^0.2.0
-        version: 0.2.0(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
+        specifier: ^1.0.1
+        version: 1.0.1(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
       '@eventuras/vipps':
         specifier: workspace:*
         version: link:../../packages/vipps
@@ -1217,10 +1217,10 @@ packages:
       '@opentelemetry/sdk-logs':
         optional: true
 
-  '@eventuras/ratio-ui-next@0.2.0':
-    resolution: {integrity: sha512-15IjM6QSAwD3HN/aHk8GUGSP93eOVTbrbDzSbMh5LtuDHLUuWjEaAxwbkv3s28KBeqz96thH3hxMO3exfb3zGg==}
+  '@eventuras/ratio-ui-next@1.0.1':
+    resolution: {integrity: sha512-fBxjFZCTJdCNQujnMrbUS3M8lsIPjXV54WRwK2BQk+KTghHoZLby4G+JMa/w/032HdoR5VtDu5XLGRggHTSLVw==}
     peerDependencies:
-      '@eventuras/ratio-ui': ^2.7.0
+      '@eventuras/ratio-ui': ^2.8.0
       next: ^16.0.0
 
   '@eventuras/ratio-ui@2.23.0':
@@ -4701,8 +4701,8 @@ packages:
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
-  minimizer-webpack-plugin@5.9.0:
-    resolution: {integrity: sha512-OASqv+dewv8vjkOBjqMOHvxUaXhtGBLZAXq7JbmYE8TSzBvOswiGq5JcBdc8ypuLL/8YUT1OEyupga6/iqdyTA==}
+  minimizer-webpack-plugin@5.10.0:
+    resolution: {integrity: sha512-2//60T4S0X1Ug/dqLDOgDaGlZsN1Lv8hf8oB0NOV/KIHSaXlPwXBBIbim79dE2Z7NEs52ES8YHoSv6Lmsk+XNg==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
       '@minify-html/node': '*'
@@ -6989,7 +6989,7 @@ snapshots:
       '@opentelemetry/api-logs': 0.222.0
       '@opentelemetry/sdk-logs': 0.222.0(@opentelemetry/api@1.9.1)
 
-  '@eventuras/ratio-ui-next@0.2.0(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
+  '@eventuras/ratio-ui-next@1.0.1(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
     dependencies:
       '@eventuras/ratio-ui': 2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next: 16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4)
@@ -10642,7 +10642,7 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  minimizer-webpack-plugin@5.9.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))(webpack@5.108.4(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))):
+  minimizer-webpack-plugin@5.10.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))(webpack@5.108.4(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -10655,7 +10655,7 @@ snapshots:
       postcss: 8.5.26
       sharp: 0.35.4(@types/node@24.13.3)
 
-  minimizer-webpack-plugin@5.9.0(esbuild@0.28.2)(webpack@5.108.4(esbuild@0.28.2)):
+  minimizer-webpack-plugin@5.10.0(esbuild@0.28.2)(webpack@5.108.4(esbuild@0.28.2)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -11971,7 +11971,7 @@ snapshots:
       graceful-fs: 4.2.11
       loader-runner: 4.3.2
       mime-db: 1.54.0
-      minimizer-webpack-plugin: 5.9.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))(webpack@5.108.4(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3)))
+      minimizer-webpack-plugin: 5.10.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3))(webpack@5.108.4(@swc/core@1.16.1(@swc/helpers@0.5.23))(esbuild@0.25.12)(postcss@8.5.26)(sharp@0.35.4(@types/node@24.13.3)))
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
@@ -12013,7 +12013,7 @@ snapshots:
       graceful-fs: 4.2.11
       loader-runner: 4.3.2
       mime-db: 1.54.0
-      minimizer-webpack-plugin: 5.9.0(esbuild@0.28.2)(webpack@5.108.4(esbuild@0.28.2))
+      minimizer-webpack-plugin: 5.10.0(esbuild@0.28.2)(webpack@5.108.4(esbuild@0.28.2))
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
