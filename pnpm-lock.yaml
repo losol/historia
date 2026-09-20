@@ -45,8 +45,8 @@ importers:
         specifier: ^2.23.0
         version: 2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@eventuras/ratio-ui-next':
-        specifier: ^0.2.0
-        version: 0.2.0(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
+        specifier: ^1.0.1
+        version: 1.0.1(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))
       '@eventuras/vipps':
         specifier: workspace:*
         version: link:../../packages/vipps
@@ -1220,10 +1220,10 @@ packages:
       '@opentelemetry/sdk-logs':
         optional: true
 
-  '@eventuras/ratio-ui-next@0.2.0':
-    resolution: {integrity: sha512-15IjM6QSAwD3HN/aHk8GUGSP93eOVTbrbDzSbMh5LtuDHLUuWjEaAxwbkv3s28KBeqz96thH3hxMO3exfb3zGg==}
+  '@eventuras/ratio-ui-next@1.0.1':
+    resolution: {integrity: sha512-fBxjFZCTJdCNQujnMrbUS3M8lsIPjXV54WRwK2BQk+KTghHoZLby4G+JMa/w/032HdoR5VtDu5XLGRggHTSLVw==}
     peerDependencies:
-      '@eventuras/ratio-ui': ^2.7.0
+      '@eventuras/ratio-ui': ^2.8.0
       next: ^16.0.0
 
   '@eventuras/ratio-ui@2.23.0':
@@ -6984,7 +6984,7 @@ snapshots:
       '@opentelemetry/api-logs': 0.222.0
       '@opentelemetry/sdk-logs': 0.222.0(@opentelemetry/api@1.9.1)
 
-  '@eventuras/ratio-ui-next@0.2.0(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
+  '@eventuras/ratio-ui-next@1.0.1(@eventuras/ratio-ui@2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))':
     dependencies:
       '@eventuras/ratio-ui': 2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next: 16.3.1(@babel/core@7.29.7(supports-color@5.5.0))(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4)
