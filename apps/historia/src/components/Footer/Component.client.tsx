@@ -3,9 +3,9 @@
 import type React from 'react';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { List } from '@eventuras/ratio-ui/core/List';
+import { Box } from '@eventuras/ratio-ui/layout/Box';
 import { Grid } from '@eventuras/ratio-ui/layout/Grid';
 import { Link } from '@eventuras/ratio-ui-next';
-import { Box } from 'node_modules/@eventuras/ratio-ui/dist/layout/Box';
 import { useLocale } from '@/hooks/useLocale';
 import type { NavBlock, Page } from '@/payload-types';
 import { getPageUrl } from '@/utilities/getPageUrl';

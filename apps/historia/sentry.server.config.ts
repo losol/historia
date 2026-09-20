@@ -50,12 +50,12 @@ if (otlpLogsEndpoint) {
   }
 
   setupOpenTelemetryLogger({
-    logRecordProcessor: new BatchLogRecordProcessor(
-      new OTLPLogExporter({
+    logRecordProcessor: new BatchLogRecordProcessor({
+      exporter: new OTLPLogExporter({
         url: otlpLogsEndpoint,
         headers,
       }),
-    ),
+    }),
   });
 
   console.log(`[OpenTelemetry] Logger initialized - sending to ${otlpLogsEndpoint}`);

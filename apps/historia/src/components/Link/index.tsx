@@ -1,8 +1,8 @@
 import type React from 'react';
 import Link from 'next/link';
-import { cn } from 'src/utilities/cn';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import type { Article, Page } from '@/payload-types';
+import { cn } from '@/utilities/cn';
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant'];
