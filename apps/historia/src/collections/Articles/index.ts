@@ -1,3 +1,4 @@
+import { seoTab } from '@eventuras/payload-seo';
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { publishedOnly } from '@/access/publishedOnly';
@@ -17,7 +18,6 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
 import { revalidateArticle } from './hooks/revalidateArticle';
 

@@ -4,9 +4,9 @@
  * Smart fallback chain for SEO metadata generation with multi-tenant support.
  */
 
+import type { SEODocument } from '@eventuras/payload-seo';
 import type { Metadata } from 'next';
-import type { SEODocument } from '@/lib/payload-plugin-seo';
-import type { Website } from '@/payload-types';
+import type { Media, Website } from '@/payload-types';
 import { getServerSideURL } from '@/utilities/getURL';
 import { extractImage, getImageURL } from './utils';
 
@@ -14,7 +14,7 @@ export interface GenerateMetaOptions {
   /**
    * The document to generate metadata for
    */
-  doc: SEODocument;
+  doc: SEODocument<Media>;
 
   /**
    * Optional website for fallback meta values and canonical URL domain

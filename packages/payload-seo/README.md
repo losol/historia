@@ -1,4 +1,4 @@
-# Payload SEO Plugin (Internal)
+# @eventuras/payload-seo
 
 Simple, framework-agnostic SEO meta fields for Payload CMS collections.
 
@@ -10,20 +10,20 @@ Simple, framework-agnostic SEO meta fields for Payload CMS collections.
 - ✅ **Smart fallbacks** - Empty fields auto-generate from content
 - ✅ **Type-safe** - Full TypeScript support
 - ✅ **Tab UI** - Clean separation in admin panel
-- ✅ **Zero dependencies** - No external plugins
+- ✅ **Zero runtime dependencies** - `payload` is the only peer
 
 ## Usage
 
 ### Add SEO Tab to Collection
 
 ```typescript
-import { seoTab } from '@/lib/payload-plugin-seo';
+import { seoTab } from '@eventuras/payload-seo';
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
   fields: [
     // ... your content fields
-    seoTab('no'), // 'en' or 'no' for localized labels
+    seoTab(),
   ],
 };
 ```
@@ -31,7 +31,7 @@ export const Articles: CollectionConfig = {
 ### Add Meta Fields Inline (No Tab)
 
 ```typescript
-import { metaField } from '@/lib/payload-plugin-seo';
+import { metaField } from '@eventuras/payload-seo';
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -45,16 +45,25 @@ export const Pages: CollectionConfig = {
 ## TypeScript Types
 
 ```typescript
-import type { SEOFields, SEODocument } from '@/lib/payload-plugin-seo';
+import type { SEODocument, SEOFields } from '@eventuras/payload-seo';
 
 // Use in your document interfaces
 interface MyDocument extends SEOFields {
   title: string;
   // ... other fields
 }
+```
 
-// Or use the pre-built SEODocument type
-const doc: SEODocument = {
+The types are generic over the media type. By default they use `SEOMedia`, a
+minimal structural shape that any Payload upload document satisfies, so the
+package stays independent of a host app's generated `payload-types`. Pass your
+own generated type when you want exact typing:
+
+```typescript
+import type { SEODocument } from '@eventuras/payload-seo';
+import type { Media } from '@/payload-types';
+
+const doc: SEODocument<Media> = {
   title: 'My Article',
   meta: {
     title: 'Custom SEO Title',
@@ -100,15 +109,11 @@ Recommended fallback order in `generateMetadata`:
 
 Same for description and image.
 
-## Future Plans
+## Requirements
 
-When this library is mature and tested in production, it can be:
+The `image` field is an upload relation to a collection with the slug `media`.
+The host app must define that collection.
 
-- Moved to monorepo `libs/payload-seo`
-- Published as `@eventuras/payload-seo`
-- Reused across multiple Payload CMS projects
-- Enhanced with character counters, auto-generate hooks, robots fields
+## Possible Enhancements
 
-## Related
-
-- [lib/seo](../seo/README.md) - Generic SEO utilities for Next.js metadata generation
+Character counters, auto-generate hooks, and robots fields.

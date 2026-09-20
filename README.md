@@ -8,6 +8,7 @@ history.
 
 - `apps/historia` — the CMS app (Next.js 16, Payload 3)
 - `packages/vipps` — Vipps MobilePay integration (`@eventuras/vipps`)
+- `packages/payload-seo` — SEO meta fields for Payload (`@eventuras/payload-seo`)
 - `packages/payload-vipps-auth` — Vipps login for Payload (`@eventuras/payload-vipps-auth`)
 - `packages/notitia-templates` — notification templates (`@eventuras/notitia-templates`)
 

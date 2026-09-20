@@ -100,7 +100,7 @@ import { image } from '@/fields/image';
 import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
-import { seoTab } from '@/lib/payload-plugin-seo';
+import { seoTab } from '@eventuras/payload-seo';
 
 export const Timelines: CollectionConfig = {
   slug: 'timelines',

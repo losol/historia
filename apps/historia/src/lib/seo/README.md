@@ -135,4 +135,4 @@ When moved to `libs/seo`:
 
 ## Related
 
-- [lib/payload-plugin-seo](../payload-plugin-seo/README.md) - Payload CMS SEO fields
+- [@eventuras/payload-seo](../../../../../packages/payload-seo/README.md) - Payload CMS SEO fields

@@ -1,3 +1,4 @@
+import { seoTab } from '@eventuras/payload-seo';
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
@@ -11,7 +12,6 @@ import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 
 export const Products: CollectionConfig = {
