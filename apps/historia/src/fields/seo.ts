@@ -22,10 +22,7 @@ export const metaField: Field = {
   fields: [
     MetaTitleField({ overrides: { label: 'Meta Title', maxLength: 60 } }),
     MetaDescriptionField({ overrides: { label: 'Meta Description', maxLength: 160 } }),
-    MetaImageField({
-      relationTo: 'media',
-      overrides: { label: 'Social Share Image', localized: false },
-    }),
+    MetaImageField({ relationTo: 'media', overrides: { label: 'Social Share Image' } }),
   ],
 };
 
