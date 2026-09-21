@@ -1,4 +1,5 @@
 packages:
+  - apphost
   - apps/**
   - packages/**
   - '!**/.next'

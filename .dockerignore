@@ -9,3 +9,5 @@ node_modules
 **/*.log
 .env
 .env.*
+# Local development orchestration only; not part of the image.
+apphost
