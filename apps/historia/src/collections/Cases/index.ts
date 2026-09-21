@@ -9,11 +9,11 @@ import { lead } from '@/fields/lead';
 import { partners } from '@/fields/partners';
 import { publishedAt } from '@/fields/publishedAt';
 import resourceId from '@/fields/resourceId';
+import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { startDate } from '@/fields/startDate';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { populatePublishedAt } from '../../hooks/populatePublishedAt';
 import { revalidateDelete, revalidatePage } from './hooks/revalidateCase';
 

@@ -13,11 +13,11 @@ import { license } from '@/fields/license';
 import { publishedAt } from '@/fields/publishedAt';
 import { relatedContent } from '@/fields/relatedContent';
 import resourceId from '@/fields/resourceId';
+import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
 import { revalidateArticle } from './hooks/revalidateArticle';
 

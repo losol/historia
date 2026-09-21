@@ -6,4 +6,5 @@
 
 export type { GenerateMetaOptions } from './generateMeta';
 export { generateMeta } from './generateMeta';
+export type { SEODocument, SEOFields } from './types';
 export { extractImage, getImageURL, isMediaObject } from './utils';

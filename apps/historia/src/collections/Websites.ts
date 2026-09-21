@@ -1,9 +1,9 @@
 import type { CollectionConfig } from 'payload';
 import { Nav } from '@/blocks/Nav/config';
 import { name } from '@/fields/name';
+import { metaField } from '@/fields/seo';
 import { summary } from '@/fields/summary';
 import { title } from '@/fields/title';
-import { metaField } from '@/lib/payload-plugin-seo';
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { authenticatedOrFirstWebsite } from '../access/authenticatedOrFirstWebsite';

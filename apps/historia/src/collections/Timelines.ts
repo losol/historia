@@ -7,9 +7,9 @@ import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
 import { image } from '@/fields/image';
 import resourceId from '@/fields/resourceId';
+import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 
 export const Timelines: CollectionConfig = {

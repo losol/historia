@@ -135,4 +135,4 @@ When moved to `libs/seo`:
 
 ## Related
 
-- [lib/payload-plugin-seo](../payload-plugin-seo/README.md) - Payload CMS SEO fields
+- [fields/seo](../../fields/seo.ts) - Payload CMS SEO fields, built on [`@payloadcms/plugin-seo`](https://payloadcms.com/docs/plugins/seo)
