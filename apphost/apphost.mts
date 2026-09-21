@@ -1,5 +1,5 @@
 // Aspire AppHost for Historia: the CMS with Postgres and Mailpit, as one command.
-// Start it with `aspire run` from this directory. See the README for the workflow.
+// Start it with `aspire run` from the repo root (or this directory). See the README.
 
 import { createBuilder, OtlpProtocol } from './.aspire/modules/aspire.mjs';
 
@@ -7,7 +7,8 @@ const builder = await createBuilder();
 
 // Every address the stack serves, defined once. Historia keeps the port `pnpm dev`
 // already uses, so NEXT_PUBLIC_CMS_URL and anything bookmarked stay valid.
-const historiaUrl = 'http://localhost:3100';
+const historiaPort = 3100;
+const historiaUrl = `http://localhost:${historiaPort}`;
 const mailpitUiPort = 3101;
 const mailpitSmtpPort = 3102;
 // Pinned so a terminal can reach the database too, e.g. for `payload migrate:create`.
@@ -80,10 +81,10 @@ const historia = await builder
     'node_modules/next/dist/bin/next',
     'dev',
     '--port',
-    '3100',
+    String(historiaPort),
   ])
-  // Not proxied: Next binds 3100 itself, so Aspire only records the address.
-  .withHttpEndpoint({ port: 3100, isProxied: false, name: 'http' })
+  // Not proxied: Next binds the port itself, so Aspire only records the address.
+  .withHttpEndpoint({ port: historiaPort, isProxied: false, name: 'http' })
   .withUrl(`${historiaUrl}/admin`, { displayText: 'Admin' })
   // Historia's exporter speaks OTLP over HTTP with JSON bodies.
   .withOtlpExporter({ protocol: OtlpProtocol.HttpJson })
