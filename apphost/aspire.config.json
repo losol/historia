@@ -1,0 +1,22 @@
+{
+  "appHost": {
+    "path": "apphost.mts",
+    "language": "typescript/nodejs"
+  },
+  "sdk": {
+    "version": "13.5.4"
+  },
+  "packages": {
+    "Aspire.Hosting.PostgreSQL": "13.5.4"
+  },
+  "profiles": {
+    "http": {
+      "applicationUrl": "http://localhost:15100",
+      "environmentVariables": {
+        "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true",
+        "ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL": "http://localhost:15101",
+        "ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:15102"
+      }
+    }
+  }
+}
