@@ -5,9 +5,9 @@
  */
 
 import type { Metadata } from 'next';
-import type { SEODocument } from '@/lib/payload-plugin-seo';
 import type { Website } from '@/payload-types';
 import { getServerSideURL } from '@/utilities/getURL';
+import type { SEODocument } from './types';
 import { extractImage, getImageURL } from './utils';
 
 export interface GenerateMetaOptions {

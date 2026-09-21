@@ -12,6 +12,7 @@ import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant';
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs';
 import { redirectsPlugin } from '@payloadcms/plugin-redirects';
 import { searchPlugin } from '@payloadcms/plugin-search';
+import { seoPlugin } from '@payloadcms/plugin-seo';
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { s3Storage } from '@payloadcms/storage-s3';
 import type { Plugin } from 'payload';
@@ -193,6 +194,10 @@ export const plugins: Plugin[] = [
       },
     },
   }),
+  // No collections: the SEO fields are placed by hand via `@/fields/seo`.
+  // Registering the plugin still matters, as it provides the translations
+  // those field components render with.
+  seoPlugin({}),
   vippsAuthPlugin({
     enabled: process.env.VIPPS_LOGIN_ENABLED === 'true',
     environment: process.env.VIPPS_LOGIN_ENVIRONMENT === 'production' ? 'production' : 'test',

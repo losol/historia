@@ -8,10 +8,10 @@ import { description } from '@/fields/description';
 import { image } from '@/fields/image';
 import { lead } from '@/fields/lead';
 import resourceId from '@/fields/resourceId';
+import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
-import { seoTab } from '@/lib/payload-plugin-seo';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 
 export const Products: CollectionConfig = {

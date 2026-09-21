@@ -1,5 +1,6 @@
 /**
- * TypeScript types for SEO meta fields
+ * TypeScript types for documents carrying the SEO meta fields
+ * defined in `@/fields/seo`
  */
 
 import type { Media } from '@/payload-types';
@@ -13,16 +14,6 @@ export interface SEOFields {
     description?: string | null;
     image?: string | Media | null;
   };
-}
-
-/**
- * Configuration options for SEO fields
- */
-export interface SEOConfig {
-  /**
-   * Locale for tab labels
-   */
-  locale?: 'en' | 'no';
 }
 
 /**
