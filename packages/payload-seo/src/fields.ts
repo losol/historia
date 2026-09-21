@@ -1,4 +1,4 @@
-import type { Field } from 'payload';
+import type { Field, Tab } from 'payload';
 
 /**
  * SEO meta fields for Open Graph and social sharing
@@ -49,11 +49,12 @@ export const metaField: Field = {
  * SEO tab configuration
  *
  * Creates a separate tab in the admin UI for SEO fields, keeping content
- * and SEO concerns cleanly separated.
+ * and SEO concerns cleanly separated. Place it in the `tabs` array of a
+ * `{ type: 'tabs' }` field, not directly in a collection's `fields`.
  *
  * @returns Tab configuration object (not a Field)
  */
-export const seoTab = () => ({
+export const seoTab = (): Tab => ({
   label: 'SEO',
   description: 'Optimize how your content appears in search engines and social media',
   fields: [metaField],

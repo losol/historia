@@ -16,14 +16,27 @@ Simple, framework-agnostic SEO meta fields for Payload CMS collections.
 
 ### Add SEO Tab to Collection
 
+`seoTab()` returns a tab, so it goes in the `tabs` array of a `tabs` field —
+not directly in the collection's `fields`:
+
 ```typescript
 import { seoTab } from '@eventuras/payload-seo';
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
   fields: [
-    // ... your content fields
-    seoTab(),
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          fields: [
+            // ... your content fields
+          ],
+        },
+        seoTab(),
+      ],
+    },
   ],
 };
 ```

@@ -15,8 +15,13 @@
  * export const Articles: CollectionConfig = {
  *   slug: 'articles',
  *   fields: [
- *     // ... other fields
- *     seoTab(),
+ *     {
+ *       type: 'tabs',
+ *       tabs: [
+ *         { label: 'Content', fields: [] }, // ... your content fields
+ *         seoTab(),
+ *       ],
+ *     },
  *   ],
  * };
  * ```
