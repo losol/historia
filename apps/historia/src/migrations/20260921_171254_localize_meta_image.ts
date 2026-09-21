@@ -1,6 +1,8 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await assertNoUnplaceableImages(db)
+
   await db.execute(sql`
    ALTER TABLE "articles" DROP CONSTRAINT "articles_meta_image_id_media_id_fk";
   
@@ -237,8 +239,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
 const TABLES = [
   // insertMissing: a document with an image but no locale row at all (a draft
   // with no localized content yet) gets a default-locale row to hold it. Off
-  // where the locale table has other NOT NULL columns: there a locale row
-  // always exists, and an insert could not satisfy them anyway.
+  // where the locale table has other NOT NULL columns, which an insert could
+  // not satisfy; the app always writes a locale row there, and
+  // assertNoUnplaceableImages stops the migration if one is missing anyway.
   { table: 'articles', column: 'meta_image_id', insertMissing: true },
   { table: '_articles_v', column: 'version_meta_image_id', insertMissing: true },
   { table: 'cases', column: 'meta_image_id', insertMissing: true },
@@ -260,6 +263,40 @@ function defaultLocale(payload: MigrateUpArgs['payload']): string {
   const { localization } = payload.config
   if (!localization) throw new Error('localize_meta_image requires localization to be enabled')
   return localization.defaultLocale
+}
+
+/**
+ * Fail before any DDL runs if a table that cannot take new locale rows has a
+ * document with an image but no locale row. That such a row always exists is
+ * only a convention of how the app writes data, not something the database
+ * enforces, and without one the DROP would lose the image silently.
+ */
+async function assertNoUnplaceableImages(db: MigrateUpArgs['db']): Promise<void> {
+  const unplaceable: string[] = []
+
+  for (const { table, column, insertMissing } of TABLES) {
+    if (insertMissing) continue
+
+    const t = sql.raw(`"${table}"`)
+    const l = sql.raw(`"${table}_locales"`)
+    const c = sql.raw(`"${column}"`)
+
+    const { rows } = await db.execute(sql`
+      SELECT p."id"::text AS id, p.${c}::text AS image
+      FROM ${t} AS p
+      WHERE p.${c} IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM ${l} AS l WHERE l."_parent_id" = p."id");`)
+
+    for (const row of rows) unplaceable.push(`${table} ${row.id} (image ${row.image})`)
+  }
+
+  if (unplaceable.length > 0) {
+    throw new Error(
+      `localize_meta_image: ${unplaceable.length} document(s) have an SEO image but no locale ` +
+        'row, and their table cannot take a new one. Give each a locale row or clear its ' +
+        `image, then run the migration again:\n  ${unplaceable.join('\n  ')}`,
+    )
+  }
 }
 
 /**
