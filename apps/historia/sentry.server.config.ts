@@ -32,33 +32,23 @@ if (isSentryEnabled && sentryDsn) {
 }
 
 // Set up OpenTelemetry logger integration
-// This sends logs to Sentry via OTLP if configured, or can be switched to any other OTLP-compatible backend
-const otlpLogsEndpoint = process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
-const otlpLogsHeaders = process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
+// The exporter reads the standard OTLP variables itself: the logs-specific
+// OTEL_EXPORTER_OTLP_LOGS_ENDPOINT and _HEADERS (e.g. Sentry), or else the generic
+// OTEL_EXPORTER_OTLP_ENDPOINT and _HEADERS with /v1/logs appended (e.g. the Aspire
+// dashboard). Its header parsing also keeps values that contain `=`, such as Sentry's.
+const otlpLogsEndpoint =
+  process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ?? process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
 if (otlpLogsEndpoint) {
-  const headers: Record<string, string> = {};
-
-  // Parse headers from environment variable (format: "key1=value1,key2=value2")
-  if (otlpLogsHeaders) {
-    otlpLogsHeaders.split(',').forEach((header) => {
-      const [key, value] = header.split('=');
-      if (key && value) {
-        headers[key.trim()] = value.trim();
-      }
-    });
-  }
-
   setupOpenTelemetryLogger({
     logRecordProcessor: new BatchLogRecordProcessor({
-      exporter: new OTLPLogExporter({
-        url: otlpLogsEndpoint,
-        headers,
-      }),
+      exporter: new OTLPLogExporter(),
     }),
   });
 
   console.log(`[OpenTelemetry] Logger initialized - sending to ${otlpLogsEndpoint}`);
 } else {
-  console.log('[OpenTelemetry] Logger not configured (OTEL_EXPORTER_OTLP_LOGS_ENDPOINT not set)');
+  console.log(
+    '[OpenTelemetry] Logger not configured (neither OTEL_EXPORTER_OTLP_LOGS_ENDPOINT nor OTEL_EXPORTER_OTLP_ENDPOINT is set)',
+  );
 }
