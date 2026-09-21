@@ -47,8 +47,10 @@ aspire run
 | Dashboard | printed by `aspire run` |
 
 The database runs on migrations, as production does, rather than schema push.
-So after changing a collection, create a migration against the running
-database and run the migrations step again:
+So after changing a collection, create a migration and run the migrations step
+again. `migrate:create` compares the config with the last migration and does
+not connect; the Postgres URL is what makes it write Postgres SQL rather than
+SQLite, and the locales must match or it will try to change the locale enum:
 
 ```sh
 cd apps/historia
