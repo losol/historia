@@ -17,6 +17,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
    CREATE TYPE "public"."enum_imports_collection_slug" AS ENUM('articles', 'instructions', 'notes', 'pages', 'users', 'orders');
   ALTER TABLE "exports" ALTER COLUMN "format" DROP NOT NULL;
   ALTER TABLE "exports" ALTER COLUMN "collection_slug" DROP DEFAULT;
-  ALTER TABLE "imports" ALTER COLUMN "collection_slug" SET DATA TYPE "public"."enum_imports_collection_slug" USING "collection_slug"::"public"."enum_imports_collection_slug";
-  ALTER TABLE "imports" ALTER COLUMN "collection_slug" DROP DEFAULT;`)
+  -- Drop the varchar default before the type change: Postgres cannot cast it to
+  -- the enum automatically. (The generated order had these two swapped.)
+  ALTER TABLE "imports" ALTER COLUMN "collection_slug" DROP DEFAULT;
+  ALTER TABLE "imports" ALTER COLUMN "collection_slug" SET DATA TYPE "public"."enum_imports_collection_slug" USING "collection_slug"::"public"."enum_imports_collection_slug";`)
 }
