@@ -19,6 +19,7 @@ import * as migration_20260124_123434_terms from './20260124_123434_terms';
 import * as migration_20260126_215642_media from './20260126_215642_media';
 import * as migration_20260921_170757_import_export_schema from './20260921_170757_import_export_schema';
 import * as migration_20260921_171254_localize_meta_image from './20260921_171254_localize_meta_image';
+import * as migration_20260922_163328_payload_3_90 from './20260922_163328_payload_3_90';
 
 export const migrations = [
   {
@@ -124,6 +125,11 @@ export const migrations = [
   {
     up: migration_20260921_171254_localize_meta_image.up,
     down: migration_20260921_171254_localize_meta_image.down,
-    name: '20260921_171254_localize_meta_image'
+    name: '20260921_171254_localize_meta_image',
+  },
+  {
+    up: migration_20260922_163328_payload_3_90.up,
+    down: migration_20260922_163328_payload_3_90.down,
+    name: '20260922_163328_payload_3_90'
   },
 ];
