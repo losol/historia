@@ -22,6 +22,12 @@ updates:
       default-days: 10
       exclude:
         - "@eventuras/*"
+    ignore:
+      # The Aspire AppHost's generated SDK imports `vscode-jsonrpc/node.js`, which
+      # 9.x no longer exports, so a major bump breaks `aspire run`. The version is
+      # Aspire's to move; take it from a fresh `aspire init` when upgrading Aspire.
+      - dependency-name: "vscode-jsonrpc"
+        update-types: ["version-update:semver-major"]
     groups:
       # First matching group wins — keep specific groups above the catch-alls.
       payload:
