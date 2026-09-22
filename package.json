@@ -6,11 +6,10 @@
   "scripts": {
     "build": "pnpm -r build",
     "changeset": "changeset",
-    "changeset:tag": "changeset tag",
+    "changeset:tag": "changeset git-tag",
     "changeset:version": "changeset version",
     "dev": "pnpm --filter @eventuras/historia dev",
     "lint": "biome check .",
-    "release": "changeset version && git add . && git commit -m 'chore: version packages' && changeset tag && git push --follow-tags",
     "test": "pnpm -r test",
     "format": "biome format --write .",
     "lint:fix": "biome check --write ."
