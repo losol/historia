@@ -29,3 +29,92 @@ jobs:
       # credentials and are run locally.
       - name: Test (vipps unit)
         run: pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
+
+  # The gate that matters for a release: the app has to type-check, its schema
+  # has to match its collections, and it has to boot against a real Postgres.
+  # `biome ci` and the Docker build cannot show any of that — the image is built
+  # with `--experimental-build-mode compile`, which never type-checks or runs it.
+  verify:
+    name: Typecheck, migrations & boot
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      CMS_DATABASE_URL: postgres://postgres:postgres@localhost:5432/cms
+      CMS_SECRET: historia-ci
+      NEXT_PUBLIC_CMS_URL: http://localhost:3100
+      # These must match the locales the migrations were created with, or the
+      # schema check below reports a difference that is only this file's doing.
+      NEXT_PUBLIC_CMS_LOCALES: no,en
+      NEXT_PUBLIC_CMS_DEFAULT_LOCALE: no
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # historia imports these from their `dist`, so they exist before it can be
+      # type-checked. Same step the Dockerfile runs.
+      - name: Build the workspace packages historia depends on
+        run: pnpm --filter '@eventuras/historia^...' build
+
+      - name: Typecheck
+        run: pnpm --filter @eventuras/historia exec tsc -p tsconfig.json --noEmit
+
+      # Production runs with `push: false` and applies these at startup, so a
+      # migration that does not apply cleanly is an outage, not a test failure.
+      - name: Run migrations
+        run: pnpm --filter @eventuras/historia exec payload migrate
+
+      # A collection changed without a migration is invisible until deploy:
+      # development on SQLite pushes the schema, production does not.
+      - name: Check the schema matches the collections
+        run: |
+          pnpm --filter @eventuras/historia exec payload migrate:create ci-schema-check --skip-empty
+          if [ -n "$(git status --porcelain apps/historia/src/migrations)" ]; then
+            echo "::error::A collection changed without a migration. Run 'pnpm payload migrate:create <name>' and commit the result."
+            # Payload normalises the name it was given to ci_schema_check.
+            cat apps/historia/src/migrations/*ci_schema_check.ts
+            exit 1
+          fi
+
+      # /api/health answers without touching Payload, so it proves nothing. These
+      # two initialise Payload against the database and render the admin.
+      - name: Boot and serve
+        run: |
+          pnpm --filter @eventuras/historia exec next dev --port 3100 > /tmp/next.log 2>&1 &
+
+          check() {
+            for _ in $(seq 1 60); do
+              code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "http://localhost:3100$1" || true)"
+              if [ "$code" = "200" ]; then echo "$1 -> 200"; return 0; fi
+              sleep 5
+            done
+            echo "::error::$1 never returned 200 (last: ${code:-no response})"
+            tail -50 /tmp/next.log
+            return 1
+          }
+
+          check /api/users/me
+          check /admin/login

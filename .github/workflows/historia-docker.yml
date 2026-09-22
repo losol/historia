@@ -175,8 +175,20 @@ jobs:
           VERSION_TAG="${ORGANIZATION_NAME}/${IMAGE_NAME}:v${VERSION}"
           LATEST_TAG="${ORGANIZATION_NAME}/${IMAGE_NAME}:latest"
 
+          # The release job only tags after the main build has pushed this image,
+          # but a hand-pushed tag can arrive first. Wait rather than fail outright.
           echo "Pulling existing staging image: ${SOURCE_TAG}"
-          docker pull "${SOURCE_TAG}"
+          for attempt in $(seq 1 30); do
+            if docker pull "${SOURCE_TAG}"; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo "::error::${SOURCE_TAG} never appeared. Did the build for this commit pass?"
+              exit 1
+            fi
+            echo "Not pushed yet (attempt ${attempt}/30); waiting 20s"
+            sleep 20
+          done
 
           echo "Retagging to version: ${VERSION_TAG}"
           docker tag "${SOURCE_TAG}" "${VERSION_TAG}"

@@ -1,6 +1,7 @@
 {
   "name": "@eventuras/notitia-templates",
   "version": "0.2.4",
+  "private": true,
   "description": "Handlebars-based library for generating SMS and email texts with support for default templates and custom overrides",
   "keywords": [
     "templates",

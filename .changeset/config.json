@@ -7,7 +7,7 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [],
+  "ignore": ["@eventuras/historia-apphost"],
   "privatePackages": {
     "version": true,
     "tag": true

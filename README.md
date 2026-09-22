@@ -65,5 +65,23 @@ Data lives in the `historia-postgres-data` volume; remove it to start over
 
 ## Releases
 
-Versioning via changesets; a `@eventuras/historia@x.y.z` tag retags the staged
-Docker image for production (see `.github/workflows/historia-docker.yml`).
+A release is a pull request you merge. Nothing is published to a registry — the
+artifact is the Docker image, and the version is the label it carries.
+
+1. **Every change that belongs in the changelog carries a changeset.** Run
+   `pnpm changeset` in the branch, pick a bump, write one line, commit the
+   `.changeset/*.md` alongside the change.
+2. **Merging to `main`** runs CI, builds and pushes `losolio/historia:main-<sha>`,
+   and then a bot opens or updates a **`chore: version packages`** pull request
+   holding the version bumps and the changelog entries.
+3. **Merging that pull request is the release.** The version lands on `main`, the
+   tag `@eventuras/historia@x.y.z` is pushed, and that tag promotes the image
+   already built for the commit to `vx.y.z` and `latest`. A GitHub release is
+   created from the changelog.
+4. **Argo CD** sets `image.tag` to deploy it. That part lives outside this repo.
+
+Because the image is promoted rather than rebuilt, what reaches production is
+exactly what CI ran against.
+
+Production applies migrations at startup (`prodMigrations`, with `push: false`),
+so **take a database backup before releasing anything that carries one**.
