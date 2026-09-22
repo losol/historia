@@ -51,8 +51,9 @@
     "@eventuras/typescript-config": "^1.0.0",
     "@eventuras/vite-config": "^0.3.1",
     "@types/handlebars": "^4.1.0",
+    "@typescript/typescript6": "^6.0.2",
     "tslib": "2.8.1",
-    "typescript": "6.0.3",
+    "typescript": "^7.0.2",
     "vite": "8.3.0",
     "vitest": "5.0.0"
   },
