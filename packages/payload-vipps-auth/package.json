@@ -37,10 +37,11 @@
     "@types/node": "^24.12.0",
     "@types/react": "^19.3.0",
     "@types/uuid": "^11.0.0",
+    "@typescript/typescript6": "^6.0.2",
     "next": "^16.3.5",
     "payload": "3.90.1",
     "react": "^19.3.0",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"
   },
