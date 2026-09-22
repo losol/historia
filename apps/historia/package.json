@@ -1,6 +1,7 @@
 {
   "name": "@eventuras/historia",
   "version": "0.25.22",
+  "private": true,
   "description": "The knowledge CMS",
   "license": "MIT",
   "type": "module",

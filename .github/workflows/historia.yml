@@ -33,3 +33,45 @@ jobs:
       NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
       CMS_SENTRY_ORG: ${{ secrets.CMS_SENTRY_ORG }}
       CMS_SENTRY_PROJECT: ${{ secrets.CMS_SENTRY_PROJECT }}
+
+  # Releases go through a pull request: every change that should show up in the
+  # changelog carries a `.changeset/*.md`, the action collects them into a
+  # "chore: version packages" PR, and merging that PR is the release. The action
+  # then tags the new version, and the tag triggers the retag job in
+  # historia-docker.yml, which promotes the image to `vX.Y.Z` and `latest`.
+  #
+  # `needs: docker` matters: the tag must not exist before the image it points
+  # at has been pushed, or the retag has nothing to promote.
+  release:
+    name: Release
+    needs: [ci, docker]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # `publish` only tags: nothing here is published to a registry, the
+      # release artifact is the Docker image.
+      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version: pnpm changeset:version
+          publish: pnpm changeset:tag
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
