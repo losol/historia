@@ -16,7 +16,7 @@
     "lint:fix": "biome check --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.12",
+    "@biomejs/biome": "^2.5.13",
     "@changesets/cli": "^2.31.1",
     "tsx": "^4.23.12"
   },
