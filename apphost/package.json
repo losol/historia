@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.apphost.json --noEmit"
   },
   "dependencies": {
-    "vscode-jsonrpc": "^8.2.0"
+    "vscode-jsonrpc": "^9.0.2"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",
