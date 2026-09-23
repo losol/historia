@@ -1,4 +1,3 @@
-import React from 'react';
 import { getCurrentWebsite } from '@/lib/website';
 import { HeaderClient } from './Component.client';
 

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Button } from '@payloadcms/ui';
 import Link from 'next/link';
 

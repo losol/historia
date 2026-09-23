@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Pill, toast } from '@payloadcms/ui';
 import Link from 'next/link';
 import { getPackingQueue, markOrderPacked } from '@/app/actions/packing';

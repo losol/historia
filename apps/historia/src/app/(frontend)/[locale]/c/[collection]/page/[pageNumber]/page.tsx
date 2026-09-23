@@ -1,4 +1,3 @@
-import React from 'react';
 import configPromise from '@payload-config';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next/types';

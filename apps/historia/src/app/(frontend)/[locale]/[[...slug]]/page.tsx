@@ -1,4 +1,4 @@
-import React, { cache } from 'react';
+import { cache } from 'react';
 import { Story, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Breadcrumb, Breadcrumbs } from '@eventuras/ratio-ui/core/Breadcrumbs';
 import { Link } from '@eventuras/ratio-ui-next';

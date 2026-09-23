@@ -195,7 +195,7 @@ export default function VippsCheckoutPage() {
           logger.error({ reference, error }, 'Unexpected error creating order');
           setState('error');
           setMessage(
-            'En uventet feil oppstod. Vennligst kontakt support med referanse: ' + reference,
+            `En uventet feil oppstod. Vennligst kontakt support med referanse: ${reference}`,
           );
           // Error already shown in UI, only toast for critical issues
         }
@@ -228,7 +228,7 @@ export default function VippsCheckoutPage() {
         }
 
         setState('error');
-        setMessage(userMessage + ' Ingen beløp er trukket.');
+        setMessage(`${userMessage} Ingen beløp er trukket.`);
       } else if (status === 'failed' || status === 'cancelled') {
         logger.warn({ reference, status }, 'Payment failed without specific reason');
 

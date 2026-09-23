@@ -74,7 +74,7 @@ export async function handleVippsSession(
   }
 
   // User authenticated - manually generate JWT and Payload cookie
-  const collection = payload.collections['users'];
+  const collection = payload.collections.users;
   if (!collection) {
     throw new Error('Users collection not found');
   }

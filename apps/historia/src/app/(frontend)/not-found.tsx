@@ -1,4 +1,3 @@
-import React from 'react';
 import { NotFound as NotFoundBlock } from '@eventuras/ratio-ui/blocks/NotFound';
 import { Link } from '@eventuras/ratio-ui-next';
 

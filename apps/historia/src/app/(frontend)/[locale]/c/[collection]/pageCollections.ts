@@ -45,7 +45,7 @@ export const collectionTranslations: Record<string, Record<string, string>> = {
 };
 
 export const getLocalizedCollectionName = (collection: string, locale: string): string => {
-  const translations = collectionTranslations[locale] || collectionTranslations['en'];
+  const translations = collectionTranslations[locale] || collectionTranslations.en;
   return translations[collection] ?? collection;
 };
 

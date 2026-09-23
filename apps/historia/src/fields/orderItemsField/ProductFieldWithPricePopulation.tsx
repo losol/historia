@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { RelationshipField, useField } from '@payloadcms/ui';
 import type { RelationshipFieldClientComponent } from 'payload';
 
