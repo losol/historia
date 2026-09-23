@@ -23,6 +23,7 @@ out/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 
 # Payload / app artifacts
 apps/historia/src/app/(payload)/admin/importMap.js

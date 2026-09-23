@@ -1,0 +1,48 @@
+{
+  // The formatter is pinned per language rather than globally, because Biome
+  // cannot format everything in this repo: Markdown, YAML and SCSS have no
+  // Biome formatter, and its HTML support is still experimental. Setting
+  // `editor.defaultFormatter` at the top level would hand those files to Biome
+  // too and leave them unformatted — or silently reformatted once HTML support
+  // lands. Only the languages listed here are ones Biome fully formats.
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+
+  // Mirrors `pnpm lint:fix` (`biome check --write`) on save: safe fixes plus the
+  // import grouping configured under `assist.actions.source.organizeImports` in
+  // biome.jsonc. Unsafe fixes stay manual — the 21 unused imports in the
+  // migration baseline need `biome check --write --unsafe` and a look at the
+  // diff, so they are deliberately not swept up on every save.
+  //
+  // "explicit" means these run on a real save, not on autosave or focus change.
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  }
+}
