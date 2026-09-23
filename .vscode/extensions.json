@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    // Biome is the repo's formatter, linter and import sorter in one. Without
+    // this extension none of biome.jsonc applies while you type — it only runs
+    // in CI and on `pnpm lint`.
+    "biomejs.biome"
+  ],
+  // ESLint and Prettier were removed in 42cfb88. If they are still installed
+  // they fight Biome over the same files, so flag them as unwanted here.
+  "unwantedRecommendations": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+}
