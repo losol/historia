@@ -1,4 +1,3 @@
-import React from 'react';
 import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
 import { redirect } from 'next/navigation';

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from '@payloadcms/ui';
 import { useRouter } from 'next/navigation';
 import { shipCompleteOrderAndCapture } from '@/app/actions/shipment';

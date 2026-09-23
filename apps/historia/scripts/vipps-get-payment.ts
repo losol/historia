@@ -46,7 +46,7 @@ function printHeader(text: string) {
 
 function printField(label: string, value: unknown) {
   console.log(
-    `${colors.dim}${label}:${colors.reset} ${value ?? colors.dim + 'N/A' + colors.reset}`,
+    `${colors.dim}${label}:${colors.reset} ${value ?? `${colors.dim}N/A${colors.reset}`}`,
   );
 }
 

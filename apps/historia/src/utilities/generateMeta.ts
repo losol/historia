@@ -5,7 +5,7 @@ import { getServerSideURL } from './getURL';
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL();
 
-  let url = serverUrl + '/images/historia.png';
+  let url = `${serverUrl}/images/historia.png`;
 
   if (image && typeof image === 'object') {
     const ogUrl = image.sizes?.landscape?.url;

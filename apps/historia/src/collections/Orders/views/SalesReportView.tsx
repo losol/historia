@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, toast } from '@payloadcms/ui';
 import Link from 'next/link';
 import { getSalesReport, type SalesReportData } from '@/app/actions/salesReport';

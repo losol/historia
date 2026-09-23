@@ -1,4 +1,3 @@
-import React from 'react';
 import { Footer as FooterUI } from '@eventuras/ratio-ui/core/Footer';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';

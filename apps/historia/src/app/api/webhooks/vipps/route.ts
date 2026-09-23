@@ -174,9 +174,9 @@ export async function POST(request: NextRequest) {
       'x-azure-socketip': allHeaders['x-azure-socketip'],
 
       // Request metadata
-      host: allHeaders['host'],
+      host: allHeaders.host,
       'user-agent': allHeaders['user-agent'],
-      referer: allHeaders['referer'],
+      referer: allHeaders.referer,
       'content-type': allHeaders['content-type'],
       'content-length': allHeaders['content-length'],
 
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
       host: allHeaders['x-forwarded-host'] || request.headers.get('host') || 'unknown',
       actualHostHeader: request.headers.get('host') || 'unknown',
       userAgent: allHeaders['user-agent'] || 'none',
-      referer: allHeaders['referer'] || 'none',
+      referer: allHeaders.referer || 'none',
 
       // Request URL
       fullUrl: request.url,
@@ -292,7 +292,7 @@ export async function POST(request: NextRequest) {
           host,
           pathAndQuery: url.pathname + url.search,
           contentSha256: xMsContentSha256,
-          authHeader: authorization?.substring(0, 50) + '...', // Log first 50 chars only
+          authHeader: `${authorization?.substring(0, 50)}...`, // Log first 50 chars only
           bodyLength: rawBody.length,
           expectedSignatureFormat:
             'HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=...',
