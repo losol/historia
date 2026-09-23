@@ -1,5 +1,17 @@
 # @eventuras/historia
 
+## 0.26.0
+
+### Minor Changes
+
+- 931b4b8: Release through a changesets pull request, and make CI a gate worth passing:
+  typecheck, migrations against a real Postgres, a check that the schema still
+  matches the collections, and a boot that renders the admin.
+
+### Patch Changes
+
+- f0be48a: Move to TypeScript 7.
+
 ## 0.25.22
 
 ### Patch Changes
