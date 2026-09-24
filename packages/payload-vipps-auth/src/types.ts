@@ -83,7 +83,7 @@ export interface VippsAuthPluginConfig {
    * })
    * ```
    */
-  mapVippsUser?: (vippsUser: VippsUserInfo) => Partial<any>;
+  mapVippsUser?: (vippsUser: VippsUserInfo) => Record<string, unknown>;
 }
 
 /**
@@ -103,7 +103,7 @@ export interface ResolvedVippsAuthConfig
   > {
   apiUrl: string;
   redirectUri?: string;
-  mapVippsUser?: (vippsUser: VippsUserInfo) => Partial<any>;
+  mapVippsUser?: (vippsUser: VippsUserInfo) => Record<string, unknown>;
   subscriptionKey?: string;
   merchantSerialNumber?: string;
 }

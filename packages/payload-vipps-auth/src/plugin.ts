@@ -75,8 +75,7 @@ export function vippsAuthPlugin(pluginConfig: VippsAuthPluginConfig) {
         if (usersCollection.auth === true) {
           usersCollection.auth = {};
         }
-        const auth = usersCollection.auth as any;
-        auth.disableLocalStrategy = true;
+        usersCollection.auth.disableLocalStrategy = true;
       }
     }
 
