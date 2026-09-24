@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
+import type { TemplateType } from '../types';
 
 describe('NotitiaTemplates - Template Rendering', () => {
   let templates: NotitiaTemplates;
@@ -148,7 +149,7 @@ describe('NotitiaTemplates - Template Rendering', () => {
 
     it('should throw error for non-existent template', () => {
       expect(() => {
-        templates.render('email', 'non-existent' as any, {});
+        templates.render('email', 'non-existent' as TemplateType, {});
       }).toThrow('Template not found');
     });
 

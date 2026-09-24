@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
+import type { TemplateType } from '../types';
+
+// Custom templates registered by the tests, not part of the built-in TemplateType union.
+const ORDER_DETAILED = 'order-confirmation-detailed' as TemplateType;
+const ORDER_MINIMAL = 'order-minimal' as TemplateType;
 
 describe('NotitiaTemplates - Order Confirmation Examples', () => {
   let templates: NotitiaTemplates;
@@ -9,7 +14,7 @@ describe('NotitiaTemplates - Order Confirmation Examples', () => {
   });
 
   it('should render detailed order confirmation with items', () => {
-    templates.registerTemplate('email', 'order-confirmation-detailed', {
+    templates.registerTemplate('email', ORDER_DETAILED, {
       subject: 'Order Confirmation - #{{orderId}}',
       content: `Hello {{name}},
 
@@ -55,7 +60,7 @@ Best regards,
       description: 'Detailed order confirmation with line items',
     });
 
-    const result = templates.render('email', 'order-confirmation-detailed', {
+    const result = templates.render('email', ORDER_DETAILED, {
       name: 'Alice Johnson',
       orderId: 'ORD-98765',
       orderDate: '2025-06-15',
@@ -99,7 +104,7 @@ Best regards,
   });
 
   it('should render minimal order confirmation', () => {
-    templates.registerTemplate('email', 'order-minimal', {
+    templates.registerTemplate('email', ORDER_MINIMAL, {
       subject: '✓ Order {{orderId}} Confirmed',
       content: `Hi {{name}}! 👋
 
@@ -117,7 +122,7 @@ We'll email you when it ships.
       description: 'Minimal order confirmation',
     });
 
-    const result = templates.render('email', 'order-minimal', {
+    const result = templates.render('email', ORDER_MINIMAL, {
       name: 'Bob',
       orderId: 'ORD-555',
       organizationName: 'Quick Shop',
