@@ -81,7 +81,7 @@ async function validatePaymentOwnership(
     // PRIMARY VALIDATION: Check database for cart with this paymentReference
     const payload = await getPayload({ config: configPromise });
     const carts = await payload.find({
-      collection: 'carts' as any,
+      collection: 'carts',
       where: {
         paymentReference: {
           equals: paymentReference,
@@ -95,7 +95,7 @@ async function validatePaymentOwnership(
         {
           ...sessionContext,
           paymentReference,
-          cartId: (carts.docs[0] as any).id,
+          cartId: carts.docs[0].id,
         },
         'Payment validated via database cart lookup',
       );
@@ -189,7 +189,7 @@ export async function createOrderFromPayment({
     // ROBUST APPROACH: Find cart by paymentReference
     // This works even if session cookies are lost/expired
     const carts = await payload.find({
-      collection: 'carts' as any,
+      collection: 'carts',
       where: {
         paymentReference: {
           equals: paymentReference,
@@ -203,7 +203,7 @@ export async function createOrderFromPayment({
 
       // Convert Payload cart to Cart type
       cart = {
-        items: (cartDoc as any).items.map((item: any) => ({
+        items: cartDoc.items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
         })),
@@ -213,7 +213,7 @@ export async function createOrderFromPayment({
       logger.info(
         {
           ...sessionContext,
-          cartId: (cartDoc as any).id,
+          cartId: cartDoc.id,
           itemCount: cart?.items.length || 0,
           paymentReference,
         },
@@ -255,7 +255,7 @@ export async function createOrderFromPayment({
       const payload = await getPayload({ config: configPromise });
 
       const cartResults = await payload.find({
-        collection: 'carts' as any,
+        collection: 'carts',
         where: {
           paymentReference: {
             equals: paymentReference,
@@ -266,11 +266,11 @@ export async function createOrderFromPayment({
       });
 
       if (cartResults.docs && cartResults.docs.length > 0) {
-        const recoveredCart = cartResults.docs[0] as any;
+        const recoveredCart = cartResults.docs[0];
 
         if (recoveredCart?.items?.length > 0) {
           cart = {
-            items: recoveredCart.items.map((item: any) => ({
+            items: recoveredCart.items.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
             })),
@@ -431,8 +431,9 @@ export async function createOrderFromPayment({
       }
     }
 
-    // If no authenticated user, try to find or create from Vipps profile data
-    let effectiveUserId = userId;
+    // If no authenticated user, try to find or create from Vipps profile data.
+    // Every branch below assigns this or returns, so TypeScript can check it is set.
+    let effectiveUserId: string;
 
     if (!userId) {
       // Try to get user info from Vipps profile sharing or user details.
@@ -523,6 +524,7 @@ export async function createOrderFromPayment({
         );
       }
     } else {
+      effectiveUserId = userId;
       logger.info(
         {
           userId: effectiveUserId,
@@ -777,7 +779,7 @@ export async function createOrderFromPayment({
     // Get user details from Historia account
     const user = await payload.findByID({
       collection: 'users',
-      id: effectiveUserId!,
+      id: effectiveUserId,
     });
 
     if (!user?.email) {
@@ -841,7 +843,7 @@ export async function createOrderFromPayment({
       collection: 'orders',
       draft: false,
       data: {
-        customer: effectiveUserId!,
+        customer: effectiveUserId,
         userEmail: user.email,
         status: 'pending',
         currency: paymentDetails.aggregate.authorizedAmount.currency,
@@ -867,7 +869,7 @@ export async function createOrderFromPayment({
     // Idempotent: Only update if not already completed (prevents race condition with webhook)
     try {
       const carts = await payload.find({
-        collection: 'carts' as any,
+        collection: 'carts',
         where: {
           paymentReference: {
             equals: paymentReference,
@@ -877,7 +879,7 @@ export async function createOrderFromPayment({
       });
 
       if (carts.docs.length > 0) {
-        const cart = carts.docs[0] as any;
+        const cart = carts.docs[0];
 
         // Idempotent check: Skip if already completed (webhook may have updated it)
         if (cart.status === 'completed') {
@@ -891,7 +893,7 @@ export async function createOrderFromPayment({
           );
         } else {
           await payload.update({
-            collection: 'carts' as any,
+            collection: 'carts',
             id: cart.id,
             data: {
               status: 'completed',
@@ -969,7 +971,7 @@ export async function createOrderFromPayment({
 
         await payload.update({
           collection: 'users',
-          id: effectiveUserId!,
+          id: effectiveUserId,
           data: {
             addresses: updatedAddresses,
           },
@@ -997,7 +999,7 @@ export async function createOrderFromPayment({
         const { firstName, lastName, mobileNumber, email } = paymentDetails.userDetails;
 
         // Build update object with only fields that Vipps actually provided
-        const updateData: Record<string, any> = {};
+        const updateData: Partial<User> = {};
 
         // Update name fields if provided (treated as atomic unit per ADR 0002)
         if (firstName || lastName) {
@@ -1022,7 +1024,7 @@ export async function createOrderFromPayment({
         if (Object.keys(updateData).length > 0) {
           await payload.update({
             collection: 'users',
-            id: effectiveUserId!,
+            id: effectiveUserId,
             data: updateData,
             overrideAccess: true, // Bypass field-level access control (trusted source)
           });
@@ -1037,7 +1039,7 @@ export async function createOrderFromPayment({
               actor: effectiveUserId,
               entity: {
                 relationTo: 'users',
-                value: effectiveUserId!,
+                value: effectiveUserId,
               },
               data: {
                 description: `User data verified and updated via Vipps payment`,
@@ -1116,7 +1118,7 @@ export async function createOrderFromPayment({
         id: transaction.id,
         data: {
           order: order.id,
-          customer: effectiveUserId!,
+          customer: effectiveUserId,
           amount: transactionAmount,
           currency: transactionCurrency as 'NOK' | 'USD' | 'EUR' | 'SEK' | 'DKK',
           status: transactionStatus,
@@ -1154,7 +1156,7 @@ export async function createOrderFromPayment({
           draft: false,
           data: {
             order: order.id,
-            customer: effectiveUserId!,
+            customer: effectiveUserId,
             amount: transactionAmount, // Store in minor units
             currency: transactionCurrency as 'NOK' | 'USD' | 'EUR' | 'SEK' | 'DKK',
             status: transactionStatus,
@@ -1163,18 +1165,19 @@ export async function createOrderFromPayment({
             tenant: websiteId,
           },
         });
-      } catch (createError: any) {
+      } catch (createError) {
         // Handle race condition: webhook and client callback both tried to create transaction
         // The unique constraint on paymentReference prevents duplicates
+        const createErrorMessage = (createError as { message?: unknown } | null)?.message;
         if (
-          createError?.message?.includes('unique') ||
-          createError?.message?.includes('duplicate')
+          typeof createErrorMessage === 'string' &&
+          (createErrorMessage.includes('unique') || createErrorMessage.includes('duplicate'))
         ) {
           logger.warn(
             {
               paymentReference,
               orderId: order.id,
-              createError: createError.message,
+              createError: createErrorMessage,
             },
             'Transaction already exists (race condition) - retrieving existing transaction',
           );
