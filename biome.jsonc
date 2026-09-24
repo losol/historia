@@ -72,7 +72,7 @@
       // When this list is empty, `biome ci --error-on-warnings` replaces
       // `biome ci` and the distinction stops mattering.
       "style": {
-        "noNonNullAssertion": "warn" // 105
+        "noNonNullAssertion": "warn" // 35
       },
       "suspicious": {
         "noExplicitAny": "warn" // 55
