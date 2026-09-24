@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNotitiaTemplates, type NotitiaTemplates } from '../NotitiaTemplates';
-import type { Template } from '../types';
+import type { Template, TemplateType } from '../types';
 
 describe('NotitiaTemplates - Core Functionality', () => {
   let templates: NotitiaTemplates;
@@ -52,8 +52,8 @@ describe('NotitiaTemplates - Core Functionality', () => {
         },
       });
 
-      expect(templates.hasTemplate('email', 'test1' as any)).toBe(true);
-      expect(templates.hasTemplate('email', 'test2' as any)).toBe(true);
+      expect(templates.hasTemplate('email', 'test1' as TemplateType)).toBe(true);
+      expect(templates.hasTemplate('email', 'test2' as TemplateType)).toBe(true);
     });
 
     it('should unregister custom template and fall back to default', () => {
@@ -94,7 +94,7 @@ describe('NotitiaTemplates - Core Functionality', () => {
   describe('Template Management', () => {
     it('should check if template exists', () => {
       expect(templates.hasTemplate('email', 'welcome')).toBe(true);
-      expect(templates.hasTemplate('email', 'non-existent' as any)).toBe(false);
+      expect(templates.hasTemplate('email', 'non-existent' as TemplateType)).toBe(false);
     });
 
     it('should get available templates', () => {
