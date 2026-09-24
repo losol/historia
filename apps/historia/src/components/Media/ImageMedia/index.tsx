@@ -40,8 +40,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
       width: fullWidth,
     } = resource;
 
-    width = fullWidth!;
-    height = fullHeight!;
+    width = fullWidth ?? undefined;
+    height = fullHeight ?? undefined;
     alt = description?.root.children.toString() || '';
 
     src = `${getClientSideURL()}${url}`;

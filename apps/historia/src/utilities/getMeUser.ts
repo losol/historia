@@ -7,7 +7,8 @@ export const getMeUser = async (args?: {
   nullUserRedirect?: string;
   validUserRedirect?: string;
 }): Promise<{
-  token: string;
+  /** Absent when there is no payload-token cookie and no nullUserRedirect was given. */
+  token: string | undefined;
   user: User;
 }> => {
   const { nullUserRedirect, validUserRedirect } = args || {};
@@ -34,9 +35,8 @@ export const getMeUser = async (args?: {
     redirect(nullUserRedirect);
   }
 
-  // Token will exist here because if it doesn't the user will be redirected
   return {
-    token: token!,
+    token,
     user,
   };
 };

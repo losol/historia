@@ -11,7 +11,7 @@ import useClickableCard from '@/utilities/useClickableCard';
 export const Card: React.FC<{
   className?: string;
   doc?: Article | Happening | Page | Person | Organization | Case | Note;
-  relationTo?: 'articles' | 'happenings' | 'pages' | 'persons' | 'cases' | 'notes';
+  relationTo: 'articles' | 'happenings' | 'pages' | 'persons' | 'cases' | 'notes';
   showTopics?: boolean;
   showImages?: boolean;
   title?: string;
@@ -28,7 +28,7 @@ export const Card: React.FC<{
 
   const href = getDocUrl({
     locale,
-    collection: relationTo!,
+    collection: relationTo,
     resourceId: doc?.resourceId,
     slug: doc?.slug,
   });
@@ -46,7 +46,7 @@ export const Card: React.FC<{
           <div className="prose">
             <h3>
               <Link className="not-prose" href={href} ref={link.ref}>
-                {'title' in doc! ? doc.title : doc?.name}
+                {'title' in doc ? doc.title : doc.name}
               </Link>
             </h3>
           </div>

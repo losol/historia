@@ -79,7 +79,8 @@ export default function VippsCheckoutPage() {
         return;
       }
 
-      if (result.data.exists) {
+      // checkExistingOrder always sets orderId when exists is true.
+      if (result.data.exists && result.data.orderId) {
         logger.info(
           { reference, orderId: result.data.orderId },
           'Order already exists, skipping SSE',
@@ -90,7 +91,7 @@ export default function VippsCheckoutPage() {
 
         // Show success immediately
         setOrderDetails({
-          orderId: result.data.orderId!,
+          orderId: result.data.orderId,
           userEmail: result.data.userEmail || '',
           shippingAddress: result.data.shippingAddress,
         });
@@ -116,6 +117,9 @@ export default function VippsCheckoutPage() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: state is only logged
   const handlePaymentStatusChange = React.useCallback(
     async (status: string) => {
+      // PaymentStatusSSE is only rendered with a reference, so this never fires without one.
+      if (!reference) return;
+
       // Log to both console and logger to ensure visibility
       console.log('🔔 [CLIENT] handlePaymentStatusChange called with status:', status);
       console.log('🔔 [CLIENT] reference:', reference);
@@ -150,7 +154,7 @@ export default function VippsCheckoutPage() {
           );
 
           // Call server action to process payment and create order
-          const orderResult = await processPaymentAndCreateOrder(reference!);
+          const orderResult = await processPaymentAndCreateOrder(reference);
 
           console.log('📬 [CLIENT] Received response from server action:', orderResult);
 
@@ -209,7 +213,7 @@ export default function VippsCheckoutPage() {
         logger.warn({ reference, status, failureReason }, 'Payment failed with reason');
 
         // Create business event for analytics
-        createPaymentFailureEvent(reference!, failureReason).catch((error) => {
+        createPaymentFailureEvent(reference, failureReason).catch((error) => {
           logger.error({ reference, failureReason, error }, 'Failed to create business event');
           // Don't show error to user - this is analytics only
         });
@@ -236,7 +240,7 @@ export default function VippsCheckoutPage() {
         logger.warn({ reference, status }, 'Payment failed without specific reason');
 
         // Create business event for analytics (no specific reason)
-        createPaymentFailureEvent(reference!, 'unknown').catch((error) => {
+        createPaymentFailureEvent(reference, 'unknown').catch((error) => {
           logger.error({ reference, error }, 'Failed to create business event');
         });
 

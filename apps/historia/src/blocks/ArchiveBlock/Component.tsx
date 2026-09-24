@@ -47,7 +47,9 @@ export const ArchiveBlock: React.FC<
           <RichText className="ml-0 max-w-[48rem]" data={description} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive docs={docs} relationTo={relationTo!} showImages={showImages} />
+      {relationTo && (
+        <CollectionArchive docs={docs} relationTo={relationTo} showImages={showImages} />
+      )}
     </div>
   );
 };
