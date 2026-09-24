@@ -22,10 +22,17 @@ npm and live in [origo](https://github.com/losol/origo).
 pnpm install
 pnpm dev          # next dev on port 3100
 pnpm build
-pnpm lint
+pnpm test
+pnpm lint         # Biome; warnings fail it too, as in CI
+pnpm --filter @eventuras/historia exec tsc --noEmit   # typecheck the app
 ```
 
-`pnpm dev` runs against a local SQLite file and needs nothing else.
+`pnpm dev` runs against a local SQLite file and needs nothing else. Configuration
+(`.env`), Vipps, HTTPS tunnels and migrations are covered in
+[`apps/historia/README.md`](apps/historia/README.md).
+
+Typechecking the app needs the workspace packages it imports to be built first:
+`pnpm --filter '@eventuras/historia^...' build`.
 
 ### With Aspire
 

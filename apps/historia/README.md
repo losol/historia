@@ -1,32 +1,48 @@
 # Historia - The CMS where stories are told
 
-Historia is a CMS that allows you to create and manage stories. It is built on top of [Payload](https://payloadcms.com), a headless CMS that provides a powerful and flexible API for your data.
+Historia is a CMS that allows you to create and manage stories. It is built on top of [Payload](https://payloadcms.com), a headless CMS that provides a powerful and flexible API for your data, and Next.js.
 
-**Experimental, not ready for production use yet**
+Installing, running and releasing are covered in the [repository README](../../README.md). This page covers what is specific to the app.
 
-## Local Development with Vipps Payment Testing
+## Configuration
 
-Vipps requires HTTPS for callback URLs. For local development, you need to expose your localhost through a secure tunnel.
+`pnpm dev` starts without any configuration, against a local SQLite file (`historia.db`). For anything beyond that, copy `.env.example` to `.env`. The variables the app reads are described in [`app.config.json`](./app.config.json) and in the guides below. The most important ones:
 
-### Setting up Cloudflare Tunnel
+| Variable | Purpose |
+| --- | --- |
+| `CMS_DATABASE_URL` | Database. A `postgres://` URL uses Postgres; unset means SQLite |
+| `CMS_SECRET` | Signs the Payload session cookie. Keep it stable in production |
+| `NEXT_PUBLIC_CMS_URL` | The app's public URL |
+| `CMS_ALLOWED_ORIGINS` | Comma-separated public origins, for CORS/CSRF and for trusting proxy headers |
+| `VIPPS_*` | Vipps ePayment (checkout), see [VIPPS.md](./docs/VIPPS.md) |
+| `VIPPS_LOGIN_*` | Vipps Login for the admin, see [VIPPS_LOGIN_SETUP.md](./docs/VIPPS_LOGIN_SETUP.md) |
 
-1. **Login to Cloudflare:**
+## Local development with HTTPS
+
+Vipps (both payments and login) needs public HTTPS URLs for its callbacks. For local development, expose localhost through a Cloudflare Tunnel.
+
+**Quick, temporary URL:**
+
+```bash
+cloudflared tunnel --url http://localhost:3100
+```
+
+The printed `https://….trycloudflare.com` URL changes every time you run it.
+
+**Stable URL with a named tunnel** (needs a domain on Cloudflare):
+
+1. Log in and create the tunnel:
 
    ```bash
    cloudflared tunnel login
-   ```
-
-2. **Create a named tunnel:**
-
-   ```bash
    cloudflared tunnel create historia-dev
    ```
 
-3. **Create a config file** at `~/.cloudflared/config.yml`:
+2. Create `~/.cloudflared/config.yml`, using the tunnel ID printed by `create`:
 
    ```yaml
-   tunnel: dev
-   credentials-file: /Users/YOUR_USERNAME/.cloudflared/<TUNNEL_ID>.json
+   tunnel: historia-dev
+   credentials-file: /path/to/home/.cloudflared/<TUNNEL_ID>.json
 
    ingress:
      - hostname: historia-dev.YOUR-DOMAIN.com
@@ -34,49 +50,64 @@ Vipps requires HTTPS for callback URLs. For local development, you need to expos
      - service: http_status:404
    ```
 
-4. **Create a DNS record** in Cloudflare dashboard:
-   - Type: `CNAME`
-   - Name: `dev` (or your preferred subdomain)
-   - Target: `<TUNNEL_ID>.cfargotunnel.com`
-   - Proxied: Yes
+3. Route the hostname to the tunnel. This creates the DNS record for you:
 
-5. **Run the tunnel:**
+   ```bash
+   cloudflared tunnel route dns historia-dev historia-dev.YOUR-DOMAIN.com
+   ```
+
+4. Run it:
 
    ```bash
    cloudflared tunnel run historia-dev
    ```
 
-6. **Update your `.env` file:**
-
-   ```bash
-   NEXT_PUBLIC_CMS_URL=https://historia-dev.YOUR-DOMAIN.com
-   ```
-
-Now your tunnel URL will remain the same across restarts!
-
-**Alternative:** If you don't have a custom domain, you can use the free tunnel but create a bash alias to make it easier:
+Either way, point the app at the public URL in `.env`:
 
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
-alias historia-tunnel='cloudflared tunnel --url http://localhost:3100'
+NEXT_PUBLIC_CMS_URL=https://historia-dev.YOUR-DOMAIN.com
+CMS_ALLOWED_ORIGINS=https://historia-dev.YOUR-DOMAIN.com
 ```
 
-## Database Migrations
+## Database migrations
 
-Historia uses Payload CMS's built-in migration system. When you modify collections or fields, you should create and run migrations:
+Production runs on Postgres and applies the migrations in `src/migrations/` at startup (`prodMigrations`); it never pushes the schema. Local development on SQLite pushes the schema instead, so it needs no migrations.
+
+The migrations are Postgres SQL. That means you must create them with a Postgres URL, or Payload writes SQLite SQL. After changing a collection or field:
 
 ```bash
-# Generate a migration based on schema changes
-pnpm payload migrate:create
-
-# Run pending migrations
-pnpm payload migrate
-
-# Check migration status
-pnpm payload migrate:status
-
-# Refresh the database (drops all tables and recreates - development only!)
-pnpm payload migrate:refresh
+CMS_DATABASE_URL=postgres://postgres:historia@localhost:3103/cms \
+NEXT_PUBLIC_CMS_LOCALES=no,en NEXT_PUBLIC_CMS_DEFAULT_LOCALE=no \
+  pnpm payload migrate:create <name>
 ```
 
-Migrations are stored in `src/migrations/` and are automatically run when the application starts in production.
+`migrate:create` does not connect to the database; the URL only selects the dialect. The locales must match the ones the existing migrations were made with, or it will try to change the locale enum. CI fails a pull request that changes a collection without a matching migration.
+
+To apply and inspect migrations against a Postgres database, for example the one `aspire run` starts (see the [repository README](../../README.md#with-aspire)):
+
+```bash
+CMS_DATABASE_URL=postgres://postgres:historia@localhost:3103/cms pnpm payload migrate
+CMS_DATABASE_URL=postgres://postgres:historia@localhost:3103/cms pnpm payload migrate:status
+```
+
+`pnpm payload migrate:refresh` drops every table and re-runs all migrations. Never point it at a database you care about.
+
+## Documentation
+
+For administrators:
+
+- [Role-based access control](./docs/administrator/role-based-access-control.md)
+- [Orders](./docs/administrator/orders.md)
+- [Vipps Login and user accounts](./docs/administrator/vipps-login.md)
+- [Vipps commerce and user data](./docs/administrator/vipps-commerce.md)
+- [API keys for media and notes](./docs/administrator/api-keys.md)
+
+For developers:
+
+- [Vipps ePayment integration](./docs/VIPPS.md)
+- [Vipps Login setup](./docs/VIPPS_LOGIN_SETUP.md)
+- [Real-time payment status with SSE](./docs/SSE_PAYMENT_STATUS.md)
+- [Payment recovery via SSE](./docs/VIPPS_WEBHOOK_SSE_RECOVERY.md)
+- [Theme toggle](./docs/ThemeToggle.md)
+- [Kubernetes Helm chart](./k8s/README.md)
+- [Architecture decision records](./docs/adr/)
