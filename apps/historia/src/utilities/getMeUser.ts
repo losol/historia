@@ -7,31 +7,28 @@ export const getMeUser = async (args?: {
   nullUserRedirect?: string;
   validUserRedirect?: string;
 }): Promise<{
-  /** Absent when there is no payload-token cookie and no nullUserRedirect was given. */
+  /** Absent when there is no payload-token cookie. */
   token: string | undefined;
-  user: User;
+  /** Null when not signed in, unless nullUserRedirect was given (then it redirects). */
+  user: User | null;
 }> => {
   const { nullUserRedirect, validUserRedirect } = args || {};
   const cookieStore = await cookies();
   const token = cookieStore.get('payload-token')?.value;
 
-  const meUserReq = await fetch(`${getClientSideURL()}/api/users/me`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
+  const meUserReq = await fetch(
+    `${getClientSideURL()}/api/users/me`,
+    token ? { headers: { Authorization: `JWT ${token}` } } : undefined,
+  );
 
-  const {
-    user,
-  }: {
-    user: User;
-  } = await meUserReq.json();
+  const body: { user?: User | null } = await meUserReq.json();
+  const user = meUserReq.ok ? (body.user ?? null) : null;
 
-  if (validUserRedirect && meUserReq.ok && user) {
+  if (validUserRedirect && user) {
     redirect(validUserRedirect);
   }
 
-  if (nullUserRedirect && (!meUserReq.ok || !user)) {
+  if (nullUserRedirect && !user) {
     redirect(nullUserRedirect);
   }
 
