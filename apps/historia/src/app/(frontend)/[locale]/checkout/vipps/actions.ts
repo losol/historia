@@ -1324,9 +1324,7 @@ export async function checkExistingOrder(paymentReference: string): Promise<
     };
   }>
 > {
-  // CRITICAL: Log immediately when server action is invoked
-  console.log('[SERVER ACTION] checkExistingOrder called with reference:', paymentReference);
-  logger.info({ paymentReference }, '🔍 SERVER ACTION INVOKED: checkExistingOrder');
+  logger.info({ paymentReference }, 'checkExistingOrder invoked');
 
   try {
     // Validate payment ownership
@@ -1444,12 +1442,7 @@ export async function processPaymentAndCreateOrder(paymentReference: string): Pr
     };
   }>
 > {
-  // CRITICAL: Log immediately when server action is invoked
-  console.log(
-    '[SERVER ACTION] processPaymentAndCreateOrder called with reference:',
-    paymentReference,
-  );
-  logger.info({ paymentReference }, '🚀 SERVER ACTION INVOKED: processPaymentAndCreateOrder');
+  logger.info({ paymentReference }, 'processPaymentAndCreateOrder invoked');
 
   try {
     // Validate payment ownership

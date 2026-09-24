@@ -159,7 +159,7 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
         setSubmitting(false);
       }
     } catch (error) {
-      console.error('Checkout error:', error);
+      logger.error({ error }, 'Checkout failed');
       alert('En uventet feil oppstod');
       setSubmitting(false);
     }
