@@ -69,39 +69,44 @@ export function logStartupConfig() {
     console.log(`   Logs Export: ❌ DISABLED (OTEL_EXPORTER_OTLP_LOGS_ENDPOINT not set)`);
   }
 
-  // Database Configuration
+  // Database Configuration (mirrors the adapter choice in payload.config.ts)
   console.log('\n💾 Database:');
-  console.log(`   Type: ${process.env.DATABASE_ADAPTER || 'not set'}`);
-  console.log(`   URI: ${process.env.DATABASE_URI ? '✅ configured' : '❌ missing'}`);
-
-  // CORS & Security Configuration
-  console.log('\n🔒 CORS & Security:');
-  const allowedOrigins = process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_CMS_URL;
-  console.log(`   Server URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL || 'not set'}`);
-  console.log(`   Allowed Origins: ${allowedOrigins || 'not configured'}`);
-  console.log(`   CORS Credentials: ${process.env.CORS_CREDENTIALS || 'not set'}`);
-  console.log(`   Cookie Domain: ${process.env.COOKIE_DOMAIN || 'not set'}`);
+  const databaseUrl = process.env.CMS_DATABASE_URL;
+  const isPostgres = /^postgres(ql)?:\/\//.test(databaseUrl ?? '');
+  console.log(`   Type: ${isPostgres ? 'Postgres' : 'SQLite'}`);
   console.log(
-    `   Cookie Secure: ${process.env.COOKIE_SECURE === 'true' ? 'yes' : 'no (HTTP allowed)'}`,
+    `   CMS_DATABASE_URL: ${databaseUrl ? '✅ configured' : 'not set (local SQLite file)'}`,
   );
-  console.log(`   Cookie SameSite: ${process.env.COOKIE_SAME_SITE || 'lax (default)'}`);
+
+  // CORS & Security Configuration (payload.config.ts uses the list for both cors and csrf)
+  console.log('\n🔒 CORS & Security:');
+  console.log(`   Allowed Origins: ${process.env.CMS_ALLOWED_ORIGINS || 'not configured'}`);
 
   // Session & Authentication
   console.log('\n🔑 Session & Auth:');
-  console.log(`   Session Secret: ${process.env.PAYLOAD_SECRET ? '✅ configured' : '❌ missing'}`);
-  console.log(`   Session Max Age: ${process.env.SESSION_MAX_AGE || '30 days (default)'}`);
   console.log(
-    `   CSRF Protection: ${process.env.DISABLE_CSRF !== 'true' ? '✅ enabled' : '⚠️ disabled'}`,
+    `   CMS_SECRET: ${
+      process.env.CMS_SECRET
+        ? '✅ configured'
+        : '❌ missing (a random secret is generated, so sessions do not survive a restart)'
+    }`,
+  );
+  console.log(
+    `   Vipps Login: ${process.env.VIPPS_LOGIN_ENABLED === 'true' ? '✅ ENABLED' : '❌ DISABLED'}`,
   );
 
-  // Email Configuration
+  // Email Configuration (mirrors the nodemailer setup in payload.config.ts)
   console.log('\n📧 Email:');
-  const emailFrom = process.env.EMAIL_FROM || process.env.SMTP_FROM;
-  console.log(`   From Address: ${emailFrom || 'not configured'}`);
-  console.log(`   SMTP Host: ${process.env.SMTP_HOST || 'not configured'}`);
-  console.log(`   SMTP Port: ${process.env.SMTP_PORT || 'not configured'}`);
-  console.log(`   SMTP Secure: ${process.env.SMTP_SECURE === 'true' ? 'yes (TLS)' : 'no'}`);
-  console.log(`   SMTP User: ${process.env.SMTP_USER ? '✅ configured' : 'not configured'}`);
+  if (process.env.FEATURE_SMTP === 'enabled') {
+    console.log('   Transport: SMTP');
+    console.log(`   From Address: ${process.env.SMTP_FROM_EMAIL || 'noreply@eventuras.local'}`);
+    console.log(`   SMTP Host: ${process.env.SMTP_HOST || 'localhost'}`);
+    console.log(`   SMTP Port: ${process.env.SMTP_PORT || '587'}`);
+    console.log(`   SMTP Secure: ${process.env.SMTP_SECURE === 'true' ? 'yes (TLS)' : 'no'}`);
+    console.log(`   SMTP User: ${process.env.SMTP_USER ? '✅ configured' : '❌ missing'}`);
+  } else {
+    console.log('   Transport: console log only (FEATURE_SMTP is not "enabled")');
+  }
 
   // Storage Configuration
   console.log('\n📦 Storage:');
@@ -121,7 +126,8 @@ export function logStartupConfig() {
   }
   // Vipps Configuration
   console.log('\n💳 Payment (Vipps):');
-  console.log(`   Test Mode: ${process.env.VIPPS_USE_TEST_MODE === 'true' ? '✅ yes' : 'no'}`);
+  const vippsApiUrl = process.env.VIPPS_API_URL || 'https://apitest.vipps.no';
+  console.log(`   API: ${vippsApiUrl}${vippsApiUrl.includes('apitest') ? ' (test)' : ''}`);
   console.log(`   Client ID: ${process.env.VIPPS_CLIENT_ID ? '✅ configured' : '❌ missing'}`);
   console.log(
     `   Client Secret: ${process.env.VIPPS_CLIENT_SECRET ? '✅ configured' : '❌ missing'}`,
@@ -129,7 +135,7 @@ export function logStartupConfig() {
   console.log(
     `   Subscription Key: ${process.env.VIPPS_SUBSCRIPTION_KEY ? '✅ configured' : '❌ missing'}`,
   );
-  console.log(`   MSN: ${process.env.VIPPS_MSN || 'not set'}`);
+  console.log(`   MSN: ${process.env.VIPPS_MERCHANT_SERIAL_NUMBER || 'not set'}`);
 
   console.log('\n════════════════════════════════════════════════════════════\n');
 }
