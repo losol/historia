@@ -264,6 +264,9 @@ importers:
       '@types/handlebars':
         specifier: ^4.1.0
         version: 4.1.0
+      '@types/node':
+        specifier: ^24.12.0
+        version: 24.13.4
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2

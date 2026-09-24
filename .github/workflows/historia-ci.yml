@@ -25,10 +25,13 @@ jobs:
       - name: Lint & format
         run: pnpm exec biome ci --error-on-warnings .
 
+      # Typecheck covers src, the tests and scripts/ (tsconfig.typecheck.json).
       # Unit tests only — the vipps integration suites need live Vipps test
       # credentials and are run locally.
-      - name: Test (vipps unit)
-        run: pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
+      - name: Typecheck & test (vipps)
+        run: |
+          pnpm --filter @eventuras/vipps typecheck
+          pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
 
       - name: Typecheck & test (notitia-templates)
         run: |
