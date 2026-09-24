@@ -72,10 +72,10 @@
       // When this list is empty, `biome ci --error-on-warnings` replaces
       // `biome ci` and the distinction stops mattering.
       "style": {
-        "noNonNullAssertion": "warn" // 35
+        "noNonNullAssertion": "warn" // 28
       },
       "suspicious": {
-        "noExplicitAny": "warn" // 41
+        "noExplicitAny": "warn" // 22
       },
       "performance": {
         // InstructionBlock renders a plain <img>. <Media> would work, but it

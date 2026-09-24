@@ -14,7 +14,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
-import type { Transaction } from '@/payload-types';
+import type { Transaction, User } from '@/payload-types';
 
 const logger = Logger.create({
   namespace: 'historia:api:webhooks:vipps',
@@ -59,7 +59,7 @@ async function updateUserFromVipps(
 ): Promise<void> {
   try {
     // Build update object with only fields that Vipps actually provided
-    const updateData: Record<string, any> = {};
+    const updateData: Partial<User> = {};
 
     // Update name fields if provided (treated as atomic unit per ADR 0002)
     if (vippsData.given_name || vippsData.family_name) {
@@ -784,7 +784,9 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       // Vipps redacts PII to "[Expired]" after its retention period — keep
       // the values stored at payment time instead of overwriting them.
       ...(paymentDetails && {
-        data: mergeExpiredPaymentDetails(paymentDetails, transaction.data) as any,
+        // Spread into a plain object: PaymentDetails is an interface, which has no index
+        // signature and so is not assignable to Payload's JSON field type as-is.
+        data: { ...mergeExpiredPaymentDetails(paymentDetails, transaction.data) },
       }),
       ...(customerId && { customer: customerId }),
     },
@@ -1079,7 +1081,7 @@ async function updateOrderStatus(
     if (newOrderStatus === 'completed') {
       try {
         const carts = await payloadInstance.find({
-          collection: 'carts' as any,
+          collection: 'carts',
           where: {
             paymentReference: {
               equals: vippsPayload?.reference,
@@ -1089,7 +1091,7 @@ async function updateOrderStatus(
         });
 
         if (carts.docs.length > 0) {
-          const cart = carts.docs[0] as any;
+          const cart = carts.docs[0];
 
           // Idempotent check: Skip if already completed (checkout callback may have updated it)
           if (cart.status === 'completed') {
@@ -1103,7 +1105,7 @@ async function updateOrderStatus(
             );
           } else {
             await payloadInstance.update({
-              collection: 'carts' as any,
+              collection: 'carts',
               id: cart.id,
               data: {
                 status: 'completed',
