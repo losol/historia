@@ -2,6 +2,8 @@
  * Locale-specific text for order status email templates
  */
 export interface OrderStatusTexts {
+  /** BCP 47 language tag for the <html lang> attribute, e.g. "nb" */
+  lang: string;
   copyBanner: string;
   headerTitle: string;
   greeting: string;
@@ -63,7 +65,7 @@ export const ORDER_STATUS_STYLES = `
  */
 export function buildOrderStatusTemplate(texts: OrderStatusTexts): string {
   return `<!DOCTYPE html>
-<html>
+<html lang="${texts.lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

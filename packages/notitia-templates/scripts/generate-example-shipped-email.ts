@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { notitiaTemplates } from '../src/notitiaTemplates';
+import { notitiaTemplates } from '../src/NotitiaTemplates';
 
 // Generate example order shipped email
 const exampleEmail = notitiaTemplates.render(

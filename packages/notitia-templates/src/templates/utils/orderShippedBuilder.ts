@@ -2,6 +2,8 @@
  * Locale-specific text for order shipped email template
  */
 export interface OrderShippedTexts {
+  /** BCP 47 language tag for the <html lang> attribute, e.g. "nb" */
+  lang: string;
   headerTitle: string;
   greeting: string;
   shippedMessage: string;
@@ -60,7 +62,7 @@ export const ORDER_SHIPPED_STYLES = `
  */
 export function buildOrderShippedTemplate(texts: OrderShippedTexts): string {
   return `<!DOCTYPE html>
-<html>
+<html lang="${texts.lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

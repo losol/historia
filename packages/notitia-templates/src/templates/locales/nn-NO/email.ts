@@ -166,6 +166,7 @@ Beste helsing,
   'email:order-received': {
     subject: 'Bestilling mottatt - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'nn',
       copyBanner: 'KOPI - Intern kopi av kundestadfesting',
       headerTitle: 'Bestilling mottatt',
       greeting: 'Hei {{name}}! 👋',
@@ -196,6 +197,7 @@ Beste helsing,
   'email:order-confirmation': {
     subject: 'Ordrestadfesting - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'nn',
       copyBanner: 'KOPI - Intern kopi av kundestadfesting',
       headerTitle: 'Ordrestadfesting',
       greeting: 'Hei {{name}}! 👋',
@@ -225,6 +227,7 @@ Beste helsing,
   'email:order-shipped': {
     subject: 'Ordren din er sendt - #{{orderId}}',
     content: buildOrderShippedTemplate({
+      lang: 'nn',
       headerTitle: 'Ordren din er sendt! 🎉',
       greeting: 'Hei {{name}}! 👋',
       shippedMessage:

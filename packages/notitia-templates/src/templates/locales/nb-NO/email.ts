@@ -111,6 +111,7 @@ Beste hilsen,
   'email:order-received': {
     subject: 'Bestilling mottatt - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'nb',
       copyBanner: 'KOPI - Intern kopi av kundebekreftelse',
       headerTitle: 'Bestilling mottatt',
       greeting: 'Hei {{name}}! 👋',
@@ -142,6 +143,7 @@ Beste hilsen,
   'email:order-confirmation': {
     subject: 'Ordrebekreftelse - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'nb',
       copyBanner: 'KOPI - Intern kopi av kundebekreftelse',
       headerTitle: 'Ordrebekreftelse',
       greeting: 'Hei {{name}}! 👋',
@@ -172,6 +174,7 @@ Beste hilsen,
   'email:order-shipped': {
     subject: 'Din ordre er sendt - #{{orderId}}',
     content: buildOrderShippedTemplate({
+      lang: 'nb',
       headerTitle: 'Ordren din er sendt! 🎉',
       greeting: 'Hei {{name}}! 👋',
       shippedMessage:

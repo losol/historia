@@ -111,6 +111,7 @@ The {{organizationName}} Team`,
   'email:order-received': {
     subject: 'Order Received - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'en',
       copyBanner: 'COPY - Internal copy of customer confirmation',
       headerTitle: 'Order Received',
       greeting: 'Hello {{name}}! 👋',
@@ -142,6 +143,7 @@ The {{organizationName}} Team`,
   'email:order-confirmation': {
     subject: 'Order Confirmation - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'en',
       copyBanner: 'COPY - Internal copy of customer confirmation',
       headerTitle: 'Order Confirmation',
       greeting: 'Hello {{name}}! 👋',
@@ -172,6 +174,7 @@ The {{organizationName}} Team`,
   'email:order-shipped': {
     subject: 'Your Order Has Shipped - #{{orderId}}',
     content: buildOrderShippedTemplate({
+      lang: 'en',
       headerTitle: 'Your Order Has Shipped! 🎉',
       greeting: 'Hello {{name}}! 👋',
       shippedMessage:

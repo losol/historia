@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { notitiaTemplates } from '../notitiaTemplates';
+import { notitiaTemplates } from '../NotitiaTemplates';
 
 describe('Order Shipped Template', () => {
   it('should render order shipped notification with all details', () => {
@@ -8,7 +8,7 @@ describe('Order Shipped Template', () => {
       'order-shipped',
       {
         name: 'Skodde Losen',
-        orderId: 'asdf',
+        orderId: '9b4b8a46-eb66-4889-854f-c82bb574f894',
         trackingNumber: 'TRACK-123456',
         trackingUrl: 'https://tracking.example.com/TRACK-123456',
         estimatedDelivery: '15. januar 2026',
