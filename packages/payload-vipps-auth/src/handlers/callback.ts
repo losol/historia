@@ -55,7 +55,7 @@ function clearCookieHeader(cookieName: string, isSecure: boolean): string {
 /**
  * Default mapping from Vipps user to Payload user fields
  */
-function defaultMapVippsUser(vippsUser: VippsUserInfo): Partial<any> {
+function defaultMapVippsUser(vippsUser: VippsUserInfo): Record<string, unknown> {
   return {
     email: vippsUser.email,
     email_verified: vippsUser.email_verified,
@@ -226,7 +226,7 @@ export async function handleVippsCallback(
       user = await payload.create({
         collection: 'users',
         data: {
-          email: vippsUser.email!,
+          email: vippsUser.email,
           ...userData,
         },
       });

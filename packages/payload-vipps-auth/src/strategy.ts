@@ -11,6 +11,9 @@ import { Logger } from '@eventuras/logger';
 import type { AuthStrategy, AuthStrategyResult } from 'payload';
 import { v4 as uuidv4 } from 'uuid';
 
+/** A row in the users collection's `sessions` array, as Payload stores it. */
+type StoredSession = { id: string; createdAt?: string | null; expiresAt: string };
+
 const logger = Logger.create({
   namespace: 'payload-vipps-auth:strategy',
   context: { module: 'VippsAuthStrategy' },
@@ -152,10 +155,8 @@ export function createVippsAuthStrategy(collection = 'users'): AuthStrategy {
         };
 
         // Remove expired sessions and add new session
-        const existingSessions = Array.isArray((user as any).sessions)
-          ? (user as any).sessions
-          : [];
-        const activeSessions = existingSessions.filter((s: any) => new Date(s.expiresAt) > now);
+        const existingSessions: StoredSession[] = Array.isArray(user.sessions) ? user.sessions : [];
+        const activeSessions = existingSessions.filter((s) => new Date(s.expiresAt) > now);
 
         // Update user with new session
         await payload.update({

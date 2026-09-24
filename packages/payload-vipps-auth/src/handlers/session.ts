@@ -91,11 +91,11 @@ export async function handleVippsSession(
   // Sign the JWT token with user data and session ID
   const { token } = await jwtSign({
     fieldsToSign: {
-      _strategy: (user as any)._strategy ?? undefined,
+      _strategy: user._strategy ?? undefined,
       collection: 'users',
-      email: (user as any).email,
+      email: user.email,
       id: user.id,
-      sid: (user as any)._sid ?? undefined,
+      sid: user._sid ?? undefined,
     },
     secret,
     tokenExpiration: authConfig.tokenExpiration,
@@ -105,7 +105,7 @@ export async function handleVippsSession(
   const cookies = generatePayloadCookie({
     collectionAuthConfig: authConfig,
     cookiePrefix: payload.config.cookiePrefix,
-    token: token!,
+    token,
   });
 
   // Create redirect response with Payload auth cookie
