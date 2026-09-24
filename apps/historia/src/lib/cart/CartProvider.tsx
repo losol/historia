@@ -2,20 +2,11 @@
 
 import type React from 'react';
 import { createContext, useContext } from 'react';
-import type { Cart } from './types';
 import { useSessionCart } from './use-session-cart';
 
-interface CartContextValue {
-  cart: Cart | null;
-  items: Cart['items'];
-  itemCount: number;
-  loading: boolean;
-  addToCart: (productId: string, quantity?: number) => Promise<any>;
-  updateCartItem: (productId: string, quantity: number) => Promise<any>;
-  removeFromCart: (productId: string) => Promise<any>;
-  clearCart: () => Promise<any>;
-  refreshCart: () => Promise<void>;
-}
+// The provider hands out exactly what useSessionCart returns, so derive the type from it
+// instead of restating it by hand.
+type CartContextValue = ReturnType<typeof useSessionCart>;
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 

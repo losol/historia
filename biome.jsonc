@@ -75,7 +75,7 @@
         "noNonNullAssertion": "warn" // 28
       },
       "suspicious": {
-        "noExplicitAny": "warn" // 22
+        "noExplicitAny": "warn" // 12
       },
       "performance": {
         // InstructionBlock renders a plain <img>. <Media> would work, but it

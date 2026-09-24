@@ -14,6 +14,12 @@ interface SessionData {
   [key: string]: unknown;
 }
 
+/** Identifier fields some auth providers put on the session user beyond what fides-auth types. */
+interface SessionUserIds {
+  sub?: string;
+  id?: string;
+}
+
 /**
  * Get or create a session ID for tracking user activity across requests
  *
@@ -103,8 +109,12 @@ export async function getSessionContext(): Promise<{
 
     // Extract userId from user object - it may be stored as 'sub' in some auth systems
     // or as a custom field in session.data
+    // fides-auth types the user as { name, email, roles }, but the object can carry more.
+    const user = session.user as (NonNullable<typeof session.user> & SessionUserIds) | undefined;
     const userId =
-      (session.user as any)?.sub || (session.user as any)?.id || (sessionData as any)?.userId;
+      user?.sub ||
+      user?.id ||
+      (typeof sessionData.userId === 'string' ? sessionData.userId : undefined);
 
     return {
       sessionId: sessionData.sessionId,

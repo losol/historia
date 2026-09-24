@@ -66,6 +66,7 @@ export async function saveCartToDatabase(): Promise<
         quantity: item.quantity,
       })),
       customer: null, // Guest checkout (no authenticated user)
+      status: 'draft' as const, // The collection's default, stated so the data matches Cart
       tenant: websiteId, // Required by multiTenantPlugin
     };
 
@@ -86,13 +87,13 @@ export async function saveCartToDatabase(): Promise<
 
     // Create cart in database
     const result = await payload.create({
-      collection: 'carts' as any, // Type will be generated after running dev server
+      collection: 'carts',
       data: cartData,
       req: {
         headers: new Headers({
           'x-session-id': sessionId,
         }),
-      } as any,
+      },
     });
 
     if (!result.id) {
@@ -101,7 +102,7 @@ export async function saveCartToDatabase(): Promise<
     }
 
     // Extract secret from response (only available on creation)
-    const cartSecret = (result as any).secret as string;
+    const cartSecret = result.secret;
 
     if (!cartSecret) {
       logger.error({ cartId: result.id }, 'Cart created but no secret returned');
