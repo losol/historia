@@ -146,6 +146,10 @@ export const FormBlock: React.FC<
                     return null;
                   }
 
+                  // Each field component gets the same full set of props below and reads the
+                  // ones it needs. TypeScript cannot tie `blockType` to the matching component,
+                  // so there is no prop type they all accept.
+                  // biome-ignore lint/suspicious/noExplicitAny: heterogeneous field components, see above
                   const Field: React.FC<any> = fields[blockType];
 
                   return (
