@@ -30,6 +30,9 @@ jobs:
       - name: Test (vipps unit)
         run: pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
 
+      - name: Test (notitia-templates)
+        run: pnpm --filter @eventuras/notitia-templates exec vitest run
+
   # The gate that matters for a release: the app has to type-check, its schema
   # has to match its collections, and it has to boot against a real Postgres.
   # `biome ci` and the Docker build cannot show any of that — the image is built
