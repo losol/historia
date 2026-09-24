@@ -338,7 +338,7 @@ export async function createVippsPayment({
     try {
       const payload = await getPayload({ config: configPromise });
       await payload.update({
-        collection: 'carts' as any,
+        collection: 'carts',
         id: cartId,
         data: {
           paymentReference: reference,

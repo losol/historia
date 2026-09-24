@@ -9,10 +9,10 @@
     "changeset:tag": "changeset git-tag",
     "changeset:version": "changeset version",
     "dev": "pnpm --filter @eventuras/historia dev",
-    "lint": "biome check .",
+    "lint": "biome check --error-on-warnings .",
     "test": "pnpm -r test",
     "format": "biome format --write .",
-    "lint:fix": "biome check --write ."
+    "lint:fix": "biome check --write --error-on-warnings ."
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.12",

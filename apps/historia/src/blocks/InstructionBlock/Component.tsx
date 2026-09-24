@@ -13,6 +13,7 @@ export const InstructionBlock: React.FC<InstructionBlockType> = ({ title, image,
       <h4 className="instruction-title">{title}</h4>
       {mediaData?.url && (
         <figure>
+          {/* biome-ignore lint/performance/noImgElement: <Media> replaces the alt text with the media description, so it is not a drop-in swap for this title-based alt */}
           <img src={mediaData.url} alt={mediaData.title || title} />
           {hasRichTextCaption && image?.caption && (
             <figcaption>

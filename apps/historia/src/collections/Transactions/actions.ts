@@ -115,7 +115,9 @@ export async function updateTransactionDetails(
         status: paymentDetails.state.toLowerCase(),
         // Vipps redacts PII to "[Expired]" after its retention period — keep
         // the values stored at payment time instead of overwriting them.
-        data: mergeExpiredPaymentDetails(paymentDetails, transaction.data) as any,
+        // Spread into a plain object: PaymentDetails is an interface, which has no index
+        // signature and so is not assignable to Payload's JSON field type as-is.
+        data: { ...mergeExpiredPaymentDetails(paymentDetails, transaction.data) },
         ...(customerId && { customer: customerId }),
       },
     });

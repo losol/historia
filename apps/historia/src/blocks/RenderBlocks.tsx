@@ -23,11 +23,13 @@ const blockComponents: Record<string, React.FC<any>> = {
 // Define the type for block keys
 type BlockType = keyof typeof blockComponents;
 
-// Define the type for individual blocks
+// The fields RenderBlocks reads itself. Payload's block types carry more, which are
+// passed through to the block component as props.
 type Block = {
   blockType: BlockType;
+  id?: string | null;
   disableInnerContainer?: boolean;
-} & Record<string, any>;
+};
 
 export const RenderBlocks: React.FC<{
   blocks: Block[];

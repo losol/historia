@@ -46,8 +46,8 @@ const getCollectionsSitemap = unstable_cache(
 
           const sitemapEntries = results.docs
             ? results.docs
-                .filter((doc: any) => Boolean(doc?.slug) && Boolean(doc?.resourceId))
-                .map((doc: any) => {
+                .filter((doc) => Boolean(doc?.slug) && Boolean(doc?.resourceId))
+                .map((doc) => {
                   const combinedSlug = `${doc.slug}--${doc.resourceId}`;
                   return {
                     loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,

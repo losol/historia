@@ -6,7 +6,7 @@ import configPromise from '@payload-config';
 import type { Metadata } from 'next';
 import { draftMode, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { getPayload } from 'payload';
+import { getPayload, type Where } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { Hero } from '@/heros/Hero';
@@ -246,7 +246,7 @@ const queryPage = cache(
   }) => {
     const payload = await getPayload({ config: configPromise });
 
-    const where: Record<string, any> = {};
+    const where: Where = {};
 
     if (id) {
       where.id = { equals: id };
