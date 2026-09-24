@@ -18,6 +18,7 @@ import { s3Storage } from '@payloadcms/storage-s3';
 import type { Plugin } from 'payload';
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
+import { getVippsLoginEnv } from '@/lib/vipps/login-config';
 import type { Config } from '@/payload-types';
 import { beforeSyncWithSearch } from '@/search/beforeSync';
 import { searchFields } from '@/search/fieldOverrides';
@@ -77,14 +78,16 @@ export const plugins: Plugin[] = [
     collections: {
       media: true,
     },
-    bucket: process.env.CMS_MEDIA_S3_BUCKET!,
+    // All of these are set whenever the plugin is enabled (see areAllS3VarsPresent);
+    // the '' fallbacks only reach a disabled plugin.
+    bucket: process.env.CMS_MEDIA_S3_BUCKET ?? '',
     config: {
       credentials: {
-        accessKeyId: process.env.CMS_MEDIA_S3_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.CMS_MEDIA_S3_SECRET_ACCESS_KEY!,
+        accessKeyId: process.env.CMS_MEDIA_S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.CMS_MEDIA_S3_SECRET_ACCESS_KEY ?? '',
       },
-      endpoint: process.env.CMS_MEDIA_S3_ENDPOINT!,
-      region: process.env.CMS_MEDIA_S3_REGION!,
+      endpoint: process.env.CMS_MEDIA_S3_ENDPOINT ?? '',
+      region: process.env.CMS_MEDIA_S3_REGION ?? '',
     },
   }),
   redirectsPlugin({
@@ -199,10 +202,7 @@ export const plugins: Plugin[] = [
   // those field components render with.
   seoPlugin({}),
   vippsAuthPlugin({
-    enabled: process.env.VIPPS_LOGIN_ENABLED === 'true',
-    environment: process.env.VIPPS_LOGIN_ENVIRONMENT === 'production' ? 'production' : 'test',
-    clientId: process.env.VIPPS_LOGIN_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_LOGIN_CLIENT_SECRET!,
+    ...getVippsLoginEnv(),
 
     mapVippsUser: (vippsUser) => ({
       email: vippsUser.email,
