@@ -25,13 +25,13 @@ export async function GET(req: Request): Promise<Response> {
     return new Response('This endpoint can only be used for relative previews', { status: 500 });
   }
 
-  let user;
+  let user: Awaited<ReturnType<typeof payload.auth>>['user'];
 
   try {
-    user = await payload.auth({
+    ({ user } = await payload.auth({
       req: req as unknown as PayloadRequest,
       headers: req.headers,
-    });
+    }));
   } catch (error) {
     payload.logger.error({ err: error }, 'Error verifying token for live preview');
     return new Response('You are not allowed to preview this page', { status: 403 });
