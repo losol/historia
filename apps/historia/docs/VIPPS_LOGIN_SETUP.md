@@ -34,30 +34,21 @@ In Vipps Developer Portal:
 Copy `.env.example` to `.env` and update:
 
 ```bash
-# Vipps API environment
-VIPPS_API_URL=https://apitest.vipps.no  # Use https://api.vipps.no for production
+# Turn Vipps Login on. Anything other than exactly 'true' leaves it off:
+# no auth strategy, /api/auth/vipps/* answers 404, no button on the admin login.
+VIPPS_LOGIN_ENABLED=true
 
-# Vipps OAuth credentials
-VIPPS_CLIENT_ID=your-client-id-from-vipps-portal
-VIPPS_CLIENT_SECRET=your-client-secret-from-vipps-portal
+# 'test' or 'production' (default: test)
+VIPPS_LOGIN_ENVIRONMENT=test
 
-# OAuth redirect URI (must match Vipps portal configuration)
-VIPPS_LOGIN_REDIRECT_URI=http://localhost:3100/api/auth/vipps/callback
-
-# Session encryption secret (generate with: openssl rand -hex 32)
-SESSION_SECRET=generate-a-secure-random-secret-here
-
-# Optional: Disable email/password login (default: false)
-HISTORIA_AUTH_DISABLE_LOCAL_STRATEGY=false
+# Vipps Login credentials (separate from the ePayment VIPPS_CLIENT_ID/SECRET)
+VIPPS_LOGIN_CLIENT_ID=your-client-id-from-vipps-portal
+VIPPS_LOGIN_CLIENT_SECRET=your-client-secret-from-vipps-portal
 ```
 
-### Generate Session Secret
-
-```bash
-openssl rand -hex 32
-```
-
-Copy the output to `SESSION_SECRET`.
+The redirect URI is not configured here: the routes build it from the request's
+public origin as `<origin>/api/auth/vipps/callback`, which is what you register
+in the Vipps portal (step 2).
 
 ## Step 4: Install Dependencies
 
@@ -132,7 +123,6 @@ This gives you a public HTTPS URL like `https://random-name.trycloudflare.com`.
 Update your `.env`:
 
 ```bash
-VIPPS_LOGIN_REDIRECT_URI=https://random-name.trycloudflare.com/api/auth/vipps/callback
 NEXT_PUBLIC_CMS_URL=https://random-name.trycloudflare.com
 ```
 
@@ -145,21 +135,19 @@ And update the redirect URI in Vipps Developer Portal.
 Update `.env` for production:
 
 ```bash
-VIPPS_API_URL=https://api.vipps.no
-VIPPS_CLIENT_ID=production-client-id
-VIPPS_CLIENT_SECRET=production-client-secret
-VIPPS_LOGIN_REDIRECT_URI=https://your-domain.com/api/auth/vipps/callback
-SESSION_SECRET=super-secure-random-secret
+VIPPS_LOGIN_ENABLED=true
+VIPPS_LOGIN_ENVIRONMENT=production
+VIPPS_LOGIN_CLIENT_ID=production-client-id
+VIPPS_LOGIN_CLIENT_SECRET=production-client-secret
 NEXT_PUBLIC_CMS_URL=https://your-domain.com
 ```
 
 ### Security Checklist
 
 - [ ] Use production Vipps credentials
-- [ ] Generate new secure `SESSION_SECRET`
+- [ ] Use a strong, stable `CMS_SECRET` (it signs the Payload session cookie)
 - [ ] Ensure `HTTPS` for all URLs
 - [ ] Configure proper CORS in `payload.config.ts`
-- [ ] Consider enabling `HISTORIA_AUTH_DISABLE_LOCAL_STRATEGY=true` for Vipps-only auth
 - [ ] Test login flow end-to-end
 
 ### Multi-Instance Deployments
@@ -174,7 +162,7 @@ For production with load balancing:
 
 ### "Invalid redirect URI" error
 
-- Redirect URI in `.env` doesn't match Vipps portal configuration
+- The redirect URI registered in the Vipps portal doesn't match `<public origin>/api/auth/vipps/callback`
 - **Fix**: Ensure exact match including protocol and path
 
 ### "No email" error
@@ -192,7 +180,7 @@ For production with load balancing:
 
 - Cookie encryption secret changed
 - Not using HTTPS in production
-- **Fix**: Use consistent `SESSION_SECRET` and enable HTTPS
+- **Fix**: Keep `CMS_SECRET` stable across deploys and enable HTTPS
 
 ### Can't login after Vipps authentication
 
@@ -227,11 +215,8 @@ vippsAuthPlugin({
 
 ### Disable Local Authentication
 
-To enforce Vipps-only authentication:
-
-```bash
-HISTORIA_AUTH_DISABLE_LOCAL_STRATEGY=true
-```
+To enforce Vipps-only authentication, pass `disableLocalStrategy: true` to
+`vippsAuthPlugin()` in `src/plugins.ts`. It is not wired to an environment variable.
 
 ⚠️ **Warning**: Make sure you have a Vipps account set up as admin before enabling this!
 
