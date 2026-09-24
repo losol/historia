@@ -11,3 +11,9 @@ public/sitemap*.xml
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Written by `next dev` / `next build`
+next-env.d.ts
+# Next.js 16 writes agent instructions on `next dev`; they are regenerated each run
+AGENTS.md
+CLAUDE.md
