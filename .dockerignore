@@ -11,3 +11,6 @@ node_modules
 .env.*
 # Local development orchestration only; not part of the image.
 apphost
+# Local SQLite databases; the image builds against its own.
+**/*.db
+**/*.db-journal
