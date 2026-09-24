@@ -40,41 +40,28 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
   const statusRef = useRef('pending');
 
   useEffect(() => {
-    console.log('🔌 [PaymentStatusSSE] useEffect triggered - Component mounting');
-    console.log('🔌 [PaymentStatusSSE] reference:', reference);
-    console.log('🔌 [PaymentStatusSSE] onStatusChange defined?', typeof onStatusChange);
-
     // Prevent duplicate connections
     if (isConnectedRef.current) {
-      console.log('⚠️ [PaymentStatusSSE] Already connected, skipping');
+      logger.debug({ reference }, 'SSE already connected, skipping');
       return;
     }
     isConnectedRef.current = true;
 
     logger.info({ reference }, 'Opening SSE connection for payment status');
-    console.log(
-      '🔌 [PaymentStatusSSE] Creating EventSource to:',
-      `/api/payment/${reference}/events`,
-    );
 
     // Create EventSource connection
     const eventSource = new EventSource(`/api/payment/${reference}/events`);
     eventSourceRef.current = eventSource;
-    console.log('✅ [PaymentStatusSSE] EventSource created successfully');
 
     eventSource.onopen = () => {
       logger.debug({ reference }, 'SSE connection opened');
-      console.log('✅ [PaymentStatusSSE] Connection opened (onopen event fired)');
     };
 
     eventSource.onmessage = (event) => {
-      console.log('📬 [PaymentStatusSSE] Message received from server:', event.data);
-
       try {
         const data: PaymentStatusUpdate = JSON.parse(event.data);
 
         logger.info({ reference, data }, 'Received payment status update');
-        console.log('📬 [PaymentStatusSSE] Parsed data:', data);
 
         // Handle timeout
         if (data.timeout) {
@@ -97,8 +84,6 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
 
         // Handle status update
         if (data.status) {
-          console.log('📨 [PaymentStatusSSE] Status received:', data.status);
-          console.log('📨 [PaymentStatusSSE] onStatusChange defined?', typeof onStatusChange);
           statusRef.current = data.status;
           setStatus(data.status);
 
@@ -107,13 +92,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
           const isFailure = data.status === 'failed' || data.status === 'cancelled';
 
           if (!isFailure) {
-            if (onStatusChange) {
-              console.log('📞 [PaymentStatusSSE] Calling onStatusChange with:', data.status);
-              onStatusChange(data.status);
-              console.log('✅ [PaymentStatusSSE] onStatusChange called successfully');
-            } else {
-              console.error('❌ [PaymentStatusSSE] onStatusChange is NOT defined!');
-            }
+            onStatusChange?.(data.status);
           }
 
           // Handle successful payment
@@ -147,7 +126,6 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
 
     eventSource.onerror = (error) => {
       logger.error({ reference, error }, 'SSE connection error');
-      console.error('[PaymentStatusSSE] Connection error:', error);
       eventSource.close();
 
       // Don't show error toast if we already have a status
@@ -159,7 +137,6 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
     // Cleanup on unmount
     return () => {
       logger.debug({ reference }, 'Closing SSE connection');
-      console.log('[PaymentStatusSSE] Cleanup - closing connection');
       eventSource.close();
       isConnectedRef.current = false;
     };

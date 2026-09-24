@@ -120,43 +120,27 @@ export default function VippsCheckoutPage() {
       // PaymentStatusSSE is only rendered with a reference, so this never fires without one.
       if (!reference) return;
 
-      // Log to both console and logger to ensure visibility
-      console.log('🔔 [CLIENT] handlePaymentStatusChange called with status:', status);
-      console.log('🔔 [CLIENT] reference:', reference);
-      console.log('🔔 [CLIENT] Current state:', {
-        currentState: state,
-        processingFlag: processingRef.current,
-      });
-
-      logger.info({ reference, status, currentState: state }, '🔔 Payment status changed via SSE');
+      logger.info(
+        { reference, status, currentState: state, processing: processingRef.current },
+        'Payment status changed via SSE',
+      );
 
       // Only process if payment is captured/authorized
       if (status === 'captured' || status === 'authorized') {
-        console.log('✅ [CLIENT] Status is captured/authorized, will process');
-
         // Prevent duplicate processing
         if (processingRef.current) {
-          console.log('⚠️ [CLIENT] Already processing, skipping');
           logger.warn({ reference }, 'Already processing payment');
           return;
         }
 
-        console.log('🚀 [CLIENT] Setting processing flag and calling server action');
         processingRef.current = true;
 
         setState('processing');
         setMessage('Oppretter ordre...');
 
         try {
-          console.log(
-            '📞 [CLIENT] Calling processPaymentAndCreateOrder with reference:',
-            reference,
-          );
-
           // Call server action to process payment and create order
           const orderResult = await processPaymentAndCreateOrder(reference);
-
-          console.log('📬 [CLIENT] Received response from server action:', orderResult);
 
           if (!orderResult.success) {
             logger.error({ reference, error: orderResult.error }, 'Order creation failed');
