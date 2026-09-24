@@ -1,0 +1,14 @@
+{
+  // Typecheck only, never used to emit. tsconfig.json is the build config, which
+  // leaves out tests (so they stay out of dist) and scripts/ (not part of the
+  // package). This one covers everything, so none of it goes unchecked.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    // The library config lists no ambient types; scripts/ runs on Node.
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "scripts/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

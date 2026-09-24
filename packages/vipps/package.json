@@ -26,6 +26,7 @@
     "dev": "vite build --watch",
     "payment:get": "tsx --env-file=.env scripts/get-payment.ts",
     "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "webhook:delete": "tsx --env-file=.env scripts/delete-webhook.ts",
