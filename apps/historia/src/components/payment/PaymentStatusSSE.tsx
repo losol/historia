@@ -35,6 +35,9 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
   const [status, setStatus] = useState<string>('pending');
   const eventSourceRef = useRef<EventSource | null>(null);
   const isConnectedRef = useRef(false);
+  // Mirrors `status` for the SSE handlers. Reading the state directly would mean
+  // depending on it, and every status update would then reopen the connection.
+  const statusRef = useRef('pending');
 
   useEffect(() => {
     console.log('🔌 [PaymentStatusSSE] useEffect triggered - Component mounting');
@@ -85,6 +88,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
         if (data.error) {
           logger.error({ reference, error: data.error }, 'Payment status error');
           toast.error(data.error);
+          statusRef.current = 'error';
           setStatus('error');
           onStatusChange?.('error');
           eventSource.close();
@@ -95,6 +99,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
         if (data.status) {
           console.log('📨 [PaymentStatusSSE] Status received:', data.status);
           console.log('📨 [PaymentStatusSSE] onStatusChange defined?', typeof onStatusChange);
+          statusRef.current = data.status;
           setStatus(data.status);
 
           if (onStatusChange) {
@@ -140,7 +145,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
       eventSource.close();
 
       // Don't show error toast if we already have a status
-      if (status === 'pending') {
+      if (statusRef.current === 'pending') {
         toast.error('Mistet forbindelse til server. Vennligst last siden på nytt.');
       }
     };
@@ -152,7 +157,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
       eventSource.close();
       isConnectedRef.current = false;
     };
-  }, [reference, onStatusChange, toast, status]);
+  }, [reference, onStatusChange, toast]);
 
   return (
     <div className="text-sm text-gray-600 dark:text-gray-400">
