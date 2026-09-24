@@ -16,8 +16,8 @@
  *   VIPPS_USE_TEST_MODE (optional, defaults to true)
  */
 
-import type { VippsConfig } from '../src/vipps-core';
 import { deleteWebhook } from '../src/webhooks-v1/client';
+import { vippsConfigFromEnv } from './env';
 
 async function main() {
   const webhookId = process.argv[2];
@@ -30,35 +30,7 @@ async function main() {
 
   console.log('🗑️  Deleting Vipps Webhook\n');
 
-  // Check required env vars
-  const required = [
-    'VIPPS_CLIENT_ID',
-    'VIPPS_CLIENT_SECRET',
-    'VIPPS_MERCHANT_SERIAL_NUMBER',
-    'VIPPS_SUBSCRIPTION_KEY',
-  ];
-
-  const missing = required.filter((key) => !process.env[key]);
-  if (missing.length > 0) {
-    console.error('❌ Missing required environment variables:');
-    for (const key of missing) console.error(`   - ${key}`);
-    process.exit(1);
-  }
-
-  const useTestMode = process.env.VIPPS_USE_TEST_MODE !== 'false';
-  const apiUrl = useTestMode ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
-
-  const config: VippsConfig = {
-    apiUrl,
-    clientId: process.env.VIPPS_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_CLIENT_SECRET!,
-    merchantSerialNumber: process.env.VIPPS_MERCHANT_SERIAL_NUMBER!,
-    subscriptionKey: process.env.VIPPS_SUBSCRIPTION_KEY!,
-    systemName: 'vipps-webhook-delete',
-    systemVersion: '1.0.0',
-    pluginName: '',
-    pluginVersion: '',
-  };
+  const config = vippsConfigFromEnv('vipps-webhook-delete');
 
   try {
     console.log(`⏳ Deleting webhook ${webhookId}...\n`);
