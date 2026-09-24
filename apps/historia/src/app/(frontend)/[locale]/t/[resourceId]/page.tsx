@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getPayload } from 'payload';
+import { JsonLd } from '@/components/JsonLd';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
@@ -99,12 +100,7 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateTermJsonLd(term)).replaceAll('<', String.raw`\u003c`),
-        }}
-      />
+      <JsonLd data={generateTermJsonLd(term)} />
       {draft && <LivePreviewListener />}
       <Container>
         <Story>

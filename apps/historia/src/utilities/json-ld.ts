@@ -53,10 +53,7 @@ export function extractPlainText(richText: unknown): string {
  *
  * @example
  * ```tsx
- * <script
- *   type="application/ld+json"
- *   dangerouslySetInnerHTML={{ __html: JSON.stringify(generateQuoteJsonLd(quote)) }}
- * />
+ * <JsonLd data={generateQuoteJsonLd(quote)} />
  * ```
  */
 export function generateQuoteJsonLd(quote: Quote): object {
@@ -125,10 +122,7 @@ export function generateQuoteJsonLd(quote: Quote): object {
  *
  * @example
  * ```tsx
- * <script
- *   type="application/ld+json"
- *   dangerouslySetInnerHTML={{ __html: JSON.stringify(generateSourceJsonLd(source)) }}
- * />
+ * <JsonLd data={generateSourceJsonLd(source)} />
  * ```
  */
 export function generateSourceJsonLd(source: Source): object {
@@ -305,10 +299,7 @@ export function generateSourceJsonLd(source: Source): object {
  *
  * @example
  * ```tsx
- * <script
- *   type="application/ld+json"
- *   dangerouslySetInnerHTML={{ __html: JSON.stringify(generateTermJsonLd(term)) }}
- * />
+ * <JsonLd data={generateTermJsonLd(term)} />
  * ```
  */
 /**

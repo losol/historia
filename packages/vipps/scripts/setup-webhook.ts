@@ -61,7 +61,7 @@ async function main() {
   const missing = required.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:');
-    missing.forEach((key) => console.error(`   - ${key}`));
+    for (const key of missing) console.error(`   - ${key}`);
     process.exit(1);
   }
 
@@ -106,7 +106,7 @@ async function main() {
   } else {
     const indices = eventsInput
       .split(',')
-      .map((s) => Number.parseInt(s.trim()) - 1)
+      .map((s) => Number.parseInt(s.trim(), 10) - 1)
       .filter((i) => i >= 0 && i < availableEvents.length);
 
     if (indices.length === 0) {

@@ -110,7 +110,10 @@ export default function VippsCheckoutPage() {
   }, [reference]);
 
   // Handle payment status change from SSE
-  // CRITICAL: useCallback to prevent EventSource recreation on every render
+  // CRITICAL: useCallback to prevent EventSource recreation on every render.
+  // `state` is only read for logging; depending on it would reopen the SSE stream on
+  // every state change, so it is left out on purpose.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: state is only logged
   const handlePaymentStatusChange = React.useCallback(
     async (status: string) => {
       // Log to both console and logger to ensure visibility

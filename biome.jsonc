@@ -64,52 +64,34 @@
       // `biome ci` exits 0 on warnings, so these rules are NOT enforced —
       // a new `any` or `!` lands without CI objecting.
       //
-      // Counts are current as of 2026-09-23. Burn a rule down to zero, then
+      // Counts are current as of 2026-09-24. Burn a rule down to zero, then
       // drop its line. Careful: dropping a line restores the rule's default
       // severity in the recommended preset, and that default is only "warn"
-      // for some rules (noUnusedImports and useDateNow are both "warn"), so
-      // check before assuming CI will gate it — pin it to "error" if not.
+      // for some rules, so check with `biome explain <rule>` before assuming
+      // CI will gate it — pin it to "error" below if not.
       // When this list is empty, `biome ci --error-on-warnings` replaces
       // `biome ci` and the distinction stops mattering.
       "style": {
-        "noNonNullAssertion": "warn" // 95
+        "noNonNullAssertion": "warn" // 107
       },
       "suspicious": {
-        "noExplicitAny": "warn", // 68
-        "noImplicitAnyLet": "warn", // 9
-        "noArrayIndexKey": "warn", // 5
-        "useIterableCallbackReturn": "warn" // 3 — forEach(() => console.error(…)) in dev scripts
-      },
-      "correctness": {
-        // Cleared by the mechanical sweep and pinned above its "warn" default
-        // so it cannot creep back in unnoticed.
-        "noUnusedImports": "error",
-
-        // These autofixes edit React dependency arrays or rename bindings to
-        // `_foo`, so they are deliberately excluded from the mechanical sweep.
-        // Tried once: Biome dropped `pathname` from a Header effect's deps,
-        // which stops the effect re-running on navigation. Fix these by hand.
-        "useExhaustiveDependencies": "warn", // 3
-        "noUnusedFunctionParameters": "warn", // 6
-        "noUnusedVariables": "warn" // 2
-      },
-      "security": {
-        "noDangerouslySetInnerHtml": "warn" // 4 — deliberate when rendering CMS content
-      },
-      "a11y": {
-        "noSvgWithoutTitle": "warn", // 3
-        "noLabelWithoutControl": "warn", // 1
-        "useButtonType": "warn", // 1
-        "useHtmlLang": "warn" // 1 — example-order-shipped-email.html
+        "noExplicitAny": "warn" // 69
       },
       "performance": {
-        "noAccumulatingSpread": "warn", // 2
-        "noImgElement": "warn" // 1
+        // InstructionBlock renders a plain <img>. <Media> would work, but it
+        // replaces the alt text with the media description, so it is not a
+        // drop-in swap.
+        "noImgElement": "warn", // 1
+
+        // ── Cleared, pinned above their "warn" default ──
+        "noAccumulatingSpread": "error"
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUnusedVariables": "error"
       },
       "complexity": {
-        // Also cleared, also only "warn" by default. noImportantStyles and
-        // a11y/noRedundantRoles were cleared too but default to "error", so
-        // they need no line here.
         "useDateNow": "error"
       }
     }

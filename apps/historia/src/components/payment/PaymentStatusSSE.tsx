@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Logger } from '@eventuras/logger';
 import { useToast } from '@eventuras/ratio-ui/toast';
-import { useRouter } from 'next/navigation';
 
 const logger = Logger.create({
   namespace: 'historia:payment',
@@ -32,7 +31,6 @@ interface PaymentStatusUpdate {
  * the transaction status and sends updates via SSE.
  */
 export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<PaymentStatusProps>) {
-  const router = useRouter();
   const toast = useToast();
   const [status, setStatus] = useState<string>('pending');
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -154,7 +152,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
       eventSource.close();
       isConnectedRef.current = false;
     };
-  }, [reference, onStatusChange, router, toast, status]);
+  }, [reference, onStatusChange, toast, status]);
 
   return (
     <div className="text-sm text-gray-600 dark:text-gray-400">

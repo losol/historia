@@ -14,7 +14,7 @@ import { getPayload } from 'payload';
 import type { Cart, SessionData } from '@/lib/cart/types';
 import { getSessionContext } from '@/lib/session/sessionId';
 import { getCurrentWebsiteId } from '@/lib/website';
-import type { Product } from '@/payload-types';
+import type { Product, Transaction, User } from '@/payload-types';
 import { createOrderAutoCreatedEvent } from './businessEvents';
 import { notifyOrphanedPayment } from './orphanedPaymentNotification';
 
@@ -22,6 +22,8 @@ const logger = Logger.create({
   namespace: 'historia:payment',
   context: { module: 'paymentCallbackActions' },
 });
+
+type UserAddress = NonNullable<User['addresses']>[number];
 
 /**
  * Normalize Norwegian phone number to E.164 format with country code
@@ -803,7 +805,7 @@ export async function createOrderFromPayment({
     );
 
     // Extract shipping address from Vipps (prioritize shippingDetails over userDetails)
-    let vippsShippingAddress;
+    let vippsShippingAddress: Omit<UserAddress, 'id' | 'label' | 'isDefault'> | undefined;
     if (paymentDetails.shippingDetails?.address) {
       vippsShippingAddress = {
         addressLine1: paymentDetails.shippingDetails.address.addressLine1,
@@ -933,7 +935,7 @@ export async function createOrderFromPayment({
         const currentAddresses = user.addresses || [];
         const vippsAddressIndex = currentAddresses.findIndex((addr) => addr.label === 'Vipps');
 
-        let updatedAddresses;
+        let updatedAddresses: UserAddress[];
         if (vippsAddressIndex >= 0) {
           // Update existing Vipps address
           updatedAddresses = [...currentAddresses];
@@ -1093,7 +1095,7 @@ export async function createOrderFromPayment({
       limit: 1,
     });
 
-    let transaction;
+    let transaction: Transaction;
     if (existingWebhookTransactions.docs.length > 0) {
       // Transaction already exists from webhook - update it with order and customer
       transaction = existingWebhookTransactions.docs[0];

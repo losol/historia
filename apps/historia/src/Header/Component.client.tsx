@@ -18,6 +18,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ title }) => {
   const pathname = usePathname();
   const locale = useLocale();
 
+  // pathname is not read in the body: it is there so the theme resets on every navigation.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on navigation
   useEffect(() => {
     if (headerTheme !== null) {
       setHeaderTheme(null);

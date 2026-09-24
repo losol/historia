@@ -47,7 +47,7 @@ export const MediaCollections: CollectionConfig = {
   ],
   hooks: {
     beforeValidate: [
-      async ({ data, req, operation, originalDoc }) => {
+      async ({ data, req, originalDoc }) => {
         // Only check when updating or creating with parent
         if (!data?.parentCollection) return data;
 

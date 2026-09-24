@@ -199,7 +199,7 @@ export async function handleVippsCallback(
       limit: 1,
     });
 
-    let user;
+    let user: (typeof users.docs)[number] | undefined;
     if (users.docs.length > 0) {
       // Update existing user
       user = users.docs[0];

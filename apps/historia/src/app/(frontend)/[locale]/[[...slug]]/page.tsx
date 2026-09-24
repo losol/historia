@@ -95,7 +95,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const fullPath = slug?.length ? `/${slug.join('/')}` : undefined;
   const currentSlug = slug?.length ? slug.at(-1) : undefined;
 
-  let page;
+  let page: Awaited<ReturnType<typeof queryPage>> | undefined;
   if (!currentSlug || !fullPath) {
     // Homepage
     const homePageId = await getHomePageId();
@@ -150,7 +150,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
   // Get the last segment (the page's own slug)
   const currentSlug = slug?.length ? slug.at(-1) : undefined;
 
-  let page;
+  let page: Awaited<ReturnType<typeof queryPage>> | undefined;
   if (!currentSlug || !fullPath) {
     // Handle the homepage logic
     const homePageId = await getHomePageId();

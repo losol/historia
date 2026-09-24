@@ -55,15 +55,6 @@ function formatAmount(amount: { value: number; currency: string }) {
   return `${major.toFixed(2)} ${amount.currency}`;
 }
 
-function formatDate(dateString?: string) {
-  if (!dateString) return null;
-  const date = new Date(dateString);
-  return date.toLocaleString('no-NO', {
-    dateStyle: 'medium',
-    timeStyle: 'medium',
-  });
-}
-
 async function main() {
   const paymentReference = process.argv[2];
 

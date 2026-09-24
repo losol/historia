@@ -236,7 +236,6 @@ function getDateRangeForPreset(preset: DatePreset): DateRange {
       return getLastMonthRange();
     case 'year-to-date':
       return getYearToDateRange();
-    case 'custom':
     default:
       return getLastWeekRange();
   }
@@ -396,8 +395,8 @@ export function SalesReportView() {
                 </tr>
               </thead>
               <tbody>
-                {reportData.productSummary.map((line, idx) => (
-                  <tr key={`${line.productId}-${line.vatRate}-${idx}`}>
+                {reportData.productSummary.map((line) => (
+                  <tr key={`${line.productId}-${line.vatRate}`}>
                     <td>{line.productName}</td>
                     <td className={styles.rightAlign}>{line.vatRate}%</td>
                     <td className={styles.rightAlign}>{formatNumber(line.totalQuantity)}</td>

@@ -4,13 +4,7 @@ import { useEffect } from 'react';
 import { FieldLabel, TextInput, useField, useFormFields } from '@payloadcms/ui';
 import type { TextFieldClientProps } from 'payload';
 
-// import 'index.scss'
-
-export const PersonNameComponent: React.FC<TextFieldClientProps> = ({
-  field,
-  path,
-  readOnly: readOnlyFromProps,
-}) => {
+export const PersonNameComponent: React.FC<TextFieldClientProps> = ({ field, path }) => {
   const { label } = field;
 
   const { value, setValue } = useField<string>({ path });

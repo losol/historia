@@ -24,7 +24,7 @@ function getStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const payload = await getPayload({ config });
 

@@ -61,6 +61,7 @@ export function CartDrawer({ isOpen, onClose, locale }: Readonly<CartDrawerProps
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"

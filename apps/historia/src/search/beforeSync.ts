@@ -1,6 +1,6 @@
 import type { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types';
 
-export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc, payload }) => {
+export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc }) => {
   const {
     doc: { relationTo: collection },
   } = searchDoc;
