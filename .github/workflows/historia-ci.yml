@@ -21,9 +21,9 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       # Biome covers the whole workspace in a single run: formatting,
-      # linting and import sorting. Fails on errors, not on warnings.
+      # linting and import sorting. Warnings fail the build too.
       - name: Lint & format
-        run: pnpm exec biome ci .
+        run: pnpm exec biome ci --error-on-warnings .
 
       # Unit tests only — the vipps integration suites need live Vipps test
       # credentials and are run locally.

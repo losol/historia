@@ -46,7 +46,7 @@ export const ordersUpdateAccess: Access = (args) => {
     return false;
   }
 
-  const orderStatus = (doc as any).status;
+  const orderStatus = (doc as { status?: string }).status;
   if (!isOrderEditableByCommerce(orderStatus)) {
     return false;
   }

@@ -23,7 +23,7 @@ type Props = {
 };
 
 function isValidCollection(collection: string): collection is PageCollectionsType {
-  return pageCollections.includes(collection as any);
+  return (pageCollections as readonly string[]).includes(collection);
 }
 
 export default async function Page({ params: paramsPromise }: Readonly<Props>) {

@@ -146,7 +146,7 @@ export function getImageAlt(image: Image | null | undefined, fallback: string = 
   if ('caption' in image && image.caption) {
     if (typeof image.caption === 'object' && 'root' in image.caption) {
       const captionText = image.caption.root.children
-        .map((child: any) => {
+        .map((child) => {
           if (typeof child === 'object' && 'text' in child) {
             return child.text;
           }
@@ -165,7 +165,7 @@ export function getImageAlt(image: Image | null | undefined, fallback: string = 
   if (media && 'description' in media && media.description) {
     if (typeof media.description === 'object' && 'root' in media.description) {
       const descriptionText = media.description.root.children
-        .map((child: any) => {
+        .map((child) => {
           if (typeof child === 'object' && 'text' in child) {
             return child.text;
           }
