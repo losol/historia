@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form';
+import type { FieldErrors, FieldValues, UseFormRegister } from 'react-hook-form';
 import type { TextField } from '@payloadcms/plugin-form-builder/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,11 +7,7 @@ import { FieldError } from '../Error';
 import { Width } from '../Width';
 export const NumberField: React.FC<
   TextField & {
-    errors: Partial<
-      FieldErrorsImpl<{
-        [x: string]: any;
-      }>
-    >;
+    errors: FieldErrors;
     register: UseFormRegister<FieldValues>;
   }
 > = ({ name, defaultValue, errors, label, register, required: requiredFromProps, width }) => {
