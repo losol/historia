@@ -7,6 +7,7 @@
 import { handleVippsCallback, resolveConfig } from '@eventuras/payload-vipps-auth';
 import config from '@payload-config';
 import { getPayload } from 'payload';
+import { getVippsLoginEnv } from '@/lib/vipps/login-config';
 import { getAllowedVippsLoginDomains, getPublicRequestOrigin } from '../_utils/request-origin';
 
 export async function GET(request: Request) {
@@ -14,10 +15,12 @@ export async function GET(request: Request) {
     allowedDomains: getAllowedVippsLoginDomains(),
   });
 
+  const { clientId, clientSecret, environment } = getVippsLoginEnv();
+
   const pluginConfig = resolveConfig({
-    clientId: process.env.VIPPS_LOGIN_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_LOGIN_CLIENT_SECRET!,
-    environment: process.env.VIPPS_LOGIN_ENVIRONMENT === 'production' ? 'production' : 'test',
+    clientId,
+    clientSecret,
+    environment,
     redirectUri: `${origin}/api/auth/vipps/callback`,
   });
 
