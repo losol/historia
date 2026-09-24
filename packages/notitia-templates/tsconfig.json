@@ -1,5 +1,14 @@
 {
-  "extends": "@eventuras/typescript-config/base.json",
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "extends": "@eventuras/typescript-config/library.json",
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  // `include` has to be declared here, not inherited: library.json's "src/**/*"
+  // resolves relative to that file inside node_modules, and only its `outDir`
+  // uses ${configDir}.
+  "include": ["src/**/*"],
+  // A package-level "exclude" replaces the shared base list rather than adding
+  // to it, so the test patterns have to be repeated. `__tests__` is excluded as
+  // a directory so helper files that do not match *.test.ts stay out of dist.
+  "exclude": ["node_modules", "dist", "**/__tests__"]
 }

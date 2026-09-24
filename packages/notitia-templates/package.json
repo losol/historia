@@ -34,7 +34,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "pnpm run clean && vite build",
+    "build": "pnpm run clean && vite build && tsc --emitDeclarationOnly",
     "clean": "rm -rf dist",
     "dev": "vite build --watch",
     "lint": "biome check .",
