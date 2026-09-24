@@ -1,37 +1,43 @@
 # Vipps Login Setup Guide
 
-This guide walks you through setting up Vipps Login authentication for Historia (Payload CMS).
+This guide walks you through setting up Vipps Login for the Historia admin (Payload CMS).
+Vipps Login is separate from Vipps ePayment (checkout), with its own credentials; see
+[VIPPS.md](./VIPPS.md) for payments.
 
 ## Prerequisites
 
 - Vipps MobilePay developer account
-- Registered Vipps application with Login API enabled
-- HTTPS domain (required for production, use Cloudflare Tunnel for local dev)
+- Registered Vipps application with the Login API enabled
+- A public HTTPS URL for the app. For local development, use a Cloudflare Tunnel
+  (see [Local development with HTTPS](#local-development-with-https)).
 
-## Step 1: Get Vipps Credentials
+## Step 1: Get Vipps credentials
 
-1. Log in to [Vipps Developer Portal](https://portal.vipps.no/)
+1. Log in to the [Vipps Developer Portal](https://portal.vipps.no/)
 2. Navigate to your application
-3. Enable **Login API**
-4. Note down:
-   - Client ID
-   - Client Secret
-   - Subscription Key (for API access)
+3. Enable the **Login API**
+4. Note down the **Client ID** and **Client Secret**
 
-## Step 2: Configure Redirect URI
+## Step 2: Register the redirect URI
 
-In Vipps Developer Portal:
+Historia does not read the redirect URI from configuration. The login and callback
+routes build it from the public origin of the request:
 
-1. Go to **Login API Settings**
-2. Add redirect URI:
-   - **Test**: `http://localhost:3100/api/auth/vipps/callback`
-   - **Production**: `https://your-domain.com/api/auth/vipps/callback`
+```text
+<public origin>/api/auth/vipps/callback
+```
 
-⚠️ **Important**: The redirect URI must **exactly match** what you configure in your `.env` file.
+Register exactly that in the Vipps portal under **Login API Settings**, for example
+`https://historia-dev.example.com/api/auth/vipps/callback` for a tunnel, or
+`https://your-domain.com/api/auth/vipps/callback` in production.
 
-## Step 3: Configure Environment Variables
+Behind a proxy, the origin is taken from `X-Forwarded-Host` / `X-Forwarded-Proto` only
+when the host is listed in `CMS_ALLOWED_ORIGINS`; otherwise the request's own `Host` is
+used. Add every public origin you use there (see step 3).
 
-Copy `.env.example` to `.env` and update:
+## Step 3: Configure environment variables
+
+Copy `.env.example` to `.env` and set:
 
 ```bash
 # Turn Vipps Login on. Anything other than exactly 'true' leaves it off:
@@ -44,184 +50,144 @@ VIPPS_LOGIN_ENVIRONMENT=test
 # Vipps Login credentials (separate from the ePayment VIPPS_CLIENT_ID/SECRET)
 VIPPS_LOGIN_CLIENT_ID=your-client-id-from-vipps-portal
 VIPPS_LOGIN_CLIENT_SECRET=your-client-secret-from-vipps-portal
+
+# Public origin(s) of the app, comma-separated. Used for CORS/CSRF and to trust
+# forwarded host headers when building the redirect URI.
+CMS_ALLOWED_ORIGINS=https://historia-dev.example.com
+NEXT_PUBLIC_CMS_URL=https://historia-dev.example.com
 ```
 
-The redirect URI is not configured here: the routes build it from the request's
-public origin as `<origin>/api/auth/vipps/callback`, which is what you register
-in the Vipps portal (step 2).
-
-## Step 4: Install Dependencies
-
-The plugin is already configured in Historia. Just install dependencies:
+## Step 4: Start the app and test
 
 ```bash
 pnpm install
-```
-
-## Step 5: Start Development Server
-
-```bash
 pnpm dev
 ```
 
-Historia will start on `http://localhost:3100`.
+1. Open `<public origin>/admin`
+2. You should see a **"Logg inn med Vipps"** button. It is only shown when
+   `VIPPS_LOGIN_ENABLED=true`.
+3. Click it. You are sent to Vipps, and after logging in with your Vipps test user you
+   come back to `/admin`.
 
-## Step 6: Test Vipps Login
+## How users are created and matched
 
-1. Navigate to `http://localhost:3100/admin`
-2. You should see a **"Logg inn med Vipps"** button
-3. Click the button
-4. You'll be redirected to Vipps for authentication
-5. Log in with your Vipps test user
-6. After successful login, you'll be redirected back to `/admin`
+Users are matched on **email**:
 
-## User Management
+- **Existing user with that email:** they are logged in, and their profile is updated
+  from Vipps (see `mapVippsUser` in `src/plugins.ts`).
+- **No user with that email:** a new user is created from the Vipps profile.
+- **Vipps account without an email:** the login is refused (`?error=no_email`).
 
-### First Login
+If someone changes their email in Vipps, they will not match their old account and a
+new user is created.
 
-When a user logs in with Vipps for the first time:
+### Access for new users
 
-1. A new user account is automatically created
-2. User data is populated from Vipps profile (name, email, phone, etc.)
-3. User gets default role: `['user']`
-4. Admin must manually assign tenant access
+A new Vipps user has no roles and no tenant access. They can sign in, but see nothing
+until an admin grants access:
 
-### Role Assignment
+1. Open **Users** in the admin and find the user
+2. Under **Tenants**, add the website and pick a role: `admin`, `editor`, `commerce`
+   or `member`
+3. Save
 
-New Vipps users have no tenant access by default. To grant access:
+The one exception is an empty database: the first user ever created becomes
+`system-admin`, whether they sign up with Vipps or any other way.
 
-1. Go to **Users** collection in Payload admin
-2. Find the user
-3. Scroll to **Tenants** sidebar
-4. Click **Add Item**
-5. Select website/tenant
-6. Assign role: `site-member` or `site-admin`
-7. Save
+The global `system-admin` role can otherwise only be granted by another system admin. See
+[Role-based access control](./administrator/role-based-access-control.md) for what
+each role can do.
 
-### Existing Users
+## Local development with HTTPS
 
-If a user with the same email already exists:
-- They will be logged in automatically
-- User data is updated with latest Vipps profile info
-
-⚠️ **Email Matching**: Users are matched by email. If a user changes their email in Vipps, they will be treated as a new user.
-
-## Local Development with HTTPS
-
-Vipps requires HTTPS in production. For local development, use Cloudflare Tunnel:
+Vipps needs a public HTTPS redirect URI. A quick option is a temporary Cloudflare
+Tunnel:
 
 ```bash
-# Install Cloudflare Tunnel
 brew install cloudflared
-
-# Start tunnel
 cloudflared tunnel --url http://localhost:3100
 ```
 
-This gives you a public HTTPS URL like `https://random-name.trycloudflare.com`.
+This prints a URL such as `https://random-name.trycloudflare.com`. Put it in
+`NEXT_PUBLIC_CMS_URL` and `CMS_ALLOWED_ORIGINS`, and register
+`https://random-name.trycloudflare.com/api/auth/vipps/callback` in the Vipps portal.
+The URL changes every time; for a stable one, use a named tunnel as described in the
+[Historia README](../README.md#local-development-with-https).
 
-Update your `.env`:
-
-```bash
-NEXT_PUBLIC_CMS_URL=https://random-name.trycloudflare.com
-```
-
-And update the redirect URI in Vipps Developer Portal.
-
-## Production Deployment
-
-### Environment Configuration
-
-Update `.env` for production:
+## Production
 
 ```bash
 VIPPS_LOGIN_ENABLED=true
 VIPPS_LOGIN_ENVIRONMENT=production
 VIPPS_LOGIN_CLIENT_ID=production-client-id
 VIPPS_LOGIN_CLIENT_SECRET=production-client-secret
+CMS_ALLOWED_ORIGINS=https://your-domain.com
 NEXT_PUBLIC_CMS_URL=https://your-domain.com
 ```
 
-### Security Checklist
+Checklist:
 
-- [ ] Use production Vipps credentials
-- [ ] Use a strong, stable `CMS_SECRET` (it signs the Payload session cookie)
-- [ ] Ensure `HTTPS` for all URLs
-- [ ] Configure proper CORS in `payload.config.ts`
-- [ ] Test login flow end-to-end
+- [ ] Production Vipps Login credentials, and `VIPPS_LOGIN_ENVIRONMENT=production`
+- [ ] A strong, stable `CMS_SECRET` (it signs the Payload session cookie)
+- [ ] HTTPS for all URLs
+- [ ] `CMS_ALLOWED_ORIGINS` lists every public origin
+- [ ] The production redirect URI is registered in the Vipps portal
+- [ ] Log in end to end once after deploying
 
-### Multi-Instance Deployments
+### Multiple instances
 
-⚠️ **Important**: The default PKCE state storage is **in-memory** and won't work across multiple server instances.
-
-For production with load balancing:
-1. Implement Redis-based PKCE storage
-2. Or use sticky sessions in your load balancer
+The login flow keeps no server-side state. The PKCE code verifier and the post-login
+redirect are stored in short-lived, HttpOnly cookies on the browser, so any instance
+can handle the callback. No sticky sessions are needed.
 
 ## Troubleshooting
 
-### "Invalid redirect URI" error
+### The Vipps button is missing, or `/api/auth/vipps/login` returns 404
 
-- The redirect URI registered in the Vipps portal doesn't match `<public origin>/api/auth/vipps/callback`
-- **Fix**: Ensure exact match including protocol and path
+Vipps Login is off. Set `VIPPS_LOGIN_ENABLED=true` (exactly) and restart.
+
+### 500 from `/api/auth/vipps/login`
+
+Vipps Login is on, but `VIPPS_LOGIN_CLIENT_ID` or `VIPPS_LOGIN_CLIENT_SECRET` is
+missing. The server log names which one.
+
+### "Invalid redirect URI" from Vipps
+
+The URI Historia sends (`<public origin>/api/auth/vipps/callback`) is not registered in
+the Vipps portal. Check the protocol and host. Behind a proxy, also check that the
+public host is in `CMS_ALLOWED_ORIGINS`, or the internal host is used instead.
 
 ### "No email" error
 
-- User's Vipps account has no verified email
-- **Fix**: User must verify email in Vipps app
+The user's Vipps account has no verified email. They need to add one in the Vipps app.
 
-### "Invalid state" error
+### Login fails after spending a long time at Vipps
 
-- PKCE state expired (10 minute TTL)
-- User took too long to complete login
-- **Fix**: Retry login
+The PKCE cookies live for 10 minutes. Start the login again.
 
 ### Session not persisting
 
-- Cookie encryption secret changed
-- Not using HTTPS in production
-- **Fix**: Keep `CMS_SECRET` stable across deploys and enable HTTPS
-
-### Can't login after Vipps authentication
-
-- User created but session cookie not set
-- Browser blocking third-party cookies
-- **Fix**: Check browser console for errors, ensure HTTPS
+`CMS_SECRET` changed between deploys, or the site is served over plain HTTP. Keep
+`CMS_SECRET` stable and use HTTPS.
 
 ## Customization
 
-### Custom User Mapping
+### User mapping
 
-Edit `apps/historia/src/plugins.ts` to customize how Vipps data maps to user fields:
+`mapVippsUser` in `src/plugins.ts` decides which Vipps fields are written to the user
+on every login. Keep it to profile data. Do not grant roles or tenant access from
+Vipps data, as anything that controls access should be assigned by an admin.
 
-```typescript
-vippsAuthPlugin({
-  mapVippsUser: (vippsUser) => ({
-    email: vippsUser.email,
-    given_name: vippsUser.given_name,
-    family_name: vippsUser.family_name,
-    phone_number: vippsUser.phone_number,
-    // Custom: Auto-assign admin role for @example.com emails
-    roles: vippsUser.email?.endsWith('@example.com') ? ['admin'] : ['user'],
-    // Custom: Map Vipps addresses
-    addresses: vippsUser.addresses?.map((addr) => ({
-      label: 'Vipps',
-      isDefault: true,
-      ...addr,
-    })),
-  }),
-})
-```
+### Disable email/password login
 
-### Disable Local Authentication
+To allow Vipps login only, pass `disableLocalStrategy: true` to `vippsAuthPlugin()` in
+`src/plugins.ts`. It is not wired to an environment variable.
 
-To enforce Vipps-only authentication, pass `disableLocalStrategy: true` to
-`vippsAuthPlugin()` in `src/plugins.ts`. It is not wired to an environment variable.
+⚠️ Make sure a system admin can log in with Vipps before you do this.
 
-⚠️ **Warning**: Make sure you have a Vipps account set up as admin before enabling this!
+## Further reading
 
-## Support
-
-- [Vipps Login API Documentation](https://developer.vippsmobilepay.com/docs/APIs/login-api/)
-- [Payload Custom Strategies](https://payloadcms.com/docs/authentication/custom-strategies)
-- [Eventuras GitHub](https://github.com/losol/eventuras)
+- [Vipps Login API documentation](https://developer.vippsmobilepay.com/docs/APIs/login-api/)
+- [Payload custom auth strategies](https://payloadcms.com/docs/authentication/custom-strategies)
+- [Administrator guide to Vipps Login](./administrator/vipps-login.md)
