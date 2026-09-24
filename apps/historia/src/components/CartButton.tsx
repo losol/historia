@@ -26,6 +26,7 @@ export function CartButton({ locale }: Readonly<CartButtonProps>) {
   return (
     <>
       <button
+        type="button"
         onClick={() => setIsDrawerOpen(true)}
         className="relative rounded-md p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         aria-label="Åpne handlekurv"

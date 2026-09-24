@@ -4,17 +4,17 @@ import type { Article, Case, Happening, Note, Page } from '@/payload-types';
 
 export type ArchiveDocument = Article | Happening | Page | Case | Note;
 
-type CollectionArchiveProps<T extends { slug: string }> = {
+type CollectionArchiveProps = {
   docs: ArchiveDocument[];
   relationTo: 'articles' | 'happenings' | 'notes' | 'cases';
   showImages?: boolean;
 };
 
-export const CollectionArchive = <T extends { slug: string }>({
+export const CollectionArchive = ({
   docs,
   relationTo,
   showImages = true,
-}: CollectionArchiveProps<T>) => {
+}: CollectionArchiveProps) => {
   return (
     <Grid cols={{ sm: 1, md: 2, lg: 3 }} paddingClassName="gap-4 lg:gap-8">
       {docs?.map((doc) => (

@@ -149,6 +149,7 @@ export const FormBlock: React.FC<
                   const Field: React.FC<any> = fields[blockType];
 
                   return (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: the field list is static for a given form, and FormFieldBlock has no id
                     <div className="mb-6 last:mb-0" key={index}>
                       <Field
                         form={formFromProps}

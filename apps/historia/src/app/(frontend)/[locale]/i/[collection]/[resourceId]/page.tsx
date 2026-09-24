@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { type CollectionSlug, getPayload } from 'payload';
+import { JsonLd } from '@/components/JsonLd';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
@@ -139,12 +140,7 @@ function QuotePage({ quote }: Readonly<{ quote: Quote }>) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateQuoteJsonLd(quote)).replaceAll('<', String.raw`\u003c`),
-        }}
-      />
+      <JsonLd data={generateQuoteJsonLd(quote)} />
       <Container>
         <Story>
           <StoryHeader>
@@ -188,12 +184,7 @@ function SourcePage({ source, locale }: Readonly<{ source: Source; locale: strin
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateSourceJsonLd(source)).replaceAll('<', String.raw`\u003c`),
-        }}
-      />
+      <JsonLd data={generateSourceJsonLd(source)} />
       <Container>
         <Story>
           <StoryHeader>
@@ -301,8 +292,8 @@ function SourcePage({ source, locale }: Readonly<{ source: Source; locale: strin
               <Section>
                 <Heading as="h2">Identifiers</Heading>
                 <ul>
-                  {source.identifiers.map((id, index) => (
-                    <li key={index}>
+                  {source.identifiers.map((id) => (
+                    <li key={`${id.type}:${id.value}`}>
                       <strong>{id.type?.toUpperCase()}:</strong> {id.value}
                     </li>
                   ))}

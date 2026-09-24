@@ -37,7 +37,7 @@ export const RenderBlocks: React.FC<{
   if (blocks && blocks.length > 0) {
     return (
       <>
-        {blocks.map((block, index) => {
+        {blocks.map((block) => {
           const { blockType } = block;
 
           if (blockType in blockComponents) {
@@ -45,7 +45,7 @@ export const RenderBlocks: React.FC<{
 
             if (BlockComponent) {
               return (
-                <div className="my-8" key={index}>
+                <div className="my-8" key={block.id}>
                   <BlockComponent {...block} disableInnerContainer={true} />
                 </div>
               );

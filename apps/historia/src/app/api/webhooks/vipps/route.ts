@@ -1,5 +1,9 @@
 import { Logger } from '@eventuras/logger';
-import { getPaymentDetails, mergeExpiredPaymentDetails } from '@eventuras/vipps/epayment-v1';
+import {
+  getPaymentDetails,
+  mergeExpiredPaymentDetails,
+  type PaymentDetails,
+} from '@eventuras/vipps/epayment-v1';
 import {
   getEventType,
   parseWebhookPayload,
@@ -442,7 +446,7 @@ export async function POST(request: NextRequest) {
  * GET handler for webhook verification
  * Some webhook systems send GET requests to verify endpoint availability
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   logger.info('Webhook verification request received (GET)');
 
   return NextResponse.json({
@@ -475,7 +479,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
   });
 
   // If no transaction exists, create one (orphaned payment scenario)
-  let transaction;
+  let transaction: Transaction;
   if (transactions.docs.length === 0) {
     logger.info(
       {
@@ -677,7 +681,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
   }
 
   // Fetch full payment details from Vipps API for successful payments
-  let paymentDetails;
+  let paymentDetails: PaymentDetails | undefined;
   let customerId = transaction.customer;
 
   if (payload.name === 'AUTHORIZED' || payload.name === 'CAPTURED') {

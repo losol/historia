@@ -25,7 +25,7 @@ export const TotalPriceField: React.FC = () => {
 
   return (
     <div className="field-type">
-      <label className="field-label">Total Price (inc. VAT)</label>
+      <span className="field-label">Total Price (inc. VAT)</span>
       <div className="rounded border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium">
         {displayPrice}
       </div>

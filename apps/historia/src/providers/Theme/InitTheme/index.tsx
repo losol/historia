@@ -5,6 +5,7 @@ import { defaultTheme, themeLocalStorageKey } from '../ThemeSelector/types';
 export const InitTheme: React.FC = () => {
   return (
     <Script
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
       dangerouslySetInnerHTML={{
         __html: `
   (function () {
