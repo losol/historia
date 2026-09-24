@@ -22,7 +22,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc --emitDeclarationOnly",
     "dev": "vite build --watch",
     "payment:get": "tsx --env-file=.env scripts/get-payment.ts",
     "test": "vitest run",

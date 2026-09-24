@@ -5,5 +5,9 @@
     "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  // A package-level "exclude" replaces the shared base list rather than adding
+  // to it, so the test patterns have to be repeated here. `__tests__` is
+  // excluded as a directory because setup.ts and test-utils.ts do not match
+  // *.test.ts and would otherwise be emitted into dist.
+  "exclude": ["node_modules", "dist", "**/__tests__"]
 }
