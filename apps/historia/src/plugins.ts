@@ -19,7 +19,7 @@ import type { Plugin } from 'payload';
 import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
 import { getVippsLoginEnv } from '@/lib/vipps/login-config';
-import type { Config } from '@/payload-types';
+import type { Config, User } from '@/payload-types';
 import { beforeSyncWithSearch } from '@/search/beforeSync';
 import { searchFields } from '@/search/fieldOverrides';
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';
@@ -31,6 +31,8 @@ const requiredS3MediaVars = [
   'CMS_MEDIA_S3_REGION',
   'CMS_MEDIA_S3_BUCKET',
 ];
+
+type UserAddress = NonNullable<User['addresses']>[number];
 
 const areAllS3VarsPresent = requiredS3MediaVars.every((varName) => process.env[varName]);
 
@@ -213,15 +215,21 @@ export const plugins: Plugin[] = [
       name_verified: true,
       phone_number: vippsUser.phone_number,
       phone_number_verified: vippsUser.phone_number_verified,
-      // Map Vipps addresses to Payload addresses array
-      addresses: vippsUser.addresses?.map((addr) => ({
-        label: addr.address_type || 'Vipps',
-        isDefault: false,
-        street_address: addr.street_address,
-        postal_code: addr.postal_code,
-        region: addr.region,
-        country: addr.country,
-      })),
+      // Map Vipps addresses onto the user's address fields. The return type makes
+      // TypeScript reject field names the collection does not have.
+      addresses: vippsUser.addresses?.map((addr): UserAddress => {
+        // Vipps may put several street lines in street_address, separated by newlines.
+        const [addressLine1, ...rest] = (addr.street_address ?? '').split('\n');
+        return {
+          label: addr.address_type || 'Vipps',
+          isDefault: false,
+          addressLine1: addressLine1 || undefined,
+          addressLine2: rest.join(', ') || undefined,
+          postalCode: addr.postal_code,
+          city: addr.region, // Vipps calls the city/post town "region"
+          country: addr.country,
+        };
+      }),
     }),
   }),
 ];
