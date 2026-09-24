@@ -12,7 +12,10 @@ import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
  * ```
  */
 export const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }): string => {
-  const { value, relationTo } = linkNode.fields.doc!;
+  // Payload only calls this for internal links, which carry a doc. Guard anyway
+  // rather than throw while rendering if one arrives without it.
+  if (!linkNode.fields.doc) return '#';
+  const { value, relationTo } = linkNode.fields.doc;
 
   const slug = typeof value !== 'string' && value?.slug;
 

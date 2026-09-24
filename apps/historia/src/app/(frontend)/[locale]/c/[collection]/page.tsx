@@ -81,7 +81,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Props>) {
 
         {docsPage.totalPages > 1 && (
           <div className="mb-8">
-            <Pagination page={docsPage.page!} totalPages={docsPage.totalPages} />
+            <Pagination page={docsPage.page ?? 1} totalPages={docsPage.totalPages} />
             <PageRange
               collection={originalCollectionName}
               currentPage={docsPage.page}

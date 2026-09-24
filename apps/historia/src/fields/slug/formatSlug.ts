@@ -13,11 +13,8 @@ export const formatSlug = (val: string): string => {
   };
 
   // Replace Norwegian and other special characters
-  for (const key in conversions) {
-    if (Object.hasOwn(conversions, key)) {
-      const re = new RegExp(conversions[key]!, 'gi'); // Case-insensitive
-      val = val.replace(re, key);
-    }
+  for (const [replacement, pattern] of Object.entries(conversions)) {
+    val = val.replace(new RegExp(pattern, 'gi'), replacement); // Case-insensitive
   }
 
   // Final formatting (spaces to hyphens, remove invalid characters, lowercase)

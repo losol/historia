@@ -66,12 +66,30 @@ async function main() {
     process.exit(1);
   }
 
-  // Build Vipps configuration from environment variables
+  // Validate the environment before building the config from it
+  const {
+    VIPPS_CLIENT_ID: clientId,
+    VIPPS_CLIENT_SECRET: clientSecret,
+    VIPPS_SUBSCRIPTION_KEY: subscriptionKey,
+    VIPPS_MERCHANT_SERIAL_NUMBER: merchantSerialNumber,
+  } = process.env;
+
+  const missingVars: string[] = [];
+  if (!clientId) missingVars.push('VIPPS_CLIENT_ID');
+  if (!clientSecret) missingVars.push('VIPPS_CLIENT_SECRET');
+  if (!subscriptionKey) missingVars.push('VIPPS_SUBSCRIPTION_KEY');
+  if (!merchantSerialNumber) missingVars.push('VIPPS_MERCHANT_SERIAL_NUMBER');
+
+  if (!clientId || !clientSecret || !subscriptionKey || !merchantSerialNumber) {
+    printError(`Missing required environment variables: ${missingVars.join(', ')}`);
+    process.exit(1);
+  }
+
   const config: VippsConfig = {
-    clientId: process.env.VIPPS_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_CLIENT_SECRET!,
-    subscriptionKey: process.env.VIPPS_SUBSCRIPTION_KEY!,
-    merchantSerialNumber: process.env.VIPPS_MERCHANT_SERIAL_NUMBER!,
+    clientId,
+    clientSecret,
+    subscriptionKey,
+    merchantSerialNumber,
     apiUrl:
       process.env.VIPPS_IS_TEST !== 'false' ? 'https://apitest.vipps.no' : 'https://api.vipps.no',
     systemName: 'eventuras-historia',
@@ -79,18 +97,6 @@ async function main() {
     pluginName: '',
     pluginVersion: '',
   };
-
-  // Validate configuration
-  const missingVars: string[] = [];
-  if (!config.clientId) missingVars.push('VIPPS_CLIENT_ID');
-  if (!config.clientSecret) missingVars.push('VIPPS_CLIENT_SECRET');
-  if (!config.subscriptionKey) missingVars.push('VIPPS_SUBSCRIPTION_KEY');
-  if (!config.merchantSerialNumber) missingVars.push('VIPPS_MERCHANT_SERIAL_NUMBER');
-
-  if (missingVars.length > 0) {
-    printError(`Missing required environment variables: ${missingVars.join(', ')}`);
-    process.exit(1);
-  }
 
   console.log(`${colors.bright}Fetching payment details from Vipps...${colors.reset}`);
   console.log(`${colors.dim}Reference: ${paymentReference}${colors.reset}`);

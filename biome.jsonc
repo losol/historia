@@ -72,7 +72,8 @@
       // When this list is empty, `biome ci --error-on-warnings` replaces
       // `biome ci` and the distinction stops mattering.
       "style": {
-        "noNonNullAssertion": "warn" // 17
+        // Cleared; pinned above its "warn" default so CI rejects new ones.
+        "noNonNullAssertion": "error"
       },
       "suspicious": {
         "noExplicitAny": "warn" // 12
