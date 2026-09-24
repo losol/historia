@@ -102,12 +102,18 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
           statusRef.current = data.status;
           setStatus(data.status);
 
-          if (onStatusChange) {
-            console.log('📞 [PaymentStatusSSE] Calling onStatusChange with:', data.status);
-            onStatusChange(data.status);
-            console.log('✅ [PaymentStatusSSE] onStatusChange called successfully');
-          } else {
-            console.error('❌ [PaymentStatusSSE] onStatusChange is NOT defined!');
+          // Failures are reported once further down, with the reason attached.
+          // Reporting them here too made the parent handle every failure twice.
+          const isFailure = data.status === 'failed' || data.status === 'cancelled';
+
+          if (!isFailure) {
+            if (onStatusChange) {
+              console.log('📞 [PaymentStatusSSE] Calling onStatusChange with:', data.status);
+              onStatusChange(data.status);
+              console.log('✅ [PaymentStatusSSE] onStatusChange called successfully');
+            } else {
+              console.error('❌ [PaymentStatusSSE] onStatusChange is NOT defined!');
+            }
           }
 
           // Handle successful payment
@@ -118,7 +124,7 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
           }
 
           // Handle failed payment - pass failureReason via status string
-          if (data.status === 'failed' || data.status === 'cancelled') {
+          if (isFailure) {
             logger.warn(
               { reference, status: data.status, failureReason: data.failureReason },
               'Payment failed',
