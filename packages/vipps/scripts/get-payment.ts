@@ -17,7 +17,7 @@
  */
 
 import { getPaymentDetails } from '../src/epayment-v1/client.js';
-import type { VippsConfig } from '../src/vipps-core/index.js';
+import { vippsConfigFromEnv } from './env.js';
 
 async function main() {
   const paymentReference = process.argv[2];
@@ -30,29 +30,7 @@ async function main() {
     process.exit(1);
   }
 
-  // Build Vipps configuration from environment variables
-  const isTestMode = process.env.VIPPS_USE_TEST_MODE !== 'false';
-  const config: VippsConfig = {
-    clientId: process.env.VIPPS_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_CLIENT_SECRET!,
-    subscriptionKey: process.env.VIPPS_SUBSCRIPTION_KEY!,
-    merchantSerialNumber: process.env.VIPPS_MERCHANT_SERIAL_NUMBER!,
-    isTest: isTestMode,
-    apiUrl: isTestMode ? 'https://apitest.vipps.no' : 'https://api.vipps.no',
-  };
-
-  // Validate configuration
-  const missingVars: string[] = [];
-  if (!config.clientId) missingVars.push('VIPPS_CLIENT_ID');
-  if (!config.clientSecret) missingVars.push('VIPPS_CLIENT_SECRET');
-  if (!config.subscriptionKey) missingVars.push('VIPPS_SUBSCRIPTION_KEY');
-  if (!config.merchantSerialNumber) missingVars.push('VIPPS_MERCHANT_SERIAL_NUMBER');
-
-  if (missingVars.length > 0) {
-    console.error(`Error: Missing required environment variables: ${missingVars.join(', ')}`);
-    console.error('Make sure you have a .env file with these variables set.');
-    process.exit(1);
-  }
+  const config = vippsConfigFromEnv('vipps-payment-get');
 
   try {
     const payment = await getPaymentDetails(config, paymentReference);
