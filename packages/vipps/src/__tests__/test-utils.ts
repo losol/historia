@@ -20,7 +20,14 @@ export function hasTestConfig(): boolean {
  * Get test configuration for Vipps API
  */
 export function getTestConfig(): VippsConfig {
-  if (!hasTestConfig()) {
+  const {
+    VIPPS_MERCHANT_SERIAL_NUMBER: merchantSerialNumber,
+    VIPPS_CLIENT_ID: clientId,
+    VIPPS_CLIENT_SECRET: clientSecret,
+    VIPPS_SUBSCRIPTION_KEY: subscriptionKey,
+  } = process.env;
+
+  if (!merchantSerialNumber || !clientId || !clientSecret || !subscriptionKey) {
     throw new Error(
       'Missing required environment variables. Please configure .env file with Vipps test credentials.',
     );
@@ -28,10 +35,10 @@ export function getTestConfig(): VippsConfig {
 
   return {
     apiUrl: 'https://apitest.vipps.no',
-    merchantSerialNumber: process.env.VIPPS_MERCHANT_SERIAL_NUMBER!,
-    clientId: process.env.VIPPS_CLIENT_ID!,
-    clientSecret: process.env.VIPPS_CLIENT_SECRET!,
-    subscriptionKey: process.env.VIPPS_SUBSCRIPTION_KEY!,
+    merchantSerialNumber,
+    clientId,
+    clientSecret,
+    subscriptionKey,
     systemName: 'Eventuras',
     systemVersion: '1.0.0',
     pluginName: 'eventuras-vipps-tests',

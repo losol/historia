@@ -17,6 +17,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { createPayment } from '../epayment-v1/client';
 import type { CreatePaymentRequest } from '../epayment-v1/types';
+import type { VippsConfig } from '../vipps-core';
 import {
   generateTestReference,
   getTestConfig,
@@ -28,7 +29,12 @@ const runTests = hasTestConfig();
 const describeIf = runTests ? describe : describe.skip;
 
 describeIf('Vipps ePayment API - Refund Test Amounts', () => {
-  const config = runTests ? getTestConfig() : null;
+  // Read in a hook: describe.skip still runs this callback to collect the tests,
+  // and getTestConfig() throws when the credentials are missing.
+  let config: VippsConfig;
+  beforeAll(() => {
+    config = getTestConfig();
+  });
 
   beforeAll(() => {
     if (!runTests) {
@@ -58,7 +64,7 @@ describeIf('Vipps ePayment API - Refund Test Amounts', () => {
         reference,
       };
 
-      const createResponse = await createPayment(config!, payment);
+      const createResponse = await createPayment(config, payment);
       expect(createResponse).toBeDefined();
 
       console.log(`
@@ -100,7 +106,7 @@ describeIf('Vipps ePayment API - Refund Test Amounts', () => {
         reference,
       };
 
-      const createResponse = await createPayment(config!, payment);
+      const createResponse = await createPayment(config, payment);
       expect(createResponse).toBeDefined();
 
       console.log(`
@@ -137,7 +143,7 @@ describeIf('Vipps ePayment API - Refund Test Amounts', () => {
         reference,
       };
 
-      const createResponse = await createPayment(config!, payment);
+      const createResponse = await createPayment(config, payment);
       expect(createResponse).toBeDefined();
       expect(createResponse.reference).toBe(reference);
 
@@ -154,8 +160,8 @@ describeIf('Vipps ePayment API - Refund Test Amounts', () => {
 
       // In a real test with webhook/polling:
       // await waitForPaymentAuthorized(reference);
-      // await capturePayment(config!, reference, { amount: { value: 10000, currency: 'NOK' } });
-      // await refundPayment(config!, reference, { amount: { value: 10000, currency: 'NOK' } });
+      // await capturePayment(config, reference, { amount: { value: 10000, currency: 'NOK' } });
+      // await refundPayment(config, reference, { amount: { value: 10000, currency: 'NOK' } });
     });
   });
 });
