@@ -111,6 +111,7 @@ The {{organizationName}} Team`,
   'email:order-confirmation': {
     subject: 'Ordrebekreftelse - #{{orderId}}',
     content: buildOrderStatusTemplate({
+      lang: 'nb',
       copyBanner: 'KOPI - Intern kopi av kundebekreftelse',
       headerTitle: 'Ordrebekreftelse',
       greeting: 'Hei {{name}}! 👋',
@@ -137,6 +138,7 @@ The {{organizationName}} Team`,
   'email:order-shipped': {
     subject: 'Din ordre er sendt - #{{orderId}}',
     content: buildOrderShippedTemplate({
+      lang: 'nb',
       headerTitle: 'Ordren din er sendt! 🎉',
       greeting: 'Hei {{name}}! 👋',
       shippedMessage:
@@ -159,7 +161,7 @@ The {{organizationName}} Team`,
   'email:orphaned-payment-alert': {
     subject: '⚠️ KRITISK: Betaling godkjent uten ordre - {{paymentReference}}',
     content: `<!DOCTYPE html>
-<html>
+<html lang="nb">
 <head>
   <meta charset="UTF-8">
   <style>

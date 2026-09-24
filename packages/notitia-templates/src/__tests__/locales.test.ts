@@ -29,7 +29,7 @@ describe('NotitiaTemplates - Multi-language Support', () => {
       });
 
       expect(result.subject).toContain('Order Confirmation');
-      expect(result.content).toContain('Thank you for your order');
+      expect(result.content).toContain('Your payment has been confirmed');
     });
   });
 
@@ -61,7 +61,7 @@ describe('NotitiaTemplates - Multi-language Support', () => {
       });
 
       expect(result.subject).toContain('Ordrebekreftelse');
-      expect(result.content).toContain('Takk for din bestilling');
+      expect(result.content).toContain('Din betaling er nå bekreftet');
       expect(result.content).toContain('Ordredetaljer');
     });
 
@@ -103,7 +103,7 @@ describe('NotitiaTemplates - Multi-language Support', () => {
       });
 
       expect(result.subject).toContain('Ordrestadfesting');
-      expect(result.content).toContain('Takk for bestillinga di');
+      expect(result.content).toContain('Betalinga di er nå stadfesta');
       expect(result.content).toContain('Ordredetaljar');
     });
 
