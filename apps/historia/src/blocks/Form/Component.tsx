@@ -3,11 +3,11 @@ import type React from 'react';
 import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Logger } from '@eventuras/logger';
+import { Button } from '@eventuras/ratio-ui/core/Button';
 import type { Form as FormType } from '@payloadcms/plugin-form-builder/types';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import { useRouter } from 'next/navigation';
 import RichText from '@/components/RichText';
-import { Button } from '@/components/ui/button';
 import { getClientSideURL } from '@/utilities/getURL';
 import { buildInitialFormState } from './buildInitialFormState';
 import { fields } from './fields';
@@ -177,7 +177,7 @@ export const FormBlock: React.FC<
                 })}
               </div>
 
-              <Button form={formID} type="submit" variant="default">
+              <Button form={formID} type="submit">
                 {submitButtonLabel}
               </Button>
             </form>
