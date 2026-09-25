@@ -1,7 +1,7 @@
 import type React from 'react';
 import type { FieldErrors, FieldValues, UseFormRegister } from 'react-hook-form';
+import { Label } from '@eventuras/ratio-ui/forms';
 import type { TextField } from '@payloadcms/plugin-form-builder/types';
-import { Label } from '@/components/ui/label';
 import { Textarea as TextAreaComponent } from '@/components/ui/textarea';
 import { FieldError } from '../Error';
 import { Width } from '../Width';
@@ -24,7 +24,10 @@ export const Textarea: React.FC<
 }) => {
   return (
     <Width width={width}>
-      <Label htmlFor={name}>{label}</Label>
+      {/* Same style as the label ratio-ui's Select renders, so all fields match. */}
+      <Label className="mb-2 block text-sm font-medium" htmlFor={name}>
+        {label}
+      </Label>
 
       <TextAreaComponent
         defaultValue={defaultValue}

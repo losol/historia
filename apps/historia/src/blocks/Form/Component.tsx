@@ -141,8 +141,11 @@ export const FormBlock: React.FC<
           )}
           {isLoading && !hasSubmitted && <p>Loading, please wait...</p>}
           {error && <div>{`${error.status || '500'}: ${error.message || ''}`}</div>}
+          {/* react-hook-form validates and shows the field errors. Without noValidate the
+              browser's own validation (e.g. the hidden native select behind the ratio-ui
+              Select) blocks the submit first, and those messages never render. */}
           {!hasSubmitted && (
-            <form id={formID} onSubmit={handleSubmit(onSubmit)}>
+            <form id={formID} noValidate onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4 last:mb-0">
                 {formFromProps?.fields?.map((field, index) => {
                   const blockType = field.blockType as keyof typeof fields;

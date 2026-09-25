@@ -1,15 +1,8 @@
 import type React from 'react';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+import { Select as SelectComponent } from '@eventuras/ratio-ui/forms';
 import type { StateField } from '@payloadcms/plugin-form-builder/types';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { FieldError } from '../Error';
 import { Width } from '../Width';
 import { stateOptions } from './options';
@@ -22,31 +15,24 @@ export const State: React.FC<
 > = ({ name, control, errors, label, required, width }) => {
   return (
     <Width width={width}>
-      <Label htmlFor={name}>{label}</Label>
       <Controller
         control={control}
         defaultValue=""
         name={name}
-        render={({ field: { onChange, value } }) => {
-          const controlledValue = stateOptions.find((t) => t.value === value);
-
-          return (
-            <Select onValueChange={(val) => onChange(val)} value={controlledValue?.value}>
-              <SelectTrigger className="w-full" id={name}>
-                <SelectValue placeholder={label} />
-              </SelectTrigger>
-              <SelectContent>
-                {stateOptions.map(({ label, value }) => {
-                  return (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          );
-        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <SelectComponent
+            className="w-full"
+            label={label}
+            placeholder={label}
+            name={name}
+            options={stateOptions.map((option) => ({ label: option.label, value: option.value }))}
+            selectedKey={value || null}
+            onSelectionChange={(selected) => onChange(selected ?? '')}
+            onBlur={onBlur}
+            isRequired={Boolean(required)}
+            isInvalid={Boolean(required && errors[name])}
+          />
+        )}
         rules={{ required }}
       />
       {required && errors[name] && <FieldError />}
