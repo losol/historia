@@ -1,3 +1,4 @@
+import { emailColors } from './emailColors';
 /**
  * Locale-specific text for order shipped email template
  */
@@ -24,37 +25,37 @@ export interface OrderShippedTexts {
  * Shared CSS styles for order shipped email (reusing order confirmation styles with shipping-specific colors)
  */
 export const ORDER_SHIPPED_STYLES = `
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; }
-    .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: ${emailColors.text}; background-color: ${emailColors.pageBackground}; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: ${emailColors.cardBackground}; }
+    .header { background: ${emailColors.success}; color: ${emailColors.onPrimary}; padding: 40px 30px; text-align: center; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
     .header .icon { font-size: 48px; margin-bottom: 15px; }
     .content { padding: 40px 30px; }
     .greeting { font-size: 18px; margin-bottom: 20px; }
-    .message { color: #666; margin-bottom: 30px; line-height: 1.8; }
-    .shipment-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 4px; }
-    .shipment-box h2 { margin: 0 0 15px 0; font-size: 20px; color: #333; }
+    .message { color: ${emailColors.textMuted}; margin-bottom: 30px; line-height: 1.8; }
+    .shipment-box { background: ${emailColors.successBackground}; border-left: 4px solid ${emailColors.success}; padding: 20px; margin: 30px 0; border-radius: 4px; }
+    .shipment-box h2 { margin: 0 0 15px 0; font-size: 20px; color: ${emailColors.text}; }
     .shipment-details { margin: 0; padding: 0; list-style: none; }
-    .shipment-details li { padding: 12px 0; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+    .shipment-details li { padding: 12px 0; border-bottom: 1px solid ${emailColors.border}; display: flex; justify-content: space-between; align-items: center; }
     .shipment-details li:last-child { border-bottom: none; }
-    .shipment-details .label { color: #666; font-weight: 500; }
-    .shipment-details .value { color: #333; font-weight: 600; }
-    .tracking-link { display: inline-block; margin-top: 5px; padding: 10px 20px; background: #10b981; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; }
-    .tracking-link:hover { background: #059669; }
+    .shipment-details .label { color: ${emailColors.textMuted}; font-weight: 500; }
+    .shipment-details .value { color: ${emailColors.text}; font-weight: 600; }
+    .tracking-link { display: inline-block; margin-top: 5px; padding: 10px 20px; background: ${emailColors.success}; color: ${emailColors.onPrimary} !important; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .tracking-link:hover { background: ${emailColors.successStrong}; }
     .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    .items-table thead { background: #f8f9fa; }
-    .items-table th { padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #e9ecef; }
-    .items-table td { padding: 12px; border-bottom: 1px solid #e9ecef; }
+    .items-table thead { background: ${emailColors.panelBackground}; }
+    .items-table th { padding: 12px; text-align: left; font-weight: 600; color: ${emailColors.textMuted}; border-bottom: 2px solid ${emailColors.border}; }
+    .items-table td { padding: 12px; border-bottom: 1px solid ${emailColors.border}; }
     .items-table tbody tr:last-child td { border-bottom: none; }
     .items-table .quantity { text-align: center; }
-    .address-box { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px; }
-    .address-box h2 { margin: 0 0 15px 0; font-size: 20px; color: #333; }
-    .address-content { color: #333; line-height: 1.8; }
-    .support-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 4px; }
-    .support-box p { margin: 0; color: #78350f; }
-    .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
+    .address-box { background: ${emailColors.panelBackground}; border-left: 4px solid ${emailColors.primary}; padding: 20px; margin: 30px 0; border-radius: 4px; }
+    .address-box h2 { margin: 0 0 15px 0; font-size: 20px; color: ${emailColors.text}; }
+    .address-content { color: ${emailColors.text}; line-height: 1.8; }
+    .support-box { background: ${emailColors.warningBackground}; border-left: 4px solid ${emailColors.warning}; padding: 20px; margin: 30px 0; border-radius: 4px; }
+    .support-box p { margin: 0; color: ${emailColors.warningText}; }
+    .footer { background: ${emailColors.panelBackground}; padding: 30px; text-align: center; color: ${emailColors.textMuted}; font-size: 14px; }
     .footer-message { margin-bottom: 15px; }
-    .organization { font-weight: 600; color: #10b981; }
+    .organization { font-weight: 600; color: ${emailColors.success}; }
 `.trim();
 
 /**
