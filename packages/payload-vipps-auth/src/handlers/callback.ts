@@ -197,6 +197,9 @@ export async function handleVippsCallback(
         },
       },
       limit: 1,
+      // The Local API already defaults to this, but the whole document is passed to
+      // mapVippsUser for merging, so do not let access control trim fields from it.
+      overrideAccess: true,
     });
 
     let user: (typeof users.docs)[number] | undefined;
