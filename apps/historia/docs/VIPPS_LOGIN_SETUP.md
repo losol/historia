@@ -75,7 +75,8 @@ pnpm dev
 Users are matched on **email**:
 
 - **Existing user with that email:** they are logged in, and their profile is updated
-  from Vipps (see `mapVippsUser` in `src/plugins.ts`).
+  from Vipps (see `mapVippsUser` in `src/plugins.ts`). Of their addresses, only the one
+  labelled "Vipps" is updated (or added if missing); any others are left alone.
 - **No user with that email:** a new user is created from the Vipps profile.
 - **Vipps account without an email:** the login is refused (`?error=no_email`).
 

@@ -88,7 +88,7 @@ Every Vipps Login updates these user fields:
 | `phone_number` | Mobile phone number | ✅ Yes | ❌ No (system-admin only) |
 | `addresses` | Addresses from Vipps | ❌ No* | ✅ Yes |
 
-\* *Addresses are merged with existing addresses, not marked as verified*
+\* *Vipps keeps one address up to date: the one labelled **Vipps** (their home address if they have one). It is updated on each Vipps login, or added if missing. Other addresses the user has are never changed. Addresses are not marked as verified.*
 
 ### Data Authority
 

@@ -207,7 +207,7 @@ export async function handleVippsCallback(
 
       // Optionally update user data from Vipps
       const mapFn = config.mapVippsUser || defaultMapVippsUser;
-      const updates = mapFn(vippsUser);
+      const updates = mapFn(vippsUser, user);
 
       if (Object.keys(updates).length > 0) {
         user = await payload.update({

@@ -4,6 +4,12 @@
 
 import type { VippsUserInfo } from '@eventuras/fides-auth/providers/vipps';
 
+/** Maps Vipps profile data to the user fields to create or update. */
+export type VippsUserMapper = (
+  vippsUser: VippsUserInfo,
+  existingUser?: Record<string, unknown>,
+) => Record<string, unknown>;
+
 /**
  * Configuration options for Vipps authentication plugin
  */
@@ -66,24 +72,23 @@ export interface VippsAuthPluginConfig {
    * Custom mapping function to transform Vipps user data to Payload user fields
    * Allows customization of how Vipps profile data is stored in Payload
    *
+   * The result is written with a plain update, so array fields such as
+   * addresses replace what the user had. Use `existingUser` to merge instead.
+   *
    * @param vippsUser - User information from Vipps
+   * @param existingUser - The user being logged in, or undefined when a new user
+   *   is about to be created
    * @returns Partial user object to create/update in Payload
    *
    * @example
    * ```typescript
-   * mapVippsUser: (vippsUser) => ({
-   *   email: vippsUser.email,
+   * mapVippsUser: (vippsUser, existingUser) => ({
    *   given_name: vippsUser.given_name,
    *   family_name: vippsUser.family_name,
-   *   addresses: vippsUser.addresses?.map(addr => ({
-   *     label: 'Vipps',
-   *     isDefault: true,
-   *     ...addr
-   *   }))
    * })
    * ```
    */
-  mapVippsUser?: (vippsUser: VippsUserInfo) => Record<string, unknown>;
+  mapVippsUser?: VippsUserMapper;
 }
 
 /**
@@ -103,7 +108,7 @@ export interface ResolvedVippsAuthConfig
   > {
   apiUrl: string;
   redirectUri?: string;
-  mapVippsUser?: (vippsUser: VippsUserInfo) => Record<string, unknown>;
+  mapVippsUser?: VippsUserMapper;
   subscriptionKey?: string;
   merchantSerialNumber?: string;
 }
