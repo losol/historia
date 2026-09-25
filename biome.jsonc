@@ -101,6 +101,19 @@
           }
         }
       }
+    },
+    {
+      // The app logs through @eventuras/logger. The startup banner in
+      // logStartupConfig.ts is the one place that prints to the console on
+      // purpose.
+      "includes": ["apps/historia/src/**", "!apps/historia/src/utilities/logStartupConfig.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "error"
+          }
+        }
+      }
     }
   ]
 }
