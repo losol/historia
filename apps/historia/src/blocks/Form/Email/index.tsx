@@ -17,12 +17,15 @@ export const Email: React.FC<
         label={label}
         defaultValue={defaultValue}
         type="text"
-        {...register(name, { pattern: /^\S[^\s@]*@\S+$/, required: requiredFromProps })}
-        errors={requiredFromProps ? errors : undefined}
+        {...register(name, {
+          pattern: { value: /^\S[^\s@]*@\S+$/, message: 'Please enter a valid email address' },
+          required: requiredFromProps,
+        })}
+        errors={errors}
         noWrapper
       />
 
-      {requiredFromProps && errors[name] && <FieldError />}
+      {requiredFromProps && errors[name]?.type === 'required' && <FieldError />}
     </Width>
   );
 };
