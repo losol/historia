@@ -2,6 +2,7 @@
 import type React from 'react';
 import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { Logger } from '@eventuras/logger';
 import type { Form as FormType } from '@payloadcms/plugin-form-builder/types';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,11 @@ import { Button } from '@/components/ui/button';
 import { getClientSideURL } from '@/utilities/getURL';
 import { buildInitialFormState } from './buildInitialFormState';
 import { fields } from './fields';
+
+const logger = Logger.create({
+  namespace: 'historia:blocks:form',
+  context: { module: 'FormBlock' },
+});
 
 export type Value = unknown;
 
@@ -110,7 +116,7 @@ export const FormBlock: React.FC<
             if (redirectUrl) router.push(redirectUrl);
           }
         } catch (err) {
-          console.warn(err);
+          logger.warn({ error: err }, 'Form submission failed');
           setIsLoading(false);
           setError({
             message: 'Something went wrong.',
@@ -142,7 +148,7 @@ export const FormBlock: React.FC<
                   const blockType = field.blockType as keyof typeof fields;
 
                   if (!fields[blockType]) {
-                    console.error(`Unsupported block type: ${field.blockType}`);
+                    logger.error({ blockType: field.blockType }, 'Unsupported form field type');
                     return null;
                   }
 

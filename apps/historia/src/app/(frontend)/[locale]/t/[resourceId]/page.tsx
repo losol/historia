@@ -1,3 +1,4 @@
+import { Logger } from '@eventuras/logger';
 import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
@@ -15,6 +16,11 @@ import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
 import type { Term } from '@/payload-types';
 import { extractPlainText, generateTermJsonLd } from '@/utilities/json-ld';
+
+const logger = Logger.create({
+  namespace: 'historia:pages',
+  context: { module: 'TermRoute' },
+});
 
 export async function generateStaticParams() {
   // Skip static generation during build (ISR will handle runtime generation)
@@ -82,7 +88,7 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
 
     term = (result.docs[0] as unknown as Term) || null;
   } catch (error) {
-    console.error(`Error fetching term with resourceId ${resourceId}:`, error);
+    logger.error({ error, resourceId }, 'Error fetching term');
   }
 
   if (!term) {

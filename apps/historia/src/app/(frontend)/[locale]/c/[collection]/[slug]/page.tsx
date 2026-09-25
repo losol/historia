@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { Logger } from '@eventuras/logger';
 import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
@@ -25,6 +26,11 @@ import {
   pageCollections,
 } from '../pageCollections';
 import PageClient from './page.client';
+
+const logger = Logger.create({
+  namespace: 'historia:pages',
+  context: { module: 'CollectionDocumentRoute' },
+});
 
 /**
  * Parse slug in format: {human-readable-slug}--{resourceId}
@@ -90,10 +96,6 @@ export async function generateStaticParams() {
         documents.forEach(({ slug, resourceId }) => {
           if (slug && resourceId) {
             const combinedSlug = `${slug}--${resourceId}`;
-            console.log(
-              `Generating static params for ${locale}/c/${localizedCollectionName}/${combinedSlug}`,
-            );
-
             params.push({
               locale,
               collection: localizedCollectionName,
@@ -102,10 +104,7 @@ export async function generateStaticParams() {
           }
         });
       } catch (error) {
-        console.error(
-          `Failed to fetch documents for collection "${collection}" in locale "${locale}":`,
-          error,
-        );
+        logger.error({ error, collection, locale }, 'Failed to fetch documents for static params');
       }
     }
   }

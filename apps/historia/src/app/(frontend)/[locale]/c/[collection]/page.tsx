@@ -1,3 +1,4 @@
+import { Logger } from '@eventuras/logger';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import configPromise from '@payload-config';
 import { notFound } from 'next/navigation';
@@ -15,6 +16,11 @@ import {
   pageCollections,
 } from './pageCollections';
 
+const logger = Logger.create({
+  namespace: 'historia:pages',
+  context: { module: 'CollectionListRoute' },
+});
+
 type Props = {
   params: Promise<{
     locale: string;
@@ -31,10 +37,10 @@ export default async function Page({ params: paramsPromise }: Readonly<Props>) {
   const { locale, collection } = await paramsPromise;
 
   const originalCollectionName = getOriginalCollectionName(collection, locale);
-  console.log('Mapped Collection:', { collection, originalCollectionName, locale });
+  logger.debug({ collection, originalCollectionName, locale }, 'Mapped collection');
 
   if (!isValidCollection(originalCollectionName)) {
-    console.warn(`Invalid collection: ${originalCollectionName}`);
+    logger.info({ collection: originalCollectionName }, 'Invalid collection');
     notFound();
   }
 
@@ -62,7 +68,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Props>) {
     });
 
     if (!docsPage.docs?.length) {
-      console.warn(`No documents found for collection: ${originalCollectionName}`);
+      logger.info({ collection: originalCollectionName }, 'No documents found for collection');
       notFound();
     }
 
@@ -93,7 +99,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Props>) {
       </Container>
     );
   } catch (error) {
-    console.warn('Error fetching collection:', error);
+    logger.error({ error, collection: originalCollectionName }, 'Error fetching collection');
     notFound();
   }
 }
@@ -148,7 +154,7 @@ export async function generateStaticParams() {
       });
       return result.docs || [];
     } catch (error) {
-      console.error(`Error fetching documents for collection "${collection}":`, error);
+      logger.error({ error, collection }, 'Error fetching documents for collection');
       return [];
     }
   };
@@ -163,6 +169,6 @@ export async function generateStaticParams() {
     }
   }
 
-  console.log('Generated Static Params:', params);
+  logger.debug({ count: params.length }, 'Generated static collection params');
   return params;
 }

@@ -1,3 +1,4 @@
+import { Logger } from '@eventuras/logger';
 import { Story, StoryBody, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
@@ -14,6 +15,11 @@ import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
 import type { Quote, Source } from '@/payload-types';
 import { extractPlainText, generateQuoteJsonLd, generateSourceJsonLd } from '@/utilities/json-ld';
+
+const logger = Logger.create({
+  namespace: 'historia:pages',
+  context: { module: 'ResourceRoute' },
+});
 
 // Map URL collection names to Payload collection slugs
 const collectionMap: Record<string, CollectionSlug> = {
@@ -114,7 +120,7 @@ export default async function ItemPage({ params: paramsPromise }: Readonly<Args>
 
     doc = (result.docs[0] as unknown as Quote | Source) || null;
   } catch (error) {
-    console.error(`Error fetching ${collectionSlug} with resourceId ${resourceId}:`, error);
+    logger.error({ error, collection: collectionSlug, resourceId }, 'Error fetching resource');
   }
 
   if (!doc) {

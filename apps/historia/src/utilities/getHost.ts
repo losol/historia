@@ -1,4 +1,10 @@
+import { Logger } from '@eventuras/logger';
 import { headers } from 'next/headers';
+
+const logger = Logger.create({
+  namespace: 'historia:lib',
+  context: { module: 'getHost' },
+});
 
 /**
  * Retrieves the current domain/host from request headers.
@@ -8,7 +14,7 @@ export const getHost = async (): Promise<string | null> => {
   const requestHeaders = await headers();
   const host = requestHeaders.get('host');
   if (!host) {
-    console.warn('No host found in request headers.');
+    logger.warn('No host found in request headers');
     return process.env.NEXT_PUBLIC_SITE_URL ?? null;
   }
   return host;

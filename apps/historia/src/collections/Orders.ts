@@ -1,3 +1,4 @@
+import { Logger } from '@eventuras/logger';
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { ordersReadAccess } from '@/access/commerceReadAccess';
@@ -8,6 +9,11 @@ import { orderItemsField } from '@/fields/orderItemsField';
 import { ordersUpdateAccess } from '@/lib/commerce';
 import { populateOrderPrices } from './Orders/hooks/populateOrderPrices';
 import { sendOrderStatus } from './Orders/hooks/sendOrderStatus';
+
+const logger = Logger.create({
+  namespace: 'historia:orders',
+  context: { module: 'OrdersCollection' },
+});
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -82,7 +88,7 @@ export const Orders: CollectionConfig = {
                 });
                 return user?.email || value;
               } catch (error) {
-                console.error('Failed to fetch user email:', error);
+                logger.error({ error }, 'Failed to fetch customer email');
               }
             }
             return value;

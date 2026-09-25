@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Logger } from '@eventuras/logger';
 import { RelationshipField, useField } from '@payloadcms/ui';
 import type { RelationshipFieldClientComponent } from 'payload';
+
+const logger = Logger.create({
+  namespace: 'historia:orders',
+  context: { module: 'ProductFieldWithPricePopulation' },
+});
 
 export const ProductFieldWithPricePopulation: RelationshipFieldClientComponent = (props) => {
   const { path } = props;
@@ -30,8 +36,6 @@ export const ProductFieldWithPricePopulation: RelationshipFieldClientComponent =
               ? productValue.value
               : productValue;
 
-          console.log('Fetching product:', productId);
-
           // Fetch product details from Payload API
           const response = await fetch(`/api/products/${productId}?depth=0`, {
             credentials: 'include',
@@ -40,31 +44,24 @@ export const ProductFieldWithPricePopulation: RelationshipFieldClientComponent =
           if (response.ok) {
             const product = await response.json();
 
-            console.log('Product data:', product);
-            console.log('Product price:', product.price);
-
             // Update price fields if product has price data
             if (product.price?.amountExVat && priceAmount?.setValue) {
-              console.log('Setting amountExVat:', product.price.amountExVat);
               priceAmount.setValue(product.price.amountExVat);
             }
             if (product.price?.currency && priceCurrency?.setValue) {
-              console.log('Setting currency:', product.price.currency);
               priceCurrency.setValue(product.price.currency);
             }
             if (product.price?.vatRate !== undefined && priceVatRate?.setValue) {
-              console.log('Setting vatRate:', product.price.vatRate);
               priceVatRate.setValue(product.price.vatRate);
             } else if (priceVatRate?.setValue && !priceVatRate.value) {
               // Default to 25% if not set
-              console.log('Setting default vatRate: 25');
               priceVatRate.setValue(25);
             }
           } else {
-            console.error('Failed to fetch product:', response.status);
+            logger.error({ productId, status: response.status }, 'Failed to fetch product');
           }
         } catch (error) {
-          console.error('Failed to fetch product data:', error);
+          logger.error({ error }, 'Failed to fetch product data');
         }
       }
     };

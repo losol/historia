@@ -1,4 +1,10 @@
+import { Logger } from '@eventuras/logger';
 import type { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types';
+
+const logger = Logger.create({
+  namespace: 'historia:search',
+  context: { module: 'beforeSync' },
+});
 
 export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc }) => {
   const {
@@ -34,9 +40,9 @@ export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc 
 
       modifiedDoc.topics = mappedTopics;
     } catch (err) {
-      console.error(
-        `Failed. Topic not found when syncing collection '${collection}' with id: '${id}' to search.`,
-        err,
+      logger.error(
+        { error: err, collection, id },
+        'Topic not found when syncing document to search',
       );
     }
   }
