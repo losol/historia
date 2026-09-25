@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { Logger } from '@eventuras/logger';
 import { Story, StoryHeader } from '@eventuras/ratio-ui/blocks/Story';
 import { Breadcrumb, Breadcrumbs } from '@eventuras/ratio-ui/core/Breadcrumbs';
 import { Link } from '@eventuras/ratio-ui-next';
@@ -16,6 +17,11 @@ import type { PagesSelect } from '@/payload-types';
 import PageClient from './page.client';
 
 // Read locales and default locale from environment variables, fallback to 'en'
+const logger = Logger.create({
+  namespace: 'historia:pages',
+  context: { module: 'PageRoute' },
+});
+
 const locales = process.env.NEXT_PUBLIC_CMS_LOCALES?.split(',') || ['en'];
 const defaultLocale = process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'en';
 
@@ -41,7 +47,7 @@ export async function generateStaticParams() {
   });
 
   if (!pages.docs?.length) {
-    console.log('No pages found.');
+    logger.info('No pages found for static generation');
     return [];
   }
 
@@ -76,7 +82,7 @@ export async function generateStaticParams() {
     });
   }
 
-  console.log('Generated paths:', paths);
+  logger.debug({ count: paths.length }, 'Generated static page paths');
   return paths;
 }
 
@@ -136,12 +142,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
       'unknown';
     const userAgent = headersData.get('user-agent') || 'unknown';
 
-    console.info('Invalid locale access attempt', {
-      locale,
-      ip,
-      userAgent,
-      timestamp: new Date().toISOString(),
-    });
+    logger.info({ locale, ip, userAgent }, 'Invalid locale access attempt');
     notFound();
   }
 
@@ -155,7 +156,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     // Handle the homepage logic
     const homePageId = await getHomePageId();
     if (!homePageId) {
-      console.warn('No homepage found.');
+      logger.warn('No homepage found');
       notFound();
     }
 
@@ -204,7 +205,7 @@ const getHomePageId = cache(async (): Promise<string | null> => {
   const host = (await headers()).get('host');
 
   if (!host) {
-    console.warn('No host header found.');
+    logger.warn('No host header found');
     return null;
   }
 
@@ -227,7 +228,7 @@ const getHomePageId = cache(async (): Promise<string | null> => {
     return 'id' in website.docs[0].homePage ? website.docs[0].homePage.id : null;
   }
 
-  console.warn(`No website configuration found for host: ${host}`);
+  logger.warn({ host }, 'No website configuration found for host');
   return null;
 });
 
@@ -255,7 +256,7 @@ const queryPage = cache(
     }
 
     if (Object.keys(where).length === 0) {
-      console.warn('No valid filter provided for queryPage.');
+      logger.warn('No valid filter provided for queryPage');
       return null;
     }
 
@@ -274,13 +275,13 @@ const queryPage = cache(
       });
 
       if (!result.docs?.length) {
-        console.warn(`No document found for query: ${JSON.stringify(where)}`);
+        logger.info({ where }, 'No page found for query');
         return null;
       }
 
       return result.docs[0];
     } catch (error) {
-      console.error(`Error querying page: ${error}`, error);
+      logger.error({ error, where }, 'Error querying page');
       return null;
     }
   },
@@ -332,18 +333,13 @@ const queryPageByBreadcrumbsUrl = cache(
           'unknown';
         const userAgent = headersData.get('user-agent') || 'unknown';
 
-        console.warn('No page found for breadcrumbs URL', {
-          breadcrumbsUrl,
-          ip,
-          userAgent,
-          timestamp: new Date().toISOString(),
-        });
+        logger.info({ breadcrumbsUrl, ip, userAgent }, 'No page found for breadcrumbs URL');
         return null;
       }
 
       return page;
     } catch (error) {
-      console.error(`Error querying page by breadcrumbs URL: ${error}`, error);
+      logger.error({ error, breadcrumbsUrl }, 'Error querying page by breadcrumbs URL');
       return null;
     }
   },

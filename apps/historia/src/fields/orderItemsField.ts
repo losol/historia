@@ -1,5 +1,11 @@
 import { randomUUID } from 'node:crypto';
+import { Logger } from '@eventuras/logger';
 import type { ArrayField } from 'payload';
+
+const logger = Logger.create({
+  namespace: 'historia:orders',
+  context: { module: 'orderItemsField' },
+});
 
 export const orderItemsField = (): ArrayField => {
   return {
@@ -67,7 +73,7 @@ export const orderItemsField = (): ArrayField => {
                       });
                       return product?.price?.amountExVat || value;
                     } catch (error) {
-                      console.error('Failed to fetch product price:', error);
+                      logger.error({ error }, 'Failed to fetch product price');
                     }
                   }
                   return value;
@@ -96,7 +102,7 @@ export const orderItemsField = (): ArrayField => {
                       });
                       return product?.price?.currency || value || 'NOK';
                     } catch (error) {
-                      console.error('Failed to fetch product currency:', error);
+                      logger.error({ error }, 'Failed to fetch product currency');
                     }
                   }
                   return value || 'NOK';
@@ -128,7 +134,7 @@ export const orderItemsField = (): ArrayField => {
                       });
                       return product?.price?.vatRate ?? value ?? 25;
                     } catch (error) {
-                      console.error('Failed to fetch product VAT rate:', error);
+                      logger.error({ error }, 'Failed to fetch product VAT rate');
                     }
                   }
                   return value ?? 25;

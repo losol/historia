@@ -1,3 +1,4 @@
+import { Logger } from '@eventuras/logger';
 import config from '@payload-config';
 import { unstable_cache } from 'next/cache';
 import { getServerSideSitemap } from 'next-sitemap';
@@ -6,6 +7,11 @@ import {
   getLocalizedCollectionName,
   pageCollections,
 } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
+
+const logger = Logger.create({
+  namespace: 'historia:sitemap',
+  context: { module: 'CollectionsSitemap' },
+});
 
 const getCollectionsSitemap = unstable_cache(
   async () => {
@@ -58,10 +64,7 @@ const getCollectionsSitemap = unstable_cache(
 
           allSitemapEntries.push(...sitemapEntries);
         } catch (error) {
-          console.error(
-            `Failed to generate sitemap for collection "${collection}" in locale "${locale}":`,
-            error,
-          );
+          logger.error({ error, collection, locale }, 'Failed to generate collection sitemap');
         }
       }
     }
