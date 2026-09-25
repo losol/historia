@@ -1,4 +1,5 @@
 import type { TemplateRegistry } from '../types';
+import { emailColors } from './utils/emailColors';
 import { buildOrderShippedTemplate } from './utils/orderShippedBuilder';
 import { buildOrderStatusTemplate } from './utils/orderStatusBuilder';
 
@@ -165,17 +166,17 @@ The {{organizationName}} Team`,
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .alert-banner { background: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
-    .alert-content { background: #fff; border: 3px solid #dc2626; border-top: none; border-radius: 0 0 8px 8px; padding: 30px; }
-    .detail-box { background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0; }
-    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
-    .detail-label { font-weight: 600; color: #6b7280; }
-    .detail-value { color: #111827; }
-    .action-box { background: #fef3c7; border: 2px solid #f59e0b; padding: 20px; border-radius: 6px; margin: 20px 0; }
-    .action-title { color: #92400e; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
-    .action-steps { color: #92400e; margin: 10px 0 0 0; padding-left: 20px; }
-    .footer { color: #6b7280; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: ${emailColors.text}; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .alert-banner { background: ${emailColors.errorStrong}; color: ${emailColors.onPrimary}; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+    .alert-content { background: ${emailColors.cardBackground}; border: 3px solid ${emailColors.error}; border-top: none; border-radius: 0 0 8px 8px; padding: 30px; }
+    .detail-box { background: ${emailColors.panelBackground}; padding: 15px; border-radius: 6px; margin: 20px 0; }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid ${emailColors.border}; }
+    .detail-label { font-weight: 600; color: ${emailColors.textMuted}; }
+    .detail-value { color: ${emailColors.text}; }
+    .action-box { background: ${emailColors.warningBackground}; border: 2px solid ${emailColors.warning}; padding: 20px; border-radius: 6px; margin: 20px 0; }
+    .action-title { color: ${emailColors.warningText}; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
+    .action-steps { color: ${emailColors.warningText}; margin: 10px 0 0 0; padding-left: 20px; }
+    .footer { color: ${emailColors.textMuted}; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid ${emailColors.border}; }
   </style>
 </head>
 <body>
