@@ -141,9 +141,6 @@ importers:
       import-in-the-middle:
         specifier: ^3.5.1
         version: 3.5.1
-      lucide-react:
-        specifier: ^1.45.0
-        version: 1.45.0(react@19.3.0)
       nanoid:
         specifier: ^6.0.1
         version: 6.0.1
