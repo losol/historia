@@ -51,13 +51,12 @@ updates:
           - "@vitejs/*"
           - "vitest"
           - "@vitest/*"
+      # Everything else that is not a major, production and development alike, in
+      # one PR. Majors outside the groups above still come one per package, as
+      # each may need its own migration.
       minor-patch:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-      dev-dependencies:
-        dependency-type: "development"
+        patterns:
+          - "*"
         update-types:
           - "minor"
           - "patch"
@@ -73,6 +72,13 @@ updates:
       - "dependencies"
     cooldown:
       default-days: 10
+    groups:
+      # All action bumps, majors included, in one PR. The PR runs CI and the Docker
+      # build, so a breaking major there shows up before merge. The release job
+      # (changesets/action) only runs on main: read its notes on a major bump.
+      actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "/apps/historia"
