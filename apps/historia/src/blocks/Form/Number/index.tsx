@@ -17,7 +17,7 @@ export const NumberField: React.FC<
         defaultValue={defaultValue}
         type="number"
         {...register(name, { required: requiredFromProps })}
-        errors={requiredFromProps ? errors : undefined}
+        errors={errors}
         noWrapper
       />
       {requiredFromProps && errors[name] && <FieldError />}

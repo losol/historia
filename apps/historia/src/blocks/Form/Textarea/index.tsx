@@ -29,7 +29,7 @@ export const Textarea: React.FC<
         rows={rows}
         {...register(name, { required: requiredFromProps })}
         multiline
-        errors={requiredFromProps ? errors : undefined}
+        errors={errors}
         noWrapper
       />
 

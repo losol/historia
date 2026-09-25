@@ -18,7 +18,7 @@ export const Text: React.FC<
         defaultValue={defaultValue}
         type="text"
         {...register(name, { required: requiredFromProps })}
-        errors={requiredFromProps ? errors : undefined}
+        errors={errors}
         noWrapper
       />
       {requiredFromProps && errors[name] && <FieldError />}
