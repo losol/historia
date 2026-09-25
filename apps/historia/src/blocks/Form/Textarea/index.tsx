@@ -24,10 +24,7 @@ export const Textarea: React.FC<
 }) => {
   return (
     <Width width={width}>
-      {/* Same style as the label ratio-ui's Select renders, so all fields match. */}
-      <Label className="mb-2 block text-sm font-medium" htmlFor={name}>
-        {label}
-      </Label>
+      <Label htmlFor={name}>{label}</Label>
 
       <TextAreaComponent
         defaultValue={defaultValue}
