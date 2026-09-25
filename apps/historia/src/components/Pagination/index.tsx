@@ -19,10 +19,10 @@ export const Pagination: React.FC<{
         currentPage={page}
         totalPages={totalPages}
         onPreviousPageClick={() => {
-          router.push(`/articles/page/${page - 1}`);
+          if (page > 1) router.push(`/articles/page/${page - 1}`);
         }}
         onNextPageClick={() => {
-          router.push(`/articles/page/${page + 1}`);
+          if (page < totalPages) router.push(`/articles/page/${page + 1}`);
         }}
       />
     </div>
