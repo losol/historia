@@ -21,7 +21,6 @@ export const Country: React.FC<
         name={name}
         render={({ field: { onChange, onBlur, value } }) => (
           <SelectComponent
-            className="w-full"
             label={label}
             placeholder={label}
             name={name}
