@@ -1,36 +1,33 @@
 import type React from 'react';
+import { List } from '@eventuras/ratio-ui/core/List';
+import { Panel } from '@eventuras/ratio-ui/core/Panel';
 import RichText from '@/components/RichText';
 import type { ResourcesBlock as ResourcesBlockType } from '@/payload-types';
 
 type ResourceItem = NonNullable<ResourcesBlockType['items']>[number];
 
-export const ResourcesBlock: React.FC<ResourcesBlockType> = ({
-  title,
-  type,
-  description,
-  items,
-}) => {
+export const ResourcesBlock: React.FC<ResourcesBlockType> = ({ title, description, items }) => {
   return (
-    <div className={`resources-block resources-block--${type}`}>
-      <h3>{title}</h3>
-      {description && <RichText data={description} />}
-      <ul className="resources-list">
-        {items?.map((item: ResourceItem, index: number) => {
-          const key = item.id ?? `${item.name ?? 'resource'}-${index}`;
-          return (
-            <li key={key} className="resource-item">
-              <strong>{item.name}</strong>
-              {item.quantity && <span className="quantity"> — {item.quantity}</span>}
-              {item.unit && <span className="unit"> {item.unit}</span>}
-              {item.description && (
-                <div className="resource-description">
-                  <RichText data={item.description} />
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <Panel surface="card">
+      <Panel.Header>
+        <Panel.Title as="h3">{title}</Panel.Title>
+      </Panel.Header>
+      <Panel.Body>
+        {description && <RichText data={description} />}
+        <List variant="markdown">
+          {items?.map((item: ResourceItem, index: number) => {
+            const key = item.id ?? `${item.name ?? 'resource'}-${index}`;
+            return (
+              <List.Item key={key}>
+                <strong>{item.name}</strong>
+                {item.quantity && <> — {item.quantity}</>}
+                {item.unit && <> {item.unit}</>}
+                {item.description && <RichText data={item.description} />}
+              </List.Item>
+            );
+          })}
+        </List>
+      </Panel.Body>
+    </Panel>
   );
 };
