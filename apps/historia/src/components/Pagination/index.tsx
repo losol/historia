@@ -1,7 +1,7 @@
 'use client';
 import type React from 'react';
 import { Pagination as PaginationComponent } from '@eventuras/ratio-ui/core/Pagination';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { cn } from '@/utilities/cn';
 
 export const Pagination: React.FC<{
@@ -10,6 +10,15 @@ export const Pagination: React.FC<{
   totalPages: number;
 }> = (props) => {
   const router = useRouter();
+  const { locale } = useParams<{ locale?: string }>();
+  const labels =
+    locale === 'en'
+      ? undefined
+      : {
+          previous: 'Forrige side',
+          next: 'Neste side',
+          status: (current: number, total: number) => `Side ${current} av ${total}`,
+        };
 
   const { className, page, totalPages } = props;
 
@@ -18,6 +27,8 @@ export const Pagination: React.FC<{
       <PaginationComponent
         currentPage={page}
         totalPages={totalPages}
+        aria-label={locale === 'en' ? 'Pagination' : 'Sidenavigasjon'}
+        labels={labels}
         onPreviousPageClick={() => {
           if (page > 1) router.push(`/articles/page/${page - 1}`);
         }}

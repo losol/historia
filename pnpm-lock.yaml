@@ -58,11 +58,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/payload-vipps-auth
       '@eventuras/ratio-ui':
-        specifier: ^2.24.0
-        version: 2.24.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^2.25.0
+        version: 2.25.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@eventuras/ratio-ui-next':
         specifier: ^1.0.1
-        version: 1.0.1(@eventuras/ratio-ui@2.24.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(next@16.3.5(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))
+        version: 1.0.1(@eventuras/ratio-ui@2.25.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(next@16.3.5(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))
       '@eventuras/vipps':
         specifier: workspace:*
         version: link:../../packages/vipps
@@ -1222,8 +1222,8 @@ packages:
       '@eventuras/ratio-ui': ^2.8.0
       next: ^16.0.0
 
-  '@eventuras/ratio-ui@2.24.0':
-    resolution: {integrity: sha512-TRDtbV/MVx6z2WauWkYA1net+cqAbkiktARnMraLo1wxBua8UIeH360CNW+lqDIKOxagLH7cuXUAVPdc24wi5w==}
+  '@eventuras/ratio-ui@2.25.0':
+    resolution: {integrity: sha512-Vh7KidWM5KMBJByZLi456Fxz60xB/YL0eUM5cEFgmAeezI6NFNCgMMuX1IueXtcd13+iwBePmCTpxZgAq3Lr0A==}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
@@ -4314,8 +4314,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.45.0:
-    resolution: {integrity: sha512-yH1ubCAduho9UR7oJhRXIQXogksRILBiTuZC4/bQIGeB9JOkxMlSuEHyyZpo1Z3S0yWJO2KTSUZbjiNvVxeOUw==}
+  lucide-react@1.46.0:
+    resolution: {integrity: sha512-Bv+FZXgZPrxc/NCl1e7JJVQFLdiCxYgxNVhqoV7X0p6I8ADJo8DxBnK1auH0fZz4AmqOJ3jgneL4f1i8LJQRAA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -6490,15 +6490,15 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/sdk-logs': 0.222.0(@opentelemetry/api@1.9.1)
 
-  '@eventuras/ratio-ui-next@1.0.1(@eventuras/ratio-ui@2.24.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(next@16.3.5(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))':
+  '@eventuras/ratio-ui-next@1.0.1(@eventuras/ratio-ui@2.25.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(next@16.3.5(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))':
     dependencies:
-      '@eventuras/ratio-ui': 2.24.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@eventuras/ratio-ui': 2.25.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       next: 16.3.5(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4)
 
-  '@eventuras/ratio-ui@2.24.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@eventuras/ratio-ui@2.25.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       clsx: 2.1.1
-      lucide-react: 1.45.0(react@19.3.0)
+      lucide-react: 1.46.0(react@19.3.0)
       react: 19.3.0
       react-aria-components: 1.21.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-dom: 19.3.0(react@19.3.0)
@@ -9618,7 +9618,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.45.0(react@19.3.0):
+  lucide-react@1.46.0(react@19.3.0):
     dependencies:
       react: 19.3.0
 
