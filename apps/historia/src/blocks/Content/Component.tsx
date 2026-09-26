@@ -8,7 +8,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
 
   return (
     <Story>
-      <RichText data={props.richText} enableProse={false} />
+      <RichText data={props.richText} />
     </Story>
   );
 };
