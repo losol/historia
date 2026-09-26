@@ -1,5 +1,11 @@
 # @eventuras/payload-vipps-auth
 
+## 0.2.0
+
+### Minor Changes
+
+- d2fe77a: Vipps Login no longer replaces a user's addresses. Only the address labelled "Vipps" is updated (or added if missing); addresses the user added themselves are kept. `mapVippsUser` now receives the existing user as a second argument, so mappers can merge instead of overwrite.
+
 ## 0.1.11
 
 ### Patch Changes

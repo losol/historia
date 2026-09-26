@@ -1,5 +1,33 @@
 # @eventuras/historia
 
+## 0.27.0
+
+### Minor Changes
+
+- 646b77d: The public site is styled by ratio-ui throughout. Tailwind was never actually compiled for it, so many elements rendered unstyled; they now use ratio-ui components:
+  
+  - Form fields (text, email, number, textarea, select, country, state, checkbox) and the submit button.
+  - Rich text: lists have bullets and numbers, and links are visibly links.
+  - The instruction and resources blocks, the pending-payment notice at checkout, the cart's loading spinner, the payment status indicator and the hero lead.
+  - The cart button shows the item count as a badge, and its label names the count for screen readers.
+  
+  The skip link now appears on keyboard focus and moves focus to the main content. Tailwind, the shadcn components, Radix and other unused dependencies are removed. Requires `@eventuras/ratio-ui` 2.25.
+
+### Patch Changes
+
+- 646b77d: Paging through a collection works. The Previous and Next buttons went to `/articles/page/N`, which does not exist, and the paged route always listed articles. Every collection now pages under its own localized URL (`/no/c/artikler/page/2`), with Norwegian labels on Norwegian pages.
+- 646b77d: Form blocks: a required checkbox now shows "This field is required" when left unticked, and an invalid email address gets its own message ("Please enter a valid email address") instead of the required-field one, on optional fields too.
+- 862f534: A failed Vipps payment is reported to the checkout page once, with its reason, instead of twice. It no longer logs an extra "unknown" payment-failure event.
+- 1fb9dad: Draft preview now requires a signed-in user, not just the preview secret. Order emails set `<html lang>` for their locale.
+- eb7f058: Addresses from Vipps Login are saved with street, postal code and city. The mapping used field names the user collection does not have, so only the label and country were stored.
+- d2fe77a: Vipps Login no longer replaces a user's addresses. Only the address labelled "Vipps" is updated (or added if missing); addresses the user added themselves are kept. `mapVippsUser` now receives the existing user as a second argument, so mappers can merge instead of overwrite.
+- 3066c30: When Vipps Login is not enabled (`VIPPS_LOGIN_ENABLED` is not `true`), the `/api/auth/vipps/*` routes answer 404 instead of failing with a 500, and the admin login page no longer shows the Vipps button.
+- Updated dependencies [2239587]
+- Updated dependencies [1fb9dad]
+- Updated dependencies [d2fe77a]
+  - @eventuras/notitia-templates@0.2.5
+  - @eventuras/payload-vipps-auth@0.2.0
+
 ## 0.26.0
 
 ### Minor Changes
