@@ -7,6 +7,16 @@ import { ShoppingCart } from '@eventuras/ratio-ui/icons';
 import { useCart } from '@/lib/cart';
 import { CartDrawer } from './cart/CartDrawer';
 
+// The aria-label replaces the button's content for screen readers, so it carries the count.
+function cartLabel(locale: string, count: number): string {
+  if (locale === 'en') {
+    if (count === 0) return 'Open cart';
+    return `Open cart, ${count} ${count === 1 ? 'item' : 'items'}`;
+  }
+  if (count === 0) return 'Åpne handlekurv';
+  return `Åpne handlekurv, ${count} ${count === 1 ? 'vare' : 'varer'}`;
+}
+
 interface CartButtonProps {
   locale: string;
 }
@@ -34,7 +44,7 @@ export function CartButton({ locale }: Readonly<CartButtonProps>) {
         variant="text"
         icon={<ShoppingCart />}
         onPress={() => setIsDrawerOpen(true)}
-        aria-label={showCount ? `Åpne handlekurv, ${itemCount} varer` : 'Åpne handlekurv'}
+        aria-label={cartLabel(locale, showCount ? itemCount : 0)}
       >
         {showCount && (
           <Badge variant="count" tone="inherit">
