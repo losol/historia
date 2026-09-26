@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.5
+
+### Patch Changes
+
+- 2239587: Emails use the colours of the ratio-ui default theme instead of ad-hoc ones, with WCAG AA contrast for text on coloured backgrounds. The shipped email's green button and header previously had 2.5:1 contrast.
+- 1fb9dad: Draft preview now requires a signed-in user, not just the preview secret. Order emails set `<html lang>` for their locale.
+
 ## 0.2.4
 
 ### Patch Changes
