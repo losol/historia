@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { formatPrice } from '@eventuras/core/currency';
 import { CartLineItem } from '@eventuras/ratio-ui/commerce/CartLineItem';
 import { Button } from '@eventuras/ratio-ui/core/Button';
+import { Spinner } from '@eventuras/ratio-ui/core/Spinner';
 import { NumberField } from '@eventuras/ratio-ui/forms';
 import { Drawer } from '@eventuras/ratio-ui/layout/Drawer';
 import Link from 'next/link';
@@ -50,7 +51,7 @@ export function CartDrawer({ isOpen, onClose, locale }: Readonly<CartDrawerProps
       <Drawer.Body>
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+            <Spinner />
             <span className="ml-3 text-gray-600">Laster...</span>
           </div>
         )}

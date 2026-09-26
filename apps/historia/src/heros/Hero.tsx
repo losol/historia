@@ -3,6 +3,7 @@
 import type React from 'react';
 import { useEffect } from 'react';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
+import { Lead } from '@eventuras/ratio-ui/core/Lead';
 import { Box } from '@eventuras/ratio-ui/layout/Box';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
 import { Image as UIImage } from '@eventuras/ratio-ui-next/Image';
@@ -49,7 +50,7 @@ export const Hero: React.FC<HeroProps> = ({ title, lead, image, contributors, pu
 
       <Box className="flex flex-col justify-between">
         {title && <Heading as="h1">{title}</Heading>}
-        {lead && <p className="text-lg mb-6 lead">{lead}</p>}
+        {lead && <Lead>{lead}</Lead>}
 
         {contributors && <ContributersComponent contributors={contributors} />}
         {publishedAt && (

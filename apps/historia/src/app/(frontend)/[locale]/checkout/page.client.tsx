@@ -9,9 +9,12 @@ import { Button } from '@eventuras/ratio-ui/core/Button';
 import { Card } from '@eventuras/ratio-ui/core/Card';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Loading } from '@eventuras/ratio-ui/core/Loading';
+import { Panel } from '@eventuras/ratio-ui/core/Panel';
 import { NumberField } from '@eventuras/ratio-ui/forms';
+import { AlertTriangle } from '@eventuras/ratio-ui/icons';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { useToast } from '@eventuras/ratio-ui/toast';
+import { Link } from '@eventuras/ratio-ui-next';
 import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import { useCart } from '@/lib/cart';
 import { fromMinorUnits } from '@/lib/price';
@@ -178,58 +181,35 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
 
       {/* Pending Payment Notice */}
       {pendingPayment && (
-        <Card className="mb-6 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/10">
-          <div className="flex items-start gap-3">
-            <svg
-              className="h-6 w-6 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+        <Panel status="warning" accent="flush" marginBottom="md">
+          <Panel.Header icon={<AlertTriangle />}>
+            <Panel.Title as="h3">Du har en påbegynt betaling</Panel.Title>
+          </Panel.Header>
+          <Panel.Body>
+            Vi fant en eksisterende betaling for denne handlekurven.
+            {pendingPayment.state === 'CREATED' && ' Betalingen er ikke fullført ennå.'}
+            {pendingPayment.state === 'AUTHORIZED' &&
+              ' Betalingen er godkjent og venter på behandling.'}
+          </Panel.Body>
+          <Panel.Footer align="start">
+            <Link
+              href={`/${locale}/checkout/vipps?reference=${pendingPayment.reference}`}
+              variant="button-primary"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <div className="flex-1">
-              <Heading as="h3" paddingBottom="xs" className="text-amber-800 dark:text-amber-200">
-                Du har en påbegynt betaling
-              </Heading>
-              <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-                Vi fant en eksisterende betaling for denne handlekurven.
-                {pendingPayment.state === 'CREATED' && ' Betalingen er ikke fullført ennå.'}
-                {pendingPayment.state === 'AUTHORIZED' &&
-                  ' Betalingen er godkjent og venter på behandling.'}
-              </p>
-              <div className="flex gap-2">
-                <a
-                  href={`/${locale}/checkout/vipps?reference=${pendingPayment.reference}`}
-                  className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-                >
-                  Sjekk betalingsstatus
-                </a>
-                <Button onClick={() => setPendingPayment(null)} variant="outline">
-                  Ignorer og opprett ny
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Card>
+              Sjekk betalingsstatus
+            </Link>
+            <Button onClick={() => setPendingPayment(null)} variant="outline">
+              Ignorer og opprett ny
+            </Button>
+          </Panel.Footer>
+        </Panel>
       )}
 
       {items.length === 0 ? (
         <Card>
           <div className="py-12 text-center">
             <p className="text-gray-600 dark:text-gray-400 mb-4">Handlekurven din er tom</p>
-            <a
-              href={`/${locale}`}
-              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
-            >
-              Fortsett å handle
-            </a>
+            <Link href={`/${locale}`}>Fortsett å handle</Link>
           </div>
         </Card>
       ) : (

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Logger } from '@eventuras/logger';
+import { LiveIndicator } from '@eventuras/ratio-ui/core/LiveIndicator';
 import { useToast } from '@eventuras/ratio-ui/toast';
 
 const logger = Logger.create({
@@ -143,14 +144,9 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
   }, [reference, onStatusChange, toast]);
 
   return (
-    <div className="text-sm text-gray-600 dark:text-gray-400">
-      <div className="flex items-center gap-2">
-        <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-        <span>
-          Venter på betaling...
-          {status !== 'pending' && ` (Status: ${status})`}
-        </span>
-      </div>
-    </div>
+    <LiveIndicator status="live">
+      Venter på betaling...
+      {status !== 'pending' && ` (Status: ${status})`}
+    </LiveIndicator>
   );
 }
