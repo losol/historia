@@ -67,8 +67,19 @@ export class HistoriaClient {
     return doc;
   }
 
-  async update(collection: string, id: string, data: Record<string, unknown>): Promise<Doc> {
-    const { doc } = await this.request<{ doc: Doc }>('PATCH', `/api/${collection}/${id}`, data);
+  /** Updates a document; with `locale`, only that locale's values of localized fields. */
+  async update(
+    collection: string,
+    id: string,
+    data: Record<string, unknown>,
+    locale?: string,
+  ): Promise<Doc> {
+    const query = locale ? `?locale=${locale}` : '';
+    const { doc } = await this.request<{ doc: Doc }>(
+      'PATCH',
+      `/api/${collection}/${id}${query}`,
+      data,
+    );
     return doc;
   }
 
