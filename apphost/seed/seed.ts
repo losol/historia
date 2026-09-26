@@ -1,9 +1,9 @@
 // Fills an empty Historia with demo content through its REST API, so a fresh
 // `aspire run` shows a working site instead of "No website configuration found".
 //
-// It only ever seeds an empty site: if a website exists, it stops without
-// touching anything, so it is safe to run on every start and never overwrites
-// content you have added yourself. To start over, drop the database volume
+// It only ever seeds an empty site: if there are websites, pages or articles,
+// it stops without touching anything, so it is safe to run on every start and
+// never overwrites content you have added yourself. To start over, drop the database volume
 // (`docker volume rm historia-postgres-data`).
 //
 // Run by the AppHost, or by hand against a running Historia:
@@ -40,9 +40,13 @@ if (await client.hasUsers()) {
   console.log(`Created the demo admin ${email} (system-admin).`);
 }
 
-if ((await client.count('websites')) > 0) {
-  console.log('A website already exists. Skipping the demo seed.');
-  process.exit(0);
+// Every collection the seed writes to must be empty, not just websites: pages or
+// articles can exist without one, e.g. after a partial import.
+for (const collection of ['websites', 'pages', 'articles']) {
+  if ((await client.count(collection)) > 0) {
+    console.log(`The database already has ${collection}. Skipping the demo seed.`);
+    process.exit(0);
+  }
 }
 
 const domain = new URL(baseUrl).host;

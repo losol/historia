@@ -102,7 +102,7 @@ for (const [name, value] of Object.entries(sharedEnvironment)) {
 }
 
 // Demo content, so a fresh database shows a working site. It goes through the
-// REST API of the running app and does nothing once a website exists, so it
+// REST API of the running app and does nothing once the site has content, so it
 // never touches content you have added. See seed/seed.ts. The admin it creates
 // on an empty database signs in with these credentials.
 const seedAdminPassword = await builder.addParameter('seed-admin-password', {
