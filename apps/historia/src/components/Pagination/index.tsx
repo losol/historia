@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { cn } from '@/utilities/cn';
 
 export const Pagination: React.FC<{
+  /** URL of the list's first page, e.g. `/no/c/artikler`. Later pages are `{basePath}/page/{n}`. */
+  basePath: string;
   className?: string;
   page: number;
   totalPages: number;
@@ -20,7 +22,8 @@ export const Pagination: React.FC<{
           status: (current: number, total: number) => `Side ${current} av ${total}`,
         };
 
-  const { className, page, totalPages } = props;
+  const { basePath, className, page, totalPages } = props;
+  const pageUrl = (n: number) => (n === 1 ? basePath : `${basePath}/page/${n}`);
 
   return (
     <div className={cn('my-12', className)}>
@@ -30,10 +33,10 @@ export const Pagination: React.FC<{
         aria-label={locale === 'en' ? 'Pagination' : 'Sidenavigasjon'}
         labels={labels}
         onPreviousPageClick={() => {
-          if (page > 1) router.push(`/articles/page/${page - 1}`);
+          if (page > 1) router.push(pageUrl(page - 1));
         }}
         onNextPageClick={() => {
-          if (page < totalPages) router.push(`/articles/page/${page + 1}`);
+          if (page < totalPages) router.push(pageUrl(page + 1));
         }}
       />
     </div>

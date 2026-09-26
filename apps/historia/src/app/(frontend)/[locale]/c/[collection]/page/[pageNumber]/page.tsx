@@ -1,95 +1,36 @@
-import configPromise from '@payload-config';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next/types';
-import { getPayload } from 'payload';
-import { CollectionArchive } from '@/components/CollectionArchive';
-import { PageRange } from '@/components/PageRange';
-import { Pagination } from '@/components/Pagination';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
-import PageClient from './page.client';
-
-export const revalidate = 600;
+import { CollectionListing } from '../../CollectionListing';
+import { getOriginalCollectionName } from '../../pageCollections';
 
 type Args = {
   params: Promise<{
+    locale: string;
+    collection: string;
     pageNumber: string;
   }>;
 };
 
 export default async function Page({ params: paramsPromise }: Readonly<Args>) {
-  const { pageNumber } = await paramsPromise;
-  const payload = await getPayload({ config: configPromise });
+  const { locale, collection, pageNumber } = await paramsPromise;
+  const page = Number(pageNumber);
 
-  const sanitizedPageNumber = Number(pageNumber);
+  if (!Number.isInteger(page) || page < 1) notFound();
+  // Page 1 lives at the collection's own URL.
+  if (page === 1) redirect(`/${locale}/c/${collection}`);
 
-  if (!Number.isInteger(sanitizedPageNumber)) notFound();
-
-  const articles = await payload.find({
-    collection: 'articles',
-    depth: 1,
-    limit: 12,
-    page: sanitizedPageNumber,
-    overrideAccess: false,
-  });
-
-  return (
-    <div className="pt-24 pb-24">
-      <PageClient />
-      <div className="container mb-16">
-        <h1>Articles</h1>
-      </div>
-
-      <div className="container mb-8">
-        <PageRange
-          collection="articles"
-          currentPage={articles.page}
-          limit={12}
-          totalDocs={articles.totalDocs}
-        />
-      </div>
-
-      <CollectionArchive docs={articles.docs} relationTo="articles" />
-
-      <div className="container">
-        {articles?.page && articles?.totalPages > 1 && (
-          <Pagination page={articles.page} totalPages={articles.totalPages} />
-        )}
-      </div>
-    </div>
-  );
+  return <CollectionListing collection={collection} locale={locale} page={page} />;
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { pageNumber } = await paramsPromise;
+  const { locale, collection, pageNumber } = await paramsPromise;
+  const originalCollectionName = getOriginalCollectionName(collection, locale);
+  const capitalizedCollection =
+    originalCollectionName.charAt(0).toUpperCase() + originalCollectionName.slice(1);
+
   const website = await getCurrentWebsite();
 
-  const doc = {
-    title: `Articles - Page ${pageNumber || ''}`,
-  };
-
-  return generateMeta({ doc, website });
-}
-
-export async function generateStaticParams() {
-  // Skip static generation during build to avoid database queries
-  // Pages will be generated on-demand at runtime (ISR)
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return [];
-  }
-  const payload = await getPayload({ config: configPromise });
-  const { totalDocs } = await payload.count({
-    collection: 'articles',
-    overrideAccess: false,
-  });
-
-  const totalPages = Math.ceil(totalDocs / 10);
-
-  const pages: { pageNumber: string }[] = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) });
-  }
-
-  return pages;
+  return generateMeta({ doc: { title: `${capitalizedCollection} - ${pageNumber}` }, website });
 }
