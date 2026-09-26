@@ -14,7 +14,7 @@ export const ResourcesBlock: React.FC<ResourcesBlockType> = ({ title, descriptio
       </Panel.Header>
       <Panel.Body>
         {description && <RichText data={description} />}
-        <List variant="markdown">
+        <List as="ul" variant="markdown">
           {items?.map((item: ResourceItem, index: number) => {
             const key = item.id ?? `${item.name ?? 'resource'}-${index}`;
             return (
