@@ -14,7 +14,7 @@
 //   SEED_ADMIN_EMAIL     demo admin, created as the first user on an empty database
 //   SEED_ADMIN_PASSWORD
 
-import { HistoriaClient } from './client.ts';
+import { type Doc, HistoriaClient } from './client.ts';
 import { articles, homePage, website } from './content.ts';
 
 const baseUrl = process.env.HISTORIA_URL ?? 'http://localhost:3100';
@@ -49,13 +49,47 @@ const domain = new URL(baseUrl).host;
 const site = await client.create('websites', { ...website, domains: [domain] });
 console.log(`Created the website "${website.name}" for ${domain}.`);
 
-const home = await client.create('pages', { ...homePage, tenant: site.id, _status: 'published' });
-await client.update('websites', site.id, { homePage: home.id });
-console.log('Created the home page.');
-
-for (const article of articles) {
-  await client.create('articles', { ...article, tenant: site.id, _status: 'published' });
+/**
+ * Creates a document in Norwegian, then adds its English values. The English story
+ * reuses the Norwegian blocks' ids, so the blocks get a translation instead of
+ * being replaced.
+ */
+async function createInBothLocales(
+  collection: string,
+  shared: Record<string, unknown>,
+  localized: { no: Record<string, unknown>; en: { story: object[] } & Record<string, unknown> },
+): Promise<Doc> {
+  const doc = await client.create(collection, { ...shared, ...localized.no });
+  const blocks = (doc.story ?? []) as { id: string }[];
+  await client.update(
+    collection,
+    doc.id,
+    {
+      ...localized.en,
+      // Drafts are enabled, so the update has to say it stays published.
+      _status: shared._status,
+      story: localized.en.story.map((block, index) => ({ ...block, id: blocks[index]?.id })),
+    },
+    'en',
+  );
+  return doc;
 }
-console.log(`Created ${articles.length} articles.`);
+
+const home = await createInBothLocales(
+  'pages',
+  { tenant: site.id, _status: 'published' },
+  homePage,
+);
+await client.update('websites', site.id, { homePage: home.id });
+console.log('Created the home page, in Norwegian and English.');
+
+for (const { publishedAt, no, en } of articles) {
+  await createInBothLocales(
+    'articles',
+    { tenant: site.id, _status: 'published', publishedAt },
+    { no, en },
+  );
+}
+console.log(`Created ${articles.length} articles, in Norwegian and English.`);
 
 console.log(`Done. Open ${baseUrl} or sign in at ${baseUrl}/admin as ${email}.`);

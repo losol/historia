@@ -61,41 +61,76 @@ export const website = {
   summary: 'Demoinnhold laget av seed-skriptet i apphost/seed.',
 };
 
+// Each document comes as a Norwegian version, created first, and the English
+// values of its localized fields, applied as a `?locale=en` update. The story
+// blocks line up by position: the English update reuses the Norwegian blocks'
+// ids and fills in their English text.
+
 export const homePage = {
-  name: 'Forside',
-  title: 'Velkommen til Historia-demoen',
-  slug: 'home',
-  lead: 'Dette nettstedet er fylt med demoinnhold, så du kan se sidetypene og komponentene i bruk.',
-  story: [
-    contentBlock(
-      heading('h2', 'Hva finner du her?'),
-      paragraph(
-        'Innholdet er laget av ',
-        bold('apphost/seed'),
-        ' når Aspire starter mot en tom database. Rediger det gjerne i ',
-        link('admin', '/admin'),
-        '.',
+  no: {
+    name: 'Forside',
+    title: 'Velkommen til Historia-demoen',
+    slug: 'home',
+    lead: 'Dette nettstedet er fylt med demoinnhold, så du kan se sidetypene og komponentene i bruk.',
+    story: [
+      contentBlock(
+        heading('h2', 'Hva finner du her?'),
+        paragraph(
+          'Innholdet er laget av ',
+          bold('apphost/seed'),
+          ' når Aspire starter mot en tom database. Rediger det gjerne i ',
+          link('admin', '/admin'),
+          '.',
+        ),
+        list('bullet', [
+          'Artikler, nok til at listen blar over flere sider',
+          'Riktekst med overskrifter, lister og lenker',
+        ]),
+        heading('h3', 'Slik kommer du i gang'),
+        list('number', [
+          'Logg inn i admin med demobrukeren',
+          'Åpne en artikkel og endre teksten',
+          'Se endringen på nettstedet',
+        ]),
       ),
-      list('bullet', [
-        'Artikler, nok til at listen blar over flere sider',
-        'Riktekst med overskrifter, lister og lenker',
-      ]),
-      heading('h3', 'Slik kommer du i gang'),
-      list('number', [
-        'Logg inn i admin med demobrukeren',
-        'Åpne en artikkel og endre teksten',
-        'Se endringen på nettstedet',
-      ]),
-    ),
-  ],
+    ],
+  },
+  en: {
+    name: 'Home',
+    title: 'Welcome to the Historia demo',
+    slug: 'home',
+    lead: 'This site is filled with demo content, so you can see its page types and components in use.',
+    story: [
+      contentBlock(
+        heading('h2', 'What is here?'),
+        paragraph(
+          'The content is created by ',
+          bold('apphost/seed'),
+          ' when Aspire starts against an empty database. Feel free to edit it in the ',
+          link('admin', '/admin'),
+          '.',
+        ),
+        list('bullet', [
+          'Articles, enough for the list to span several pages',
+          'Rich text with headings, lists and links',
+        ]),
+        heading('h3', 'Getting started'),
+        list('number', [
+          'Sign in to the admin as the demo user',
+          'Open an article and change its text',
+          'See the change on the site',
+        ]),
+      ),
+    ],
+  },
 };
 
 const articleTopics = [
-  'Fyret på odden',
-  'Kystkulturen langs leia',
-  'Fiskeværet om vinteren',
-  'Handelsstedet ved sundet',
-  'Losene og båtene deres',
+  { no: 'Fyret på odden', en: 'The lighthouse on the point' },
+  { no: 'Kystkulturen langs leia', en: 'Coastal culture along the fairway' },
+  { no: 'Fiskeværet om vinteren', en: 'The fishing village in winter' },
+  { no: 'Handelsstedet ved sundet', en: 'The trading post by the sound' },
+  { no: 'Losene og båtene deres', en: 'The pilots and their boats' },
 ];
 
 /** 25 articles: more than the 20 a collection page shows, so paging has a second page. */
@@ -103,21 +138,43 @@ export const articles = Array.from({ length: 25 }, (_, index) => {
   const number = index + 1;
   const topic = articleTopics[index % articleTopics.length];
   return {
-    title: `${topic} (${number})`,
-    slug: `demo-artikkel-${number}`,
-    lead: `Demoartikkel nummer ${number} om ${topic.toLowerCase()}.`,
     // Spread over the last 25 days, newest first, so lists have a stable order.
     publishedAt: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString(),
-    story: [
-      contentBlock(
-        paragraph(`Dette er demoartikkel ${number}. Teksten er bare fyll, laget av seed-skriptet.`),
-        heading('h2', 'Litt bakgrunn'),
-        paragraph(
-          'Artikler kan ha overskrifter, lister og ',
-          link('lenker til andre sider', '/no/c/artikler'),
-          '.',
+    no: {
+      title: `${topic.no} (${number})`,
+      slug: `demo-artikkel-${number}`,
+      lead: `Demoartikkel nummer ${number}: ${topic.no.toLowerCase()}.`,
+      story: [
+        contentBlock(
+          paragraph(
+            `Dette er demoartikkel ${number}. Teksten er bare fyll, laget av seed-skriptet.`,
+          ),
+          heading('h2', 'Litt bakgrunn'),
+          paragraph(
+            'Artikler kan ha overskrifter, lister og ',
+            link('lenker til andre sider', '/no/c/artikler'),
+            '.',
+          ),
         ),
-      ),
-    ],
+      ],
+    },
+    en: {
+      title: `${topic.en} (${number})`,
+      slug: `demo-article-${number}`,
+      lead: `Demo article number ${number}: ${topic.en.toLowerCase()}.`,
+      story: [
+        contentBlock(
+          paragraph(
+            `This is demo article ${number}. The text is filler, created by the seed script.`,
+          ),
+          heading('h2', 'Some background'),
+          paragraph(
+            'Articles can have headings, lists and ',
+            link('links to other pages', '/en/c/articles'),
+            '.',
+          ),
+        ),
+      ],
+    },
   };
 });
