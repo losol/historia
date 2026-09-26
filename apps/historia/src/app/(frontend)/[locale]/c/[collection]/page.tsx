@@ -1,18 +1,13 @@
 import { Logger } from '@eventuras/logger';
-import { Container } from '@eventuras/ratio-ui/layout/Container';
 import configPromise from '@payload-config';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next/types';
 import { type CollectionSlug, getPayload } from 'payload';
-import { CollectionArchive } from '@/components/CollectionArchive';
-import { PageRange } from '@/components/PageRange';
-import { Pagination } from '@/components/Pagination';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
+import { CollectionListing } from './CollectionListing';
 import {
   getLocalizedCollectionName,
   getOriginalCollectionName,
-  type PageCollectionsType,
   pageCollections,
 } from './pageCollections';
 
@@ -28,80 +23,9 @@ type Props = {
   }>;
 };
 
-function isValidCollection(collection: string): collection is PageCollectionsType {
-  return (pageCollections as readonly string[]).includes(collection);
-}
-
 export default async function Page({ params: paramsPromise }: Readonly<Props>) {
-  const payload = await getPayload({ config: configPromise });
   const { locale, collection } = await paramsPromise;
-
-  const originalCollectionName = getOriginalCollectionName(collection, locale);
-  logger.debug({ collection, originalCollectionName, locale }, 'Mapped collection');
-
-  if (!isValidCollection(originalCollectionName)) {
-    logger.info({ collection: originalCollectionName }, 'Invalid collection');
-    notFound();
-  }
-
-  try {
-    const docsPage = await payload.find({
-      collection: originalCollectionName as CollectionSlug,
-      depth: 1,
-      limit: 20,
-      page: 1,
-      overrideAccess: false,
-      select: {
-        title: true,
-        slug: true,
-        resourceId: true,
-      },
-      // exclude shipping products if it is a product listings
-      where:
-        originalCollectionName === 'products'
-          ? {
-              productType: {
-                not_equals: 'shipping',
-              },
-            }
-          : undefined,
-    });
-
-    if (!docsPage.docs?.length) {
-      logger.info({ collection: originalCollectionName }, 'No documents found for collection');
-      notFound();
-    }
-
-    const capitalizedCollection = collection.charAt(0).toUpperCase() + collection.slice(1);
-
-    return (
-      <Container>
-        <h1>{capitalizedCollection}</h1>
-
-        <CollectionArchive
-          // @ts-expect-error
-          docs={docsPage.docs}
-          // @ts-expect-error
-          relationTo={originalCollectionName}
-        />
-
-        {docsPage.totalPages > 1 && (
-          <div className="mb-8">
-            <Pagination page={docsPage.page ?? 1} totalPages={docsPage.totalPages} />
-            <PageRange
-              collection={originalCollectionName}
-              currentPage={docsPage.page}
-              limit={20}
-              totalDocs={docsPage.totalDocs}
-            />
-          </div>
-        )}
-      </Container>
-    );
-  } catch (error) {
-    logger.error({ error, collection: originalCollectionName }, 'Error fetching collection');
-    notFound();
-  }
+  return <CollectionListing collection={collection} locale={locale} page={1} />;
 }
 
 export async function generateMetadata({
