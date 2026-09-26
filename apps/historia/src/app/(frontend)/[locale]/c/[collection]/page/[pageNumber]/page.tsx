@@ -37,9 +37,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     <div className="pt-24 pb-24">
       <PageClient />
       <div className="container mb-16">
-        <div className="prose dark:prose-invert max-w-none prose-p:py-3">
-          <h1>Articles</h1>
-        </div>
+        <h1>Articles</h1>
       </div>
 
       <div className="container mb-8">

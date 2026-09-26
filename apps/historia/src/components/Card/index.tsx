@@ -43,13 +43,11 @@ export const Card: React.FC<{
         )}
 
         <div className="p-4 flex-1">
-          <div className="prose">
-            <h3>
-              <Link className="not-prose" href={href} ref={link.ref}>
-                {'title' in doc ? doc.title : doc.name}
-              </Link>
-            </h3>
-          </div>
+          <h3>
+            <Link href={href} ref={link.ref}>
+              {'title' in doc ? doc.title : doc.name}
+            </Link>
+          </h3>
 
           {doc && 'lead' in doc && doc.lead && <div className="mt-2">{doc.lead}</div>}
         </div>
