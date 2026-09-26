@@ -1,4 +1,5 @@
 import type React from 'react';
+import { SkipLink } from '@eventuras/ratio-ui/core/SkipLink';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { AdminBar } from '@/components/AdminBar';
@@ -37,12 +38,9 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
       </head>
       <body>
         <Providers>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded"
-          >
-            Skip to main content
-          </a>
+          <SkipLink href="#main-content">
+            {locale === 'en' ? 'Skip to main content' : 'Hopp til hovedinnhold'}
+          </SkipLink>
           <div className="flex flex-col min-h-screen">
             <AdminBar
               adminBarProps={{
