@@ -101,4 +101,21 @@ for (const [name, value] of Object.entries(sharedEnvironment)) {
   await historia.withEnvironment(name, value);
 }
 
+// Demo content, so a fresh database shows a working site. It goes through the
+// REST API of the running app and does nothing once a website exists, so it
+// never touches content you have added. See seed/seed.ts. The admin it creates
+// on an empty database signs in with these credentials.
+const seedAdminPassword = await builder.addParameter('seed-admin-password', {
+  value: 'historia',
+  secret: true,
+});
+
+await builder
+  .addExecutable('seed', 'node', '.', ['seed/seed.ts'])
+  .withEnvironment('HISTORIA_URL', historiaUrl)
+  .withEnvironment('SEED_ADMIN_EMAIL', 'admin@historia.local')
+  .withEnvironment('SEED_ADMIN_PASSWORD', seedAdminPassword)
+  // Waits for the process to start; the script itself waits for Payload to answer.
+  .waitFor(historia);
+
 await builder.build().run();

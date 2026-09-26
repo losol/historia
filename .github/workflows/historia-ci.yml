@@ -33,6 +33,11 @@ jobs:
           pnpm --filter @eventuras/vipps typecheck
           pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
 
+      # The demo seed the AppHost runs (apphost/seed). Its own tsconfig, since the
+      # AppHost's needs the SDK modules only the Aspire CLI generates.
+      - name: Typecheck (demo seed)
+        run: pnpm --filter @eventuras/historia-apphost typecheck:seed
+
       - name: Typecheck & test (notitia-templates)
         run: |
           pnpm --filter @eventuras/notitia-templates typecheck
