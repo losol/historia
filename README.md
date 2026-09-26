@@ -53,6 +53,13 @@ aspire run
 | Postgres | `postgres://postgres:historia@localhost:3103/cms` |
 | Dashboard | printed by `aspire run` |
 
+On an empty database the `seed` resource fills in a demo site through the REST
+API: a website for `localhost:3100`, a home page and 25 articles, and a
+system-admin, `admin@historia.local` with password `historia`. It does nothing
+once a website exists, so it never touches content you have added. The script
+lives in `apphost/seed/`, outside the app; it also runs by hand against any
+running Historia with `node apphost/seed/seed.ts` (see the top of `seed.ts`).
+
 The database runs on migrations, as production does, rather than schema push.
 So after changing a collection, create a migration and run the migrations step
 again. `migrate:create` compares the config with the last migration and does
