@@ -63,7 +63,7 @@ VIPPS_CLIENT_ID=<your-client-id>
 VIPPS_CLIENT_SECRET=<your-client-secret>
 VIPPS_SUBSCRIPTION_KEY=<your-subscription-key>
 VIPPS_MERCHANT_SERIAL_NUMBER=<your-msn>
-VIPPS_IS_TEST=true  # Optional, defaults to true
+VIPPS_API_URL=https://apitest.vipps.no  # Optional; https://api.vipps.no for production
 ```
 
 **Output:**

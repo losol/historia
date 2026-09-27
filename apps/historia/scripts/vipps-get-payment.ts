@@ -13,7 +13,7 @@
  *   VIPPS_CLIENT_SECRET
  *   VIPPS_SUBSCRIPTION_KEY
  *   VIPPS_MERCHANT_SERIAL_NUMBER (MSN)
- *   VIPPS_IS_TEST (optional, defaults to true)
+ *   VIPPS_API_URL (optional, defaults to https://apitest.vipps.no)
  */
 
 import { getPaymentDetails } from '@eventuras/vipps/epayment-v1';
@@ -90,8 +90,8 @@ async function main() {
     clientSecret,
     subscriptionKey,
     merchantSerialNumber,
-    apiUrl:
-      process.env.VIPPS_IS_TEST !== 'false' ? 'https://apitest.vipps.no' : 'https://api.vipps.no',
+    // Same variable and default as the app itself (src/lib/vipps/config.ts).
+    apiUrl: process.env.VIPPS_API_URL || 'https://apitest.vipps.no',
     systemName: 'eventuras-historia',
     systemVersion: '1.0.0',
     pluginName: '',

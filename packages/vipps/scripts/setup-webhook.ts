@@ -13,7 +13,7 @@
  *   VIPPS_CLIENT_SECRET
  *   VIPPS_MERCHANT_SERIAL_NUMBER
  *   VIPPS_SUBSCRIPTION_KEY
- *   VIPPS_USE_TEST_MODE (optional, defaults to true)
+ *   VIPPS_API_URL (optional, defaults to https://apitest.vipps.no)
  *
  * You will be prompted for:
  *   - Webhook URL (where Vipps should send notifications)
@@ -23,7 +23,7 @@
 import * as readline from 'node:readline';
 import { registerWebhook } from '../src/webhooks-v1/client';
 import type { WebhookEventType } from '../src/webhooks-v1/types';
-import { useTestMode, vippsConfigFromEnv } from './env';
+import { vippsConfigFromEnv } from './env';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -51,7 +51,7 @@ async function main() {
   console.log('🎯 Vipps Webhook Setup\n');
 
   const config = vippsConfigFromEnv('vipps-webhook-setup');
-  console.log(`📍 Environment: ${useTestMode ? 'TEST' : 'PRODUCTION'}\n`);
+  console.log(`📍 API: ${config.apiUrl}\n`);
 
   // Get webhook URL
   const url = await question('Webhook URL (e.g., https://your-domain.com/api/webhooks/vipps): ');

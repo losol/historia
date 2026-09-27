@@ -13,7 +13,7 @@
  *   VIPPS_CLIENT_SECRET
  *   VIPPS_MERCHANT_SERIAL_NUMBER
  *   VIPPS_SUBSCRIPTION_KEY
- *   VIPPS_USE_TEST_MODE (optional, defaults to true)
+ *   VIPPS_API_URL (optional, defaults to https://apitest.vipps.no)
  */
 
 import { listWebhooks } from '../src/webhooks-v1/client';

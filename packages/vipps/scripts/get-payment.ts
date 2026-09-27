@@ -13,7 +13,7 @@
  *   VIPPS_CLIENT_SECRET
  *   VIPPS_SUBSCRIPTION_KEY
  *   VIPPS_MERCHANT_SERIAL_NUMBER (MSN)
- *   VIPPS_USE_TEST_MODE (optional, defaults to true)
+ *   VIPPS_API_URL (optional, defaults to https://apitest.vipps.no)
  */
 
 import { getPaymentDetails } from '../src/epayment-v1/client.js';
