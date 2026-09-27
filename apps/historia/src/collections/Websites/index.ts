@@ -1,12 +1,12 @@
 import type { CollectionConfig } from 'payload';
-import { Nav } from '@/blocks/Nav/config';
+import { admins } from '@/access/admins';
+import { anyone } from '@/access/anyone';
+import { authenticatedOrFirstWebsite } from '@/access/authenticatedOrFirstWebsite';
 import { name } from '@/fields/name';
 import { metaField } from '@/fields/seo';
 import { summary } from '@/fields/summary';
 import { title } from '@/fields/title';
-import { admins } from '../access/admins';
-import { anyone } from '../access/anyone';
-import { authenticatedOrFirstWebsite } from '../access/authenticatedOrFirstWebsite';
+import { siteSettings } from './siteSettings';
 
 export const Websites: CollectionConfig = {
   slug: 'websites',
@@ -103,29 +103,7 @@ export const Websites: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'siteSettings',
-      label: 'Site Settings',
-      type: 'group',
-      fields: [
-        {
-          name: 'footer',
-          label: 'Footer',
-          type: 'group',
-          fields: [
-            {
-              name: 'navigation',
-              label: 'Footer Navigation',
-              type: 'blocks',
-              blocks: [Nav],
-              admin: {
-                description: 'Navigation for the footer',
-              },
-            },
-          ],
-        },
-      ],
-    },
+    siteSettings,
     metaField,
   ],
 };

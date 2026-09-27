@@ -12,11 +12,13 @@ export interface ThemeToggleProps {
 }
 
 /**
- * ThemeToggle component for Historia
- * Integrates with the Historia theme provider to toggle between light and dark modes
+ * Lets the visitor switch between light and dark. Shown only when the website's
+ * color scheme is `both`.
  */
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, ariaLabel }) => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, switchable } = useTheme();
+
+  if (!switchable) return null;
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);

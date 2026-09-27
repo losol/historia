@@ -5,6 +5,8 @@ import { draftMode } from 'next/headers';
 import { AdminBar } from '@/components/AdminBar';
 import { Footer } from '@/components/Footer/Component';
 import { Header } from '@/Header/Component';
+import { getAppearance, htmlThemeAttributes } from '@/lib/site-settings/appearance';
+import { getCurrentWebsite } from '@/lib/website';
 import { Providers } from '@/providers';
 import { InitTheme } from '@/providers/Theme/InitTheme';
 
@@ -28,16 +30,20 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
   const { isEnabled } = await draftMode();
   const resolvedParams = params ? await params : {};
   const locale = resolvedParams.locale || process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no';
+  // An unknown host throws; the header reports that, so the layout falls back to the defaults.
+  const website = await getCurrentWebsite().catch(() => null);
+  const appearance = getAppearance(website);
+  const colorSchemeSwitchable = appearance.colorScheme === 'both';
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning {...htmlThemeAttributes(appearance)}>
       <head>
-        <InitTheme />
+        {colorSchemeSwitchable && <InitTheme />}
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
-        <Providers>
+        <Providers colorSchemeSwitchable={colorSchemeSwitchable}>
           <SkipLink href="#main-content">
             {locale === 'en' ? 'Skip to main content' : 'Hopp til hovedinnhold'}
           </SkipLink>

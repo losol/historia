@@ -6,9 +6,11 @@ import { ToastProvider } from './ToastProvider';
 
 export const Providers: React.FC<{
   children: React.ReactNode;
-}> = ({ children }) => {
+  /** Whether visitors may switch between light and dark. */
+  colorSchemeSwitchable: boolean;
+}> = ({ children, colorSchemeSwitchable }) => {
   return (
-    <ThemeProvider>
+    <ThemeProvider switchable={colorSchemeSwitchable}>
       <HeaderThemeProvider>
         <ToastProvider>
           <CartProvider>{children}</CartProvider>

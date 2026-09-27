@@ -1,7 +1,12 @@
 import type React from 'react';
 import Script from 'next/script';
-import { defaultTheme, themeLocalStorageKey } from '../ThemeSelector/types';
+import { defaultTheme, themeLocalStorageKey } from '../shared';
 
+/**
+ * Sets `data-color-scheme` on `<html>` before first paint, from the visitor's saved
+ * choice or their system setting. Only for websites whose color scheme is `both`;
+ * a fixed light or dark is rendered on `<html>` by the server.
+ */
 export const InitTheme: React.FC = () => {
   return (
     <Script
@@ -38,7 +43,7 @@ export const InitTheme: React.FC = () => {
       }
     }
 
-    document.documentElement.setAttribute('data-theme', themeToSet)
+    document.documentElement.setAttribute('data-color-scheme', themeToSet)
   })();
   `,
       }}

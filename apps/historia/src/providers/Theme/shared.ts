@@ -1,8 +1,9 @@
 import type { Theme } from './types';
 
-export const themeLocalStorageKey = 'payload-theme';
+// Not `payload-theme`: that is the admin panel's, and the two should not follow each other.
+export const themeLocalStorageKey = 'historia-color-scheme';
 
-export const defaultTheme = 'light';
+export const defaultTheme: Theme = 'light';
 
 export const getImplicitPreference = (): Theme | null => {
   const mediaQuery = '(prefers-color-scheme: dark)';
