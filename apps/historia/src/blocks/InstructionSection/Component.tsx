@@ -5,16 +5,16 @@ import { RenderBlocks } from '@/blocks/RenderBlocks';
 import RichText from '@/components/RichText';
 import type { InstructionSectionBlock as InstructionSectionBlockProps } from '@/payload-types';
 
-export const InstructionSectionBlock: React.FC<InstructionSectionBlockProps> = ({
-  title,
-  description,
-  sectionContent,
-}) => {
+export const InstructionSectionBlock: React.FC<
+  InstructionSectionBlockProps & { locale: string }
+> = ({ title, description, sectionContent, locale }) => {
   return (
     <Section>
       <Heading as="h2">{title}</Heading>
       {description && <RichText data={description} />}
-      {sectionContent && sectionContent.length > 0 && <RenderBlocks blocks={sectionContent} />}
+      {sectionContent && sectionContent.length > 0 && (
+        <RenderBlocks blocks={sectionContent} locale={locale} />
+      )}
     </Section>
   );
 };
