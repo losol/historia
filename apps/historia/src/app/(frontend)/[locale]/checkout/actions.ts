@@ -19,12 +19,11 @@ import { headers } from 'next/headers';
 import { getPayload } from 'payload';
 import { isSiteLocale } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import { setCartPaymentReference } from '@/app/actions/cart';
-import { appConfig } from '@/config.server';
 import { saveCartToDatabase } from '@/lib/cart/saveCartToDatabase';
 import { findPurchasableProducts, isValidQuantity } from '@/lib/commerce/cartValidation';
 import { SHIPPING_OPTIONS } from '@/lib/shipping/options';
 import { getVippsConfig } from '@/lib/vipps/config';
-import { getCurrentWebsiteId } from '@/lib/website';
+import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import { getMeUser } from '@/utilities/getMeUser';
 
 const logger = Logger.create({
@@ -297,13 +296,22 @@ export async function createVippsPayment({
     // Total amount without shipping (Vipps will add shipping cost)
     const totalAmount = cart.totalIncVat;
 
-    // Get current host for dynamic callback URL
-    // This ensures the callback returns to the same domain where payment was initiated
+    // Return to the domain the payment was started on. The host is read the way
+    // getCurrentWebsite reads it, and used only once a website is configured for it,
+    // so Vipps never redirects to a domain from a forged Host header.
     const headersList = await headers();
-    const host = headersList.get('host');
+    const host = headersList.get('x-forwarded-host') || headersList.get('host');
+    const website = await getCurrentWebsite();
+    if (!host || !website) {
+      logger.error(
+        { host, cartId, reference },
+        'Checkout failed: no configured website for this host - cannot build return URL',
+      );
+      return actionError('Kunne ikke starte betaling. Prøv igjen om litt.');
+    }
     const forwardedProto = headersList.get('x-forwarded-proto');
     const protocol = forwardedProto || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
-    const baseUrl = host ? `${protocol}://${host}` : appConfig.env.NEXT_PUBLIC_CMS_URL;
+    const baseUrl = `${protocol}://${host}`;
 
     logger.info({ host, baseUrl, reference }, 'Building payment with dynamic callback URL');
 
