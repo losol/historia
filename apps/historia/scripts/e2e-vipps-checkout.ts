@@ -66,7 +66,8 @@ const { values: args } = parseArgs({
 const baseUrl = (args['base-url'] ?? process.env.E2E_BASE_URL ?? '').replace(/\/$/, '');
 const locale = args.locale ?? 'no';
 const scenario = args.scenario === 'abort' ? 'abort' : 'approve';
-const approveTimeoutMs = Number(args['approve-timeout']) * 1000;
+const approveTimeoutSeconds = Number(args['approve-timeout']);
+const approveTimeoutMs = approveTimeoutSeconds * 1000;
 
 function step(message: string) {
   console.log(`\n▶ ${message}`);
@@ -95,9 +96,15 @@ function vippsConfig(): VippsConfig {
   }
   const apiUrl = process.env.VIPPS_API_URL || 'https://apitest.vipps.no';
   // Force approve and test payments only exist in the test environment; refuse to
-  // touch production even by mistake.
-  if (!apiUrl.includes('apitest')) {
-    fail(`VIPPS_API_URL must be the Vipps test environment, got ${apiUrl}.`);
+  // touch production even by mistake. localhost is for a local fake of the API.
+  let hostname = '';
+  try {
+    hostname = new URL(apiUrl).hostname;
+  } catch {
+    fail(`VIPPS_API_URL is not a URL: ${apiUrl}.`);
+  }
+  if (hostname !== 'apitest.vipps.no' && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    fail(`VIPPS_API_URL must be the Vipps test environment (apitest.vipps.no), got ${apiUrl}.`);
   }
   return {
     apiUrl,
@@ -245,6 +252,9 @@ async function main() {
   let reference: string | undefined;
   try {
     if (!baseUrl) fail('Pass --base-url (or set E2E_BASE_URL) to the site to test.');
+    if (!Number.isFinite(approveTimeoutSeconds) || approveTimeoutSeconds <= 0) {
+      fail(`--approve-timeout must be a number of seconds, got ${args['approve-timeout']}.`);
+    }
     const config = vippsConfig();
     console.log(`Vipps checkout e2e: ${scenario} against ${baseUrl}`);
 
@@ -273,6 +283,9 @@ async function main() {
       step('Cancel the payment before it is approved');
       await cancelPayment(config, reference);
       const state = await waitForState(config, reference, (s) => s !== 'CREATED', 30_000);
+      if (!['ABORTED', 'EXPIRED', 'TERMINATED'].includes(state)) {
+        fail(`Payment is ${state || 'unknown'} after cancelling, not ended.`);
+      }
       ok(`Payment is ${state} in Vipps`);
       await returnToSite(
         page,

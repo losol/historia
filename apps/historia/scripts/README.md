@@ -4,7 +4,7 @@ Utility scripts for Historia CMS development and operations.
 
 ## Vipps Payment Tools
 
-## Vipps Checkout E2E Test
+### Vipps Checkout E2E Test
 
 Drives a real browser through a running site (staging) and the Vipps **test**
 environment:
