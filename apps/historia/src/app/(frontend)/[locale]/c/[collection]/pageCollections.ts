@@ -51,11 +51,16 @@ export const getLocalizedCollectionName = (collection: string, locale: string): 
 
 export const getOriginalCollectionName = (localizedCollection: string, locale: string): string => {
   const translations = collectionTranslations[locale];
+  if (!translations) return localizedCollection;
   return (
     Object.keys(translations).find((key) => translations[key] === localizedCollection) ??
     localizedCollection
   );
 };
+
+/** Whether the site is configured for this locale (NEXT_PUBLIC_CMS_LOCALES). */
+export const isSiteLocale = (locale: string): boolean =>
+  (process.env.NEXT_PUBLIC_CMS_LOCALES?.split(',') || ['en']).includes(locale);
 
 /**
  * Resolves a collection name from a URL to the page collection it names, or null. Tries
@@ -66,6 +71,7 @@ export const resolvePageCollection = (
   localizedCollection: string,
   locale: string,
 ): ValidCollection | null => {
+  if (!isSiteLocale(locale)) return null;
   const candidates = [
     getOriginalCollectionName(localizedCollection, locale),
     ...Object.keys(collectionTranslations).map((other) =>
