@@ -9,6 +9,7 @@
     "build": "cross-env next build",
     "dev": "next dev --port 3100",
     "dev:prod": "rm -rf .next && pnpm run build && pnpm run start",
+    "e2e:vipps": "tsx scripts/e2e-vipps-checkout.ts",
     "generate:config-types": "tsx scripts/generate-config-types.ts",
     "generate:types": "payload generate:types",
     "lint": "biome check .",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "@types/node": "^24.12.0",
     "@types/react": "^19.3.0",
+    "playwright-core": "1.56.1",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   },

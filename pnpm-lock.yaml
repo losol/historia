@@ -178,6 +178,9 @@ importers:
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
+      playwright-core:
+        specifier: 1.56.1
+        version: 1.56.1
       tsx:
         specifier: ^4.23.13
         version: 4.23.13
@@ -4801,6 +4804,11 @@ packages:
   pkce-challenge@5.0.1:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
+
+  playwright-core@1.56.1:
+    resolution: {integrity: sha512-hutraynyn31F+Bifme+Ps9Vq59hKuUCz7H1kDOcBs+2oGguKkWTU50bBWrtz34OUWmIwpBTWDxaRPXrIXkgvmQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
@@ -10214,6 +10222,8 @@ snapshots:
       thread-stream: 3.2.0
 
   pkce-challenge@5.0.1: {}
+
+  playwright-core@1.56.1: {}
 
   pluralize@8.0.0: {}
 
