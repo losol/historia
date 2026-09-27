@@ -574,7 +574,18 @@ export async function createOrderFromPayment({
     }
 
     // Get the current website/tenant ID
-    const websiteId = cartTenantId ?? (await getCurrentWebsiteId().catch(() => null));
+    let websiteId = cartTenantId;
+    if (!websiteId) {
+      // Carts saved before they carried a tenant: fall back to the request's host.
+      logger.warn({ paymentReference }, 'Cart has no tenant - resolving website from host');
+      websiteId = await getCurrentWebsiteId().catch((error: unknown) => {
+        logger.error(
+          { error, paymentReference },
+          'Could not resolve website from host for order creation',
+        );
+        return null;
+      });
+    }
     if (!websiteId) {
       logger.error({ paymentReference }, 'Cannot create order without website/tenant');
       return actionError('Website configuration not found');
