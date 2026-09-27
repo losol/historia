@@ -1,7 +1,6 @@
 'use client';
 
 import type React from 'react';
-import { useEffect } from 'react';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Lead } from '@eventuras/ratio-ui/core/Lead';
 import { Box } from '@eventuras/ratio-ui/layout/Box';
@@ -10,7 +9,6 @@ import { Image as UIImage } from '@eventuras/ratio-ui-next/Image';
 import { Contributors as ContributersComponent } from '@/components/Contributors';
 import RichText from '@/components/RichText';
 import type { Contributors, Image } from '@/payload-types';
-import { useHeaderTheme } from '@/providers/HeaderTheme';
 import { getImageProps } from '@/utilities/image';
 
 interface HeroProps {
@@ -23,12 +21,6 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ title, lead, image, contributors, publishedAt }) => {
-  const { setHeaderTheme } = useHeaderTheme();
-
-  useEffect(() => {
-    setHeaderTheme('dark');
-  }, [setHeaderTheme]);
-
   const imageProps = getImageProps(image, 'landscape');
 
   return (

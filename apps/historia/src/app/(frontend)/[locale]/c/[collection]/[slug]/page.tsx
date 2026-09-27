@@ -25,7 +25,6 @@ import {
   pageCollections,
   resolvePageCollection,
 } from '../pageCollections';
-import PageClient from './page.client';
 
 const logger = Logger.create({
   namespace: 'historia:pages',
@@ -173,8 +172,6 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
   return (
     <Container>
       <Story as="article" className="px-3">
-        <PageClient />
-
         <PayloadRedirects
           disableNotFound
           url={`/${locale}/c/${localizedCollectionName}/${combinedSlug}`}
