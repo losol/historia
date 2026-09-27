@@ -38,9 +38,10 @@ const nextConfig = {
   },
 
   images: {
-    // Next 16 refuses to optimize images from local addresses. In development the
-    // media are served from localhost itself, so allow it there, never in production.
-    dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
+    // Next 16 refuses to optimize images from local addresses, a guard against SSRF.
+    // In `next dev` the media are served from localhost itself, so allow it there
+    // and nowhere else: not in production, test or any other environment.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
     remotePatterns: [
       ...allowedImageDomains.map((hostname) => ({
         protocol: 'https',
