@@ -135,6 +135,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/historia/src/migrations ./ap
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 RUN mkdir -p ./apps/historia/.next/server && chown -R nextjs:nodejs ./apps/historia/.next
 
+# What /api/health reports, so a deploy can check which build is serving. Set this
+# late, after the copies: a new commit changes it, and everything above stays cached.
+ARG HISTORIA_VERSION
+ARG HISTORIA_REVISION
+ENV HISTORIA_VERSION=${HISTORIA_VERSION}
+ENV HISTORIA_REVISION=${HISTORIA_REVISION}
+
 USER nextjs
 
 EXPOSE 3000
