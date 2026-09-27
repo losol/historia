@@ -1,8 +1,8 @@
-'use server';
-
 import crypto from 'node:crypto';
 import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
+
+// Not a server action: helpers for server code that logs with the session id.
 
 const logger = Logger.create({
   namespace: 'historia:session',

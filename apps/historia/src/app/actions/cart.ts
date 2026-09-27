@@ -10,7 +10,7 @@ import { createSession, getCurrentSession, setSessionCookie } from '@eventuras/f
 import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
-import type { Cart, CartItem, CustomerInfo, SessionData } from '@/lib/cart/types';
+import type { Cart, CartItem, SessionData } from '@/lib/cart/types';
 import {
   findPurchasableProducts,
   isValidProductId,
@@ -379,119 +379,5 @@ export async function clearCartAfterPayment(
   } catch (error) {
     logger.error({ error, reference }, 'Error clearing cart after payment');
     return actionError('Failed to clear cart');
-  }
-}
-
-/**
- * Set the payment reference in the cart session
- * Called when initiating Vipps payment to link cart with payment
- * SECURITY: Adds reference to encrypted session for access control
- */
-export async function setCartPaymentReference(
-  reference: string,
-): Promise<ServerActionResult<void>> {
-  try {
-    logger.info({ reference }, 'Setting payment reference in cart');
-
-    const session = await getCurrentSession();
-    const existingCart = session?.data?.cart;
-
-    if (!existingCart?.items || existingCart.items.length === 0) {
-      return actionError('Cart is empty');
-    }
-
-    // Get existing payment references from session
-    const existingReferences = session?.data?.paymentReferences || [];
-
-    // Add new reference if not already present
-    const paymentReferences = existingReferences.includes(reference)
-      ? existingReferences
-      : [...existingReferences, reference];
-
-    const updatedCart: Cart = {
-      ...existingCart,
-      paymentReference: reference,
-    };
-
-    const updatedSession: Session<SessionData> = {
-      ...session,
-      data: {
-        ...session?.data,
-        cart: updatedCart,
-        paymentReferences,
-      },
-    };
-
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
-
-    logger.info(
-      { reference, totalReferences: paymentReferences.length },
-      'Payment reference set and added to session',
-    );
-    return actionSuccess(undefined);
-  } catch (error) {
-    logger.error({ error, reference }, 'Error setting payment reference');
-    return actionError('Failed to set payment reference');
-  }
-}
-
-/**
- * Get cart item count for display purposes
- */
-export async function getCartItemCount(): Promise<number> {
-  try {
-    const cart = await getCart();
-    return cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
-  } catch (error) {
-    logger.error({ error }, 'Error getting cart item count');
-    return 0;
-  }
-}
-
-/**
- * Update customer information in cart
- * Called when customer_information_changed event fires in Vipps Checkout
- */
-export async function updateCartCustomerInfo(
-  customerInfo: CustomerInfo,
-): Promise<ServerActionResult<Cart>> {
-  try {
-    logger.info({ customerInfo }, 'Updating customer information in cart');
-
-    const session = await getCurrentSession();
-    const existingCart = session?.data?.cart;
-
-    if (!existingCart?.items || existingCart.items.length === 0) {
-      return actionError('Cart is empty');
-    }
-
-    const updatedCart: Cart = {
-      ...existingCart,
-      customerInfo,
-    };
-
-    const updatedSession: Session<SessionData> = {
-      ...session,
-      data: {
-        ...session?.data,
-        cart: updatedCart,
-      },
-    };
-
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
-
-    logger.info(
-      {
-        hasEmail: !!customerInfo.email,
-        hasName: !!(customerInfo.firstName || customerInfo.lastName),
-      },
-      'Customer information updated successfully',
-    );
-    return actionSuccess(updatedCart);
-  } catch (error) {
-    logger.error({ error }, 'Error updating customer information');
-    return actionError('Failed to update customer information');
   }
 }

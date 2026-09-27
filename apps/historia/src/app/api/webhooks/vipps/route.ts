@@ -17,6 +17,7 @@ import {
   canTransitionTransaction,
   type TransactionStatus,
 } from '@/lib/commerce/orderStatusRules';
+import { maskEmail } from '@/lib/observability/maskEmail';
 import { reportCritical } from '@/lib/observability/reportCritical';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
@@ -748,7 +749,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         logger.info(
           {
             userId: customerId,
-            email: paymentDetails.userDetails.email,
+            email: maskEmail(paymentDetails.userDetails.email),
             reference: payload.reference,
           },
           'Updated logged-in user with Vipps data',
@@ -782,7 +783,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
             logger.info(
               {
                 userId: customerId,
-                email: paymentDetails.userDetails.email,
+                email: maskEmail(paymentDetails.userDetails.email),
                 reference: payload.reference,
               },
               'Found and updated existing user from Vipps email',
@@ -792,7 +793,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           logger.warn(
             {
               error,
-              email: paymentDetails.userDetails?.email,
+              email: maskEmail(paymentDetails.userDetails?.email),
               reference: payload.reference,
             },
             'Failed to lookup user by email from Vipps userDetails',
@@ -882,12 +883,11 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
     );
 
     try {
-      // Import createOrderFromPayment from checkout actions
       const { createOrderFromPayment } = await import(
-        '@/app/(frontend)/[locale]/checkout/vipps/actions'
+        '@/app/(frontend)/[locale]/checkout/vipps/createOrderFromPayment'
       );
       const { createOrderAutoCreatedEvent } = await import(
-        '@/app/(frontend)/[locale]/checkout/vipps/businessEvents'
+        '@/app/(frontend)/[locale]/checkout/vipps/orderEvents'
       );
 
       // Attempt to create order from payment

@@ -1,6 +1,7 @@
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
 import type { CollectionAfterChangeHook } from 'payload';
+import { maskEmail } from '@/lib/observability/maskEmail';
 import { formatPhoneForDisplay } from '@/lib/utils/formatPhone';
 import type { Order, Product, User, Website } from '@/payload-types';
 
@@ -221,7 +222,7 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
     });
 
     logger.info(
-      { orderId: doc.id, email: doc.userEmail, templateType },
+      { orderId: doc.id, email: maskEmail(doc.userEmail), templateType },
       `${shouldSendOrderReceived ? 'Order received' : 'Order confirmation'} email sent successfully`,
     );
 
@@ -279,7 +280,7 @@ export const sendOrderStatus: CollectionAfterChangeHook<Order> = async ({
       {
         error,
         orderId: doc.id,
-        email: doc.userEmail,
+        email: maskEmail(doc.userEmail),
       },
       'Failed to send order status email',
     );
