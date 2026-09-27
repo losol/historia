@@ -193,7 +193,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
         <StoryHeader>
           <Hero title={title} image={image} />
         </StoryHeader>
-        {story && story.length > 0 && <RenderBlocks blocks={story} />}
+        {story && story.length > 0 && <RenderBlocks blocks={story} locale={locale} />}
       </Story>
     </>
   );

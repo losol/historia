@@ -33,8 +33,10 @@ type Block = {
 
 export const RenderBlocks: React.FC<{
   blocks: Block[];
+  /** The page's locale, for blocks that fetch or label content themselves. */
+  locale: string;
 }> = (props) => {
-  const { blocks } = props;
+  const { blocks, locale } = props;
 
   if (blocks && blocks.length > 0) {
     return (
@@ -48,7 +50,7 @@ export const RenderBlocks: React.FC<{
             if (BlockComponent) {
               return (
                 <div className="my-8" key={block.id}>
-                  <BlockComponent {...block} disableInnerContainer={true} />
+                  <BlockComponent {...block} locale={locale} disableInnerContainer={true} />
                 </div>
               );
             }

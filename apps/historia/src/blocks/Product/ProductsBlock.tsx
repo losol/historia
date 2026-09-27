@@ -12,8 +12,8 @@ import { Stack } from '@eventuras/ratio-ui/layout/Stack';
 import { useToast } from '@eventuras/ratio-ui/toast';
 import { Link } from '@eventuras/ratio-ui-next';
 import { useRouter } from 'next/navigation';
+import { getDocUrl } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import RichText from '@/components/RichText';
-import { useLocale } from '@/hooks/useLocale';
 import { useSessionCart } from '@/lib/cart/use-session-cart';
 import { fromMinorUnits } from '@/lib/price';
 import type { Product as ProductType } from '@/payload-types';
@@ -25,16 +25,37 @@ const logger = Logger.create({
 });
 
 interface ProductBlockProps {
+  locale: string;
   products?: (string | ProductType)[];
   showImage?: boolean;
 }
+
+const labels = {
+  en: {
+    readMore: 'Read more',
+    order: 'Order',
+    adding: 'Adding...',
+    added: 'Product added to cart!',
+    failed: 'Failed to add product to cart',
+    unexpected: 'An unexpected error occurred',
+  },
+  no: {
+    readMore: 'Les mer',
+    order: 'Bestill',
+    adding: 'Legger til...',
+    added: 'Produktet er lagt i handlekurven!',
+    failed: 'Kunne ikke legge produktet i handlekurven',
+    unexpected: 'Det oppstod en uventet feil',
+  },
+};
 
 export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
   const router = useRouter();
   const toast = useToast();
   const { addToCart } = useSessionCart();
   const [addingProductId, setAddingProductId] = React.useState<string | null>(null);
-  const locale = useLocale();
+  const { locale } = props;
+  const t = locale === 'en' ? labels.en : labels.no;
 
   if (!props?.products || !Array.isArray(props.products) || props.products.length === 0) {
     logger.warn({ props }, 'No products provided or invalid products array');
@@ -57,7 +78,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
   const handleOrder = async (product: ProductType) => {
     if (!product.id) {
       logger.error({ product }, 'Product ID is missing');
-      toast.error('Unable to add product to cart');
+      toast.error(t.failed);
       return;
     }
 
@@ -72,7 +93,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
           { productId: product.id, cartItemCount: result.data.items.length },
           'Product added to cart successfully',
         );
-        toast.success('Product added to cart!');
+        toast.success(t.added);
 
         // Navigate to checkout page with locale
         router.push(`/${locale}/checkout`);
@@ -81,11 +102,11 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
           { error: result.error, productId: product.id },
           'Failed to add product to cart',
         );
-        toast.error(result.error?.message || 'Failed to add product to cart');
+        toast.error(result.error?.message || t.failed);
       }
     } catch (error) {
       logger.error({ error, productId: product.id }, 'Error adding product to cart');
-      toast.error('An unexpected error occurred');
+      toast.error(t.unexpected);
     } finally {
       setAddingProductId(null);
     }
@@ -130,8 +151,15 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
               {/* Action Buttons */}
               <div className="mt-6 flex flex-col gap-3">
                 {product.slug && product.resourceId && (
-                  <Link href={`/${locale}/c/produkter/${product.slug}--${product.resourceId}`}>
-                    Les mer
+                  <Link
+                    href={getDocUrl({
+                      locale,
+                      collection: 'products',
+                      resourceId: product.resourceId,
+                      slug: product.slug,
+                    })}
+                  >
+                    {t.readMore}
                   </Link>
                 )}
                 <Button
@@ -141,7 +169,7 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
                   block
                   className="px-6 py-3"
                 >
-                  {isAdding ? 'Legger til...' : 'Bestill'}
+                  {isAdding ? t.adding : t.order}
                 </Button>
               </div>
             </div>

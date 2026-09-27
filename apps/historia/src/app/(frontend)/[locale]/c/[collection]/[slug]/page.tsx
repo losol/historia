@@ -207,7 +207,9 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
           {isProduct && <ProductActions product={document as Product} locale={locale} />}
 
           {'content' in document && document.content ? <RichText data={document.content} /> : null}
-          {'story' in document && document.story ? <RenderBlocks blocks={document.story} /> : null}
+          {'story' in document && document.story ? (
+            <RenderBlocks blocks={document.story} locale={locale} />
+          ) : null}
         </StoryBody>
       </Story>
     </Container>

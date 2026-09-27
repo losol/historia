@@ -8,10 +8,11 @@ import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types';
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string;
+    locale: string;
     showImages?: boolean;
   }
 > = async (props) => {
-  const { id, description, limit: limitFromProps, relationTo, showImages, topics } = props;
+  const { id, description, limit: limitFromProps, locale, relationTo, showImages, topics } = props;
 
   const limit = limitFromProps || 5;
 
@@ -28,6 +29,9 @@ export const ArchiveBlock: React.FC<
       collection: relationTo,
       depth: 1,
       limit,
+      // Titles and slugs are localized; without this the default locale's are listed.
+      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+      locale,
       where: {
         ...(flattenedTopics &&
           flattenedTopics.length > 0 && {
