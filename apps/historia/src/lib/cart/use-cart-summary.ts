@@ -46,6 +46,10 @@ export function useCartSummary(items: CartItem[], enabled = true) {
       return;
     }
 
+    // Only matters while there is no summary yet: consumers keep showing the last
+    // one while a new one is computed.
+    setLoading(true);
+
     async function load() {
       try {
         const result = await calculateCart(items);
