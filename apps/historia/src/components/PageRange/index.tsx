@@ -1,59 +1,24 @@
 import type React from 'react';
 
-const defaultLabels = {
-  plural: 'Docs',
-  singular: 'Doc',
-};
-
-const defaultCollectionLabels: Record<string, { plural: string; singular: string }> = {
-  articles: {
-    plural: 'Articles',
-    singular: 'Article',
-  },
-};
-
+/** "Showing 1 - 20 of 25 articles", in the page's language. */
 export const PageRange: React.FC<{
   className?: string;
-  collection?: string;
-  collectionLabels?: {
-    plural?: string;
-    singular?: string;
-  };
+  locale: string;
+  /** What is counted, in the page's language and in plural (e.g. `artikler`). */
+  label: string;
   currentPage?: number;
-  limit?: number;
-  totalDocs?: number;
-}> = (props) => {
-  const {
-    className,
-    collection,
-    collectionLabels: collectionLabelsFromProps,
-    currentPage,
-    limit,
-    totalDocs,
-  } = props;
-
-  let indexStart = (currentPage ? currentPage - 1 : 1) * (limit || 1) + 1;
-  if (totalDocs && indexStart > totalDocs) indexStart = 0;
-
-  let indexEnd = (currentPage || 1) * (limit || 1);
-  if (totalDocs && indexEnd > totalDocs) indexEnd = totalDocs;
-
-  const { plural, singular } =
-    collectionLabelsFromProps ||
-    (collection && defaultCollectionLabels[collection]
-      ? defaultCollectionLabels[collection]
-      : defaultLabels) ||
-    defaultLabels;
-
-  const rangeEnd = indexStart > 0 ? ` - ${indexEnd}` : '';
-  const labelText = totalDocs && totalDocs > 1 ? plural : singular;
+  limit: number;
+  totalDocs: number;
+}> = ({ className, locale, label, currentPage = 1, limit, totalDocs }) => {
+  const indexStart = Math.min((currentPage - 1) * limit + 1, totalDocs);
+  const indexEnd = Math.min(currentPage * limit, totalDocs);
+  const range = indexStart === indexEnd ? `${indexStart}` : `${indexStart} - ${indexEnd}`;
 
   return (
     <div className={[className, 'font-semibold'].filter(Boolean).join(' ')}>
-      {(typeof totalDocs === 'undefined' || totalDocs === 0) && 'Search produced no results.'}
-      {typeof totalDocs !== 'undefined' &&
-        totalDocs > 0 &&
-        `Showing ${indexStart}${rangeEnd} of ${totalDocs} ${labelText}`}
+      {locale === 'en'
+        ? `Showing ${range} of ${totalDocs} ${label}`
+        : `Viser ${range} av ${totalDocs} ${label}`}
     </div>
   );
 };

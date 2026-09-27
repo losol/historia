@@ -59,10 +59,14 @@ export async function CollectionListing({
       limit: PAGE_SIZE,
       page,
       overrideAccess: false,
+      // What the cards show. Persons and organizations have a name instead of a title.
       select: {
         title: true,
+        name: true,
+        lead: true,
         slug: true,
         resourceId: true,
+        image: { media: true },
       },
       // exclude shipping products if it is a product listings
       where:
@@ -101,7 +105,8 @@ export async function CollectionListing({
               totalPages={docsPage.totalPages}
             />
             <PageRange
-              collection={originalCollectionName}
+              locale={locale}
+              label={collection}
               currentPage={docsPage.page}
               limit={PAGE_SIZE}
               totalDocs={docsPage.totalDocs}
