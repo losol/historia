@@ -127,8 +127,10 @@ export async function GET(
             // This handles cases where webhook is not configured/arrives late
             if (pollCount >= 3) {
               logger.info(
-                { reference, pollCount },
-                'Trying Vipps API fallback after no transaction found',
+                { reference, pollCount, transactionStatus: pendingTransaction?.status ?? null },
+                pendingTransaction
+                  ? 'Trying Vipps API fallback: transaction still pending'
+                  : 'Trying Vipps API fallback: no transaction found',
               );
 
               try {
