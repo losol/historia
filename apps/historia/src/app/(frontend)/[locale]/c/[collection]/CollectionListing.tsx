@@ -50,6 +50,9 @@ export async function CollectionListing({
   try {
     const docsPage = await payload.find({
       collection: originalCollectionName as CollectionSlug,
+      // Titles and slugs are localized; without this the default locale's are listed.
+      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+      locale,
       depth: 1,
       limit: PAGE_SIZE,
       page,

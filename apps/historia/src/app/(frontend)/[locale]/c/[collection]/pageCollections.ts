@@ -58,6 +58,25 @@ export const getOriginalCollectionName = (localizedCollection: string, locale: s
 };
 
 /**
+ * Resolves a collection name from a URL to the page collection it names, or null. Tries
+ * the URL's locale first, then the others, so a link using another locale's name
+ * (`/en/c/artikler/…`) still finds `articles` and can be redirected.
+ */
+export const resolvePageCollection = (
+  localizedCollection: string,
+  locale: string,
+): ValidCollection | null => {
+  const candidates = [
+    getOriginalCollectionName(localizedCollection, locale),
+    ...Object.keys(collectionTranslations).map((other) =>
+      getOriginalCollectionName(localizedCollection, other),
+    ),
+  ];
+  const found = candidates.find((name) => (pageCollections as readonly string[]).includes(name));
+  return (found as ValidCollection | undefined) ?? null;
+};
+
+/**
  * Generates a localized URL for a given collection, resourceId, and slug.
  * Format: /{locale}/c/{collection}/{slug}--{resourceId}
  * Example: /no/c/artikler/god-artikkel--6abvh9
