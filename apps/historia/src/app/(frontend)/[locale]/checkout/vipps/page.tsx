@@ -8,6 +8,7 @@ import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { Link } from '@eventuras/ratio-ui-next';
 import { checkExistingOrder, processPaymentAndCreateOrder } from './actions';
+import { ClearCartAfterPayment } from './ClearCartAfterPayment';
 import VippsCheckoutPage from './page.client';
 
 const logger = Logger.create({
@@ -75,6 +76,7 @@ export default async function VippsCheckoutPageWrapper({
       return (
         <Container paddingX="sm" paddingY="xl">
           <div className="mx-auto max-w-2xl">
+            <ClearCartAfterPayment reference={reference} />
             <Card>
               <Heading as="h1" marginBottom="xs">
                 Takk for din bestilling!
@@ -114,6 +116,7 @@ export default async function VippsCheckoutPageWrapper({
       return (
         <Container paddingX="sm" paddingY="xl">
           <div className="mx-auto max-w-2xl">
+            <ClearCartAfterPayment reference={reference} />
             <Card>
               <Heading as="h1" marginBottom="xs">
                 Takk for din bestilling!

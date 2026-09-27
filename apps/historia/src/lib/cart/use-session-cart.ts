@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Logger } from '@eventuras/logger';
 import {
   addToCart as addToCartAction,
   clearCart as clearCartAction,
+  clearCartAfterPayment as clearCartAfterPaymentAction,
   getCart as getCartAction,
   removeFromCart as removeFromCartAction,
   updateCartItem as updateCartItemAction,
@@ -107,6 +108,20 @@ export function useSessionCart() {
     return result;
   };
 
+  // Stable, so a page can run it from an effect once its order is confirmed.
+  const clearCartAfterPayment = useCallback(async (reference: string) => {
+    const result = await clearCartAfterPaymentAction(reference);
+    if (result.success && result.data.cleared) {
+      setCart(null);
+    } else if (!result.success) {
+      logger.error(
+        { errorMessage: result.error?.message, reference },
+        'Failed to clear cart after payment',
+      );
+    }
+    return result;
+  }, []);
+
   const refreshCart = async () => {
     try {
       const sessionCart = await getCartAction();
@@ -129,6 +144,7 @@ export function useSessionCart() {
     updateCartItem,
     removeFromCart,
     clearCart,
+    clearCartAfterPayment,
     refreshCart,
   };
 }

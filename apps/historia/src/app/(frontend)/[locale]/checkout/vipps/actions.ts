@@ -149,6 +149,27 @@ async function validatePaymentOwnership(
 }
 
 /**
+ * Whether this visitor's session started the payment. The reference alone (from the
+ * return URL) is enough to see that an order exists and to have it created: it is an
+ * unguessable UUID, and the customer may come back in another browser than the one
+ * they paid from. The customer's email and address are only shown to the session that
+ * started the payment, not to anyone holding a copied link or the browser history.
+ */
+async function sessionOwnsPayment(paymentReference: string): Promise<boolean> {
+  try {
+    const session = await getCurrentSession();
+    const sessionData = session?.data as SessionData | undefined;
+    return (
+      sessionData?.cart?.paymentReference === paymentReference ||
+      (sessionData?.paymentReferences ?? []).includes(paymentReference)
+    );
+  } catch (error) {
+    logger.warn({ error, paymentReference }, 'Could not read session to check payment ownership');
+    return false;
+  }
+}
+
+/**
  * Generate a secure random password for guest checkout users
  * Uses crypto.randomBytes for cryptographically strong random data
  */
@@ -1497,20 +1518,22 @@ export async function checkExistingOrder(paymentReference: string): Promise<
       'Found existing order for payment reference',
     );
 
+    const showPersonalDetails = await sessionOwnsPayment(paymentReference);
     return actionSuccess({
       exists: true,
       orderId: orderId as string,
       transactionId: transaction.id as string,
-      userEmail: order.userEmail || undefined,
-      shippingAddress: order.shippingAddress
-        ? {
-            addressLine1: order.shippingAddress.addressLine1 || undefined,
-            addressLine2: order.shippingAddress.addressLine2 || undefined,
-            postalCode: order.shippingAddress.postalCode || undefined,
-            city: order.shippingAddress.city || undefined,
-            country: order.shippingAddress.country || undefined,
-          }
-        : undefined,
+      userEmail: (showPersonalDetails && order.userEmail) || undefined,
+      shippingAddress:
+        showPersonalDetails && order.shippingAddress
+          ? {
+              addressLine1: order.shippingAddress.addressLine1 || undefined,
+              addressLine2: order.shippingAddress.addressLine2 || undefined,
+              postalCode: order.shippingAddress.postalCode || undefined,
+              city: order.shippingAddress.city || undefined,
+              country: order.shippingAddress.country || undefined,
+            }
+          : undefined,
     });
   } catch (error) {
     logger.error(
@@ -1584,19 +1607,24 @@ export async function processPaymentAndCreateOrder(paymentReference: string): Pr
       return actionError(orderResult.error.message);
     }
 
-    // Return order details with shipping info
+    // Return order details with shipping info, the personal part only to the session
+    // that started the payment.
+    const showPersonalDetails = await sessionOwnsPayment(paymentReference);
     return actionSuccess({
       orderId: orderResult.data.orderId,
       transactionId: orderResult.data.transactionId,
-      userEmail: paymentDetails.profile?.email || paymentDetails.userDetails?.email || '',
-      shippingAddress: paymentDetails.userDetails
-        ? {
-            addressLine1: paymentDetails.userDetails.streetAddress,
-            postalCode: paymentDetails.userDetails.zipCode,
-            city: paymentDetails.userDetails.city,
-            country: paymentDetails.userDetails.country,
-          }
-        : undefined,
+      userEmail: showPersonalDetails
+        ? paymentDetails.profile?.email || paymentDetails.userDetails?.email || ''
+        : '',
+      shippingAddress:
+        showPersonalDetails && paymentDetails.userDetails
+          ? {
+              addressLine1: paymentDetails.userDetails.streetAddress,
+              postalCode: paymentDetails.userDetails.zipCode,
+              city: paymentDetails.userDetails.city,
+              country: paymentDetails.userDetails.country,
+            }
+          : undefined,
     });
   } catch (error) {
     logger.error(

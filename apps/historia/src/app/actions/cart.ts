@@ -280,6 +280,46 @@ export async function clearCart(): Promise<ServerActionResult<void>> {
 }
 
 /**
+ * Empty the cart once its payment has become an order.
+ *
+ * Only a cart that still belongs to that payment is emptied: any change to the cart
+ * clears its paymentReference, so a cart filled again (in another tab, or after the
+ * payment was started) is left alone. The session's list of payment references is
+ * kept, so the confirmation page can still show the order's details on a reload.
+ */
+export async function clearCartAfterPayment(
+  reference: string,
+): Promise<ServerActionResult<{ cleared: boolean }>> {
+  try {
+    const session = await getCurrentSession();
+    const cart = session?.data?.cart;
+
+    if (!cart || cart.paymentReference !== reference) {
+      logger.info(
+        { reference, cartReference: cart?.paymentReference, hasCart: !!cart },
+        'Cart not cleared after payment: it no longer belongs to this payment',
+      );
+      return actionSuccess({ cleared: false });
+    }
+
+    const updatedSession: Session<SessionData> = {
+      ...session,
+      data: {
+        ...session?.data,
+        cart: undefined,
+      },
+    };
+    await setSessionCookie(await createSession(updatedSession));
+
+    logger.info({ reference }, 'Cart cleared after payment');
+    return actionSuccess({ cleared: true });
+  } catch (error) {
+    logger.error({ error, reference }, 'Error clearing cart after payment');
+    return actionError('Failed to clear cart');
+  }
+}
+
+/**
  * Set the payment reference in the cart session
  * Called when initiating Vipps payment to link cart with payment
  * SECURITY: Adds reference to encrypted session for access control

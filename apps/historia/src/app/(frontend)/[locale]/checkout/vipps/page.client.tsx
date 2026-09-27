@@ -12,7 +12,7 @@ import { Container } from '@eventuras/ratio-ui/layout/Container';
 import { useToast } from '@eventuras/ratio-ui/toast';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PaymentStatusSSE } from '@/components/payment/PaymentStatusSSE';
-import { useSessionCart } from '@/lib/cart/use-session-cart';
+import { useCart } from '@/lib/cart';
 import { checkExistingOrder, processPaymentAndCreateOrder } from './actions';
 import { createPaymentFailureEvent } from './businessEvents';
 
@@ -48,7 +48,8 @@ export default function VippsCheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const toast = useToast();
-  const { clearCart } = useSessionCart();
+  // The shared cart, so the header's count updates when the cart is emptied.
+  const { clearCartAfterPayment } = useCart();
 
   const [state, setState] = useState<PageState>('waiting');
   const [message, setMessage] = useState('');
@@ -87,7 +88,7 @@ export default function VippsCheckoutPage() {
         );
 
         // Clear cart
-        clearCart();
+        if (reference) void clearCartAfterPayment(reference);
 
         // Show success immediately
         setOrderDetails({
@@ -171,7 +172,7 @@ export default function VippsCheckoutPage() {
           );
 
           // Clear cart
-          clearCart();
+          if (reference) void clearCartAfterPayment(reference);
 
           // Show success
           setOrderDetails({
@@ -220,6 +221,14 @@ export default function VippsCheckoutPage() {
 
         setState('error');
         setMessage(`${userMessage} Ingen beløp er trukket.`);
+      } else if (status === 'timeout') {
+        // No answer from Vipps or the webhook within the polling window. The payment may
+        // still go through (the webhook then creates the order), so this is not a failure.
+        logger.warn({ reference }, 'Payment status not confirmed before timeout');
+        setState('error');
+        setMessage(
+          `Vi har ikke fått bekreftet betalingen ennå. Last inn siden på nytt om litt. Er beløpet trukket, får du ordrebekreftelse på e-post. Referanse: ${reference}`,
+        );
       } else if (status === 'failed' || status === 'cancelled') {
         logger.warn({ reference, status }, 'Payment failed without specific reason');
 
@@ -232,7 +241,7 @@ export default function VippsCheckoutPage() {
         setMessage('Betalingen ble avbrutt eller feilet. Ingen beløp er trukket.');
       }
     },
-    [reference, clearCart, toast],
+    [reference, clearCartAfterPayment, toast],
   );
 
   // Validate reference on mount
