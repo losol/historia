@@ -146,12 +146,22 @@ export function useSessionCart() {
 
   const addToCart = useCallback(
     (productId: string, quantity: number = 1) => {
-      const current = itemsRef.current.find((item) => item.productId === productId);
-      const nextQuantity = Math.min((current?.quantity ?? 0) + quantity, MAX_ITEM_QUANTITY);
+      // Add at most up to the maximum, and send the server the same amount that is
+      // shown, so it does not reject what the customer already sees.
+      const currentQuantity =
+        itemsRef.current.find((item) => item.productId === productId)?.quantity ?? 0;
+      const nextQuantity = Math.min(currentQuantity + quantity, MAX_ITEM_QUANTITY);
+      const added = nextQuantity - currentQuantity;
+      if (added <= 0) {
+        logger.info({ productId, currentQuantity, quantity }, 'Not added: line is at the maximum');
+        return Promise.resolve<ServerActionResult<Cart>>(
+          actionError(`At most ${MAX_ITEM_QUANTITY} of one product`),
+        );
+      }
       return mutate(
         withQuantity(itemsRef.current, productId, nextQuantity),
-        () => addToCartAction(productId, quantity),
-        { action: 'add', productId, quantity },
+        () => addToCartAction(productId, added),
+        { action: 'add', productId, quantity: added },
       );
     },
     [mutate],
