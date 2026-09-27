@@ -12,9 +12,10 @@ import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
 import type { Cart, SessionData } from '@/lib/cart/types';
+import { canTransitionTransaction } from '@/lib/commerce/orderStatusRules';
 import { getSessionContext } from '@/lib/session/sessionId';
 import { getCurrentWebsiteId } from '@/lib/website';
-import type { Product, Transaction, User } from '@/payload-types';
+import type { Order, Product, Transaction, User } from '@/payload-types';
 import { createOrderAutoCreatedEvent } from './businessEvents';
 import { notifyOrphanedPayment } from './orphanedPaymentNotification';
 
@@ -154,6 +155,33 @@ function generateSecurePassword(): string {
   // Generate 32 random bytes and convert to base64
   // This creates a strong password that users won't need (guest checkout)
   return crypto.randomBytes(32).toString('base64');
+}
+
+/** The order created for a payment, if there is one. */
+async function findOrderByPaymentReference(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  paymentReference: string,
+): Promise<Order | undefined> {
+  const { docs } = await payload.find({
+    collection: 'orders',
+    where: { paymentReference: { equals: paymentReference } },
+    limit: 1,
+    depth: 0,
+  });
+  return docs[0];
+}
+
+async function findTransactionIdByPaymentReference(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  paymentReference: string,
+): Promise<string> {
+  const { docs } = await payload.find({
+    collection: 'transactions',
+    where: { paymentReference: { equals: paymentReference } },
+    limit: 1,
+    depth: 0,
+  });
+  return docs[0]?.id ?? '';
 }
 
 interface CreateOrderParams {
@@ -326,6 +354,34 @@ export async function createOrderFromPayment({
 
     const payload = await getPayload({ config: configPromise });
 
+    // Only an authorized payment becomes an order. After capture Vipps still reports
+    // AUTHORIZED; CREATED, ABORTED, EXPIRED and TERMINATED (cancelled) have no money
+    // behind them.
+    if (paymentDetails.state !== 'AUTHORIZED') {
+      logger.error(
+        {
+          paymentReference,
+          paymentState: paymentDetails.state,
+          authorizedAmount: paymentDetails.aggregate.authorizedAmount,
+        },
+        'Order not created: payment is not authorized',
+      );
+      return actionError('Betalingen er ikke godkjent');
+    }
+
+    // One order per payment: the webhook and the return page both get here.
+    const existingOrder = await findOrderByPaymentReference(payload, paymentReference);
+    if (existingOrder) {
+      logger.info(
+        { paymentReference, existingOrderId: existingOrder.id },
+        'Order already exists for this payment reference, returning existing order',
+      );
+      return actionSuccess({
+        orderId: existingOrder.id,
+        transactionId: await findTransactionIdByPaymentReference(payload, paymentReference),
+      });
+    }
+
     // Check if order already exists for this payment reference (idempotency)
     const existingTransactions = await payload.find({
       collection: 'transactions',
@@ -438,19 +494,36 @@ export async function createOrderFromPayment({
           'Found existing user for checkout',
         );
       } else {
-        // Create new user from Vipps data
-        const newUser = await payload.create({
-          collection: 'users',
-          data: {
-            email: vippsEmail,
-            password: generateSecurePassword(),
-            phone_number: normalizedPhone,
-            email_verified: true,
-            phone_number_verified: true,
-            given_name: vippsFirstName,
-            family_name: vippsLastName,
-          },
-        });
+        // Create new user from Vipps data. The webhook and the return page can get
+        // here at the same time for the same email; the unique email index then
+        // rejects the second create, and that caller uses the user the first created.
+        let newUser: User;
+        try {
+          newUser = await payload.create({
+            collection: 'users',
+            data: {
+              email: vippsEmail,
+              password: generateSecurePassword(),
+              phone_number: normalizedPhone,
+              email_verified: true,
+              phone_number_verified: true,
+              given_name: vippsFirstName,
+              family_name: vippsLastName,
+            },
+          });
+        } catch (error) {
+          const { docs } = await payload.find({
+            collection: 'users',
+            where: { email: { equals: vippsEmail } },
+            limit: 1,
+          });
+          if (!docs[0]) throw error;
+          logger.info(
+            { paymentReference, userId: docs[0].id },
+            'User was created by a concurrent request for the same payment - using it',
+          );
+          newUser = docs[0];
+        }
         effectiveUserId = newUser.id;
         logger.info(
           {
@@ -765,19 +838,37 @@ export async function createOrderFromPayment({
 
     // Create Order
     const orderCreateStart = Date.now();
-    const order = await payload.create({
-      collection: 'orders',
-      draft: false,
-      data: {
-        customer: effectiveUserId,
-        userEmail: user.email,
-        status: amountMatches ? 'pending' : 'on-hold',
-        currency: paymentDetails.aggregate.authorizedAmount.currency,
-        tenant: websiteId,
-        items: orderItems,
-        shippingAddress: vippsShippingAddress,
-      },
-    });
+    // paymentReference is unique on orders: if the webhook and the return page both got
+    // this far, only one insert succeeds. The other finds that order and returns it,
+    // without sending emails or touching the cart and transaction a second time.
+    let order: Order;
+    try {
+      order = await payload.create({
+        collection: 'orders',
+        draft: false,
+        data: {
+          customer: effectiveUserId,
+          userEmail: user.email,
+          status: amountMatches ? 'pending' : 'on-hold',
+          currency: paymentDetails.aggregate.authorizedAmount.currency,
+          tenant: websiteId,
+          items: orderItems,
+          shippingAddress: vippsShippingAddress,
+          paymentReference,
+        },
+      });
+    } catch (error) {
+      const concurrentOrder = await findOrderByPaymentReference(payload, paymentReference);
+      if (!concurrentOrder) throw error;
+      logger.info(
+        { paymentReference, orderId: concurrentOrder.id },
+        'Order was created by a concurrent request for the same payment - using it',
+      );
+      return actionSuccess({
+        orderId: concurrentOrder.id,
+        transactionId: await findTransactionIdByPaymentReference(payload, paymentReference),
+      });
+    }
 
     const orderCreateTime = Date.now() - orderCreateStart;
     logger.info(
@@ -1031,7 +1122,10 @@ export async function createOrderFromPayment({
     const transactionCreateStart = Date.now();
     const transactionAmount = paymentDetails.aggregate.authorizedAmount.value; // Keep in minor units (øre)
     const transactionCurrency = paymentDetails.aggregate.authorizedAmount.currency;
-    const transactionStatus = paymentDetails.state === 'AUTHORIZED' ? 'authorized' : 'captured';
+    // State is AUTHORIZED here (checked above) whether or not the payment has been
+    // captured since; the aggregate tells which.
+    const transactionStatus =
+      paymentDetails.aggregate.capturedAmount.value > 0 ? 'captured' : 'authorized';
 
     // Check if transaction already exists (from webhook)
     const existingWebhookTransactions = await payload.find({
@@ -1060,6 +1154,24 @@ export async function createOrderFromPayment({
         'Transaction already exists (from webhook) - linking to order',
       );
 
+      // The webhook may have moved the transaction further (captured, refunded) or
+      // ended it (failed) since the payment details used here were read: keep its
+      // status unless this is a step forward.
+      const statusUpdate = canTransitionTransaction(transaction.status, transactionStatus)
+        ? { status: transactionStatus }
+        : {};
+      if (!('status' in statusUpdate) && transaction.status !== transactionStatus) {
+        logger.warn(
+          {
+            paymentReference,
+            transactionId: transaction.id,
+            currentStatus: transaction.status,
+            ignoredStatus: transactionStatus,
+          },
+          'Transaction status from the return page would move it backwards - keeping current status',
+        );
+      }
+
       transaction = await payload.update({
         collection: 'transactions',
         id: transaction.id,
@@ -1068,7 +1180,7 @@ export async function createOrderFromPayment({
           customer: effectiveUserId,
           amount: transactionAmount,
           currency: transactionCurrency as 'NOK' | 'USD' | 'EUR' | 'SEK' | 'DKK',
-          status: transactionStatus,
+          ...statusUpdate,
           paymentMethod: 'vipps',
           tenant: websiteId,
         },
@@ -1152,7 +1264,20 @@ export async function createOrderFromPayment({
             throw createError; // Re-throw original error
           }
 
-          transaction = existingDuplicateTransactions.docs[0];
+          // Link it to this order, which it was created without; its status only moves
+          // forward.
+          const existingTransaction = existingDuplicateTransactions.docs[0];
+          transaction = await payload.update({
+            collection: 'transactions',
+            id: existingTransaction.id,
+            data: {
+              order: order.id,
+              customer: effectiveUserId,
+              ...(canTransitionTransaction(existingTransaction.status, transactionStatus) && {
+                status: transactionStatus,
+              }),
+            },
+          });
 
           logger.info(
             {

@@ -483,7 +483,6 @@ export interface Media {
           }
       )[]
     | null;
-  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1285,6 +1284,10 @@ export interface Order {
     country?: string | null;
   };
   customer?: (string | null) | User;
+  /**
+   * Payment provider reference this order was created from
+   */
+  paymentReference?: string | null;
   userEmail: string;
   status: 'pending' | 'processing' | 'on-hold' | 'completed' | 'canceled';
   totalAmount?: number | null;
@@ -3105,7 +3108,6 @@ export interface MediaSelect<T extends boolean = true> {
   attributionUrl?: T;
   collection?: T;
   relatedContent?: T;
-  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -3252,6 +3254,7 @@ export interface OrdersSelect<T extends boolean = true> {
         country?: T;
       };
   customer?: T;
+  paymentReference?: T;
   userEmail?: T;
   status?: T;
   totalAmount?: T;
