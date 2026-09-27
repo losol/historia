@@ -11,6 +11,10 @@ import { Providers } from '@/providers';
 import { InitTheme } from '@/providers/Theme/InitTheme';
 
 import '@eventuras/ratio-ui/ratio-ui.css';
+// The named themes a website can pick in its settings (see lib/site-settings/appearance).
+// Opt-in since ratio-ui 2.26; without them data-theme falls back to the default look.
+import '@eventuras/ratio-ui/themes/bureau.css';
+import '@eventuras/ratio-ui/themes/ink.css';
 import '@eventuras/ratio-ui/fonts.css';
 
 export const metadata: Metadata = {

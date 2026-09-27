@@ -2,7 +2,8 @@ import type { Website } from '@/payload-types';
 
 /**
  * The ratio-ui theme a website wears: its palette, fonts and shapes. `default` is
- * ratio-ui's standard theme, which needs no attribute.
+ * ratio-ui's standard theme, which needs no attribute. A new named theme also needs
+ * its stylesheet imported in the frontend layout.
  */
 export const themes = ['default', 'bureau', 'ink'] as const;
 export type SiteTheme = (typeof themes)[number];
