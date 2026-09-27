@@ -17,14 +17,10 @@ import { useToast } from '@eventuras/ratio-ui/toast';
 import { Link } from '@eventuras/ratio-ui-next';
 import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import { useCart } from '@/lib/cart';
+import { removedNotice } from '@/lib/cart/removedNotice';
+import { useCartSummary } from '@/lib/cart/use-cart-summary';
 import { fromMinorUnits } from '@/lib/price';
-import {
-  type CartSummary,
-  calculateCart,
-  checkPendingPayment,
-  createVippsPayment,
-  validateCartProducts,
-} from './actions';
+import { checkPendingPayment, createVippsPayment } from './actions';
 
 const logger = Logger.create({
   namespace: 'historia:checkout',
@@ -36,67 +32,32 @@ interface CheckoutPageClientProps {
 }
 
 export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>) {
-  const { items, updateCartItem, removeFromCart, loading: cartLoading, refreshCart } = useCart();
-  const [cart, setCart] = useState<CartSummary | null>(null);
+  const {
+    items,
+    updateCartItem,
+    removeFromCart,
+    loading: cartLoading,
+    pending: cartPending,
+    removedProductIds,
+    revalidateCart,
+  } = useCart();
+  const {
+    summary: cart,
+    loading: summaryLoading,
+    error: summaryError,
+    upToDate,
+    retry,
+  } = useCartSummary(items);
   const [pendingPayment, setPendingPayment] = useState<PaymentDetails | null>(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const toast = useToast();
 
-  // Log cart state for debugging
-  useEffect(() => {
-    logger.info(
-      {
-        itemCount: items.length,
-        items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
-        cartLoading,
-        loading,
-      },
-      'Cart state on checkout page',
-    );
-  }, [items, cartLoading, loading]);
-
-  // Validate cart products on mount and remove invalid ones
+  // Check the cart again on arrival, dropping products that can no longer be bought,
+  // and look for a payment already started for it.
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs on mount only
   useEffect(() => {
-    async function validateAndCleanCart() {
-      if (items.length === 0) return;
+    revalidateCart();
 
-      const result = await validateCartProducts(items);
-
-      if (result.success && result.data.invalidProductIds.length > 0) {
-        const invalidCount = result.data.invalidProductIds.length;
-
-        logger.warn(
-          {
-            invalidProductIds: result.data.invalidProductIds,
-            invalidCount,
-          },
-          'Removing invalid products from cart',
-        );
-
-        // Remove invalid products from cart
-        for (const productId of result.data.invalidProductIds) {
-          removeFromCart(productId);
-        }
-
-        // Show notification to user
-        toast.info(
-          `${invalidCount} product${invalidCount > 1 ? 's' : ''} ${invalidCount > 1 ? 'are' : 'is'} no longer available and ${invalidCount > 1 ? 'have' : 'has'} been removed from your cart.`,
-        );
-      }
-    }
-
-    validateAndCleanCart();
-  }, []);
-
-  // Refresh cart on mount to ensure we have the latest data
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on mount only
-  useEffect(() => {
-    logger.info('Refreshing cart on checkout page mount');
-    refreshCart();
-
-    // Check for pending payment
     async function checkPending() {
       const result = await checkPendingPayment();
       if (result.success && result.data) {
@@ -114,29 +75,23 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
     checkPending();
   }, []);
 
-  // Load cart summary from server
-  useEffect(() => {
-    async function loadCart() {
-      if (items.length === 0) {
-        setCart(null);
-        setLoading(false);
-        return;
-      }
+  // Quantities come from the cart, which shows each click at once; the summary's
+  // prices follow when the server has recomputed them.
+  const quantities = new Map(items.map((item) => [item.productId, item.quantity]));
+  const lines = (cart?.items ?? []).filter((item) => quantities.has(item.productId));
 
-      const result = await calculateCart(items);
-
-      if (result.success) {
-        setCart(result.data);
-      } else {
-        logger.error({ error: result.error }, 'Failed to load cart');
-      }
-      setLoading(false);
-    }
-
-    loadCart();
-  }, [items]);
+  // The payment is priced from the cart on the server: wait until every change has
+  // reached it and the prices shown are for the lines shown.
+  const canCheckout =
+    !cartPending &&
+    upToDate &&
+    !summaryError &&
+    !!cart &&
+    cart.items.length > 0 &&
+    cart.unavailableProductIds.length === 0;
 
   const handleVippsCheckout = async () => {
+    if (!canCheckout) return;
     setSubmitting(true);
 
     try {
@@ -144,26 +99,27 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
       const result = await createVippsPayment({ userLanguage: locale });
 
       if (!result.success) {
-        alert(`Betalingsfeil: ${result.error.message}`);
+        logger.error({ error: result.error }, 'Could not start Vipps payment');
+        toast.error('Kunne ikke starte betalingen. Prøv igjen om litt.');
         setSubmitting(false);
         return;
       }
 
-      // Redirect to Vipps
       if (result.data.redirectUrl) {
         window.location.assign(result.data.redirectUrl);
       } else {
-        alert('Ingen redirect URL mottatt');
+        logger.error('Vipps payment created without a redirect URL');
+        toast.error('Kunne ikke starte betalingen. Prøv igjen om litt.');
         setSubmitting(false);
       }
     } catch (error) {
       logger.error({ error }, 'Checkout failed');
-      alert('En uventet feil oppstod');
+      toast.error('En uventet feil oppstod. Prøv igjen om litt.');
       setSubmitting(false);
     }
   };
 
-  if (loading || cartLoading) {
+  if (cartLoading || (items.length > 0 && summaryLoading && !cart)) {
     return <Loading />;
   }
 
@@ -195,6 +151,23 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
             </Link>
             <Button onClick={() => setPendingPayment(null)} variant="outline">
               Ignorer og opprett ny
+            </Button>
+          </Panel.Footer>
+        </Panel>
+      )}
+
+      {removedProductIds.length > 0 && (
+        <Panel status="warning" accent="flush" marginBottom="md">
+          <Panel.Body>{removedNotice(removedProductIds.length)}</Panel.Body>
+        </Panel>
+      )}
+
+      {items.length > 0 && summaryError && (
+        <Panel status="error" accent="flush" marginBottom="md">
+          <Panel.Body>Kunne ikke hente prisene i handlekurven.</Panel.Body>
+          <Panel.Footer align="start">
+            <Button onClick={retry} variant="outline">
+              Prøv igjen
             </Button>
           </Panel.Footer>
         </Panel>
@@ -232,13 +205,13 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
               title="Ordresammendrag"
               showVatBreakdown
             >
-              {cart.items.map((item) => (
+              {lines.map((item) => (
                 <CartLineItem
                   key={item.productId}
                   item={{
                     productId: item.productId,
                     title: item.title,
-                    quantity: item.quantity,
+                    quantity: quantities.get(item.productId) ?? item.quantity,
                     pricePerUnitIncVat: fromMinorUnits(item.pricePerUnitIncVat, item.currency),
                     vatAmount: fromMinorUnits(item.vatAmount, item.currency),
                     lineTotalIncVat: fromMinorUnits(item.lineTotalIncVat, item.currency),
@@ -256,7 +229,12 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
             </OrderSummary>
           )}
 
-          <Button onClick={handleVippsCheckout} loading={submitting} block>
+          <Button
+            onClick={handleVippsCheckout}
+            loading={submitting}
+            isDisabled={!canCheckout}
+            block
+          >
             Kjøp nå med Vipps
           </Button>
         </div>

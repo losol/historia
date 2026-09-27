@@ -55,6 +55,69 @@ export async function getCart(): Promise<Cart | null> {
 }
 
 /**
+ * The cart, without lines that can no longer be bought: a product unpublished,
+ * deleted or moved to another website since it was added. Those lines are removed
+ * from the session too, so the count in the header, the drawer and the checkout
+ * agree, and `removedProductIds` lets the page tell the customer.
+ *
+ * Nothing is removed when the check cannot be made (no website for this host, the
+ * database unreachable): a cart is only pruned on a definite answer, never emptied
+ * because of an outage.
+ */
+export async function getValidatedCart(): Promise<
+  ServerActionResult<{ cart: Cart | null; removedProductIds: string[] }>
+> {
+  const cart = await getCart();
+  if (!cart || cart.items.length === 0) {
+    return actionSuccess({ cart, removedProductIds: [] });
+  }
+
+  try {
+    const websiteId = await getCurrentWebsiteId();
+    if (!websiteId) {
+      logger.warn('Cart not validated: no website for this host');
+      return actionSuccess({ cart, removedProductIds: [] });
+    }
+
+    const payload = await getPayload({ config: configPromise });
+    const products = await findPurchasableProducts(
+      payload,
+      cart.items.map((item) => item.productId),
+      websiteId,
+    );
+    const purchasable = new Set(products.map((product) => product.id));
+    const removedProductIds = cart.items
+      .filter((item) => !purchasable.has(item.productId) || !isValidQuantity(item.quantity))
+      .map((item) => item.productId);
+
+    if (removedProductIds.length === 0) {
+      return actionSuccess({ cart, removedProductIds });
+    }
+
+    const session = await getCurrentSession();
+    const updatedCart: Cart = {
+      ...cart,
+      items: cart.items.filter((item) => !removedProductIds.includes(item.productId)),
+      paymentReference: undefined,
+    };
+    const updatedSession: Session<SessionData> = {
+      ...session,
+      data: { ...session?.data, cart: updatedCart },
+    };
+    await setSessionCookie(await createSession(updatedSession));
+
+    logger.info(
+      { removedProductIds, remainingItems: updatedCart.items.length },
+      'Removed lines that can no longer be bought from the cart',
+    );
+    return actionSuccess({ cart: updatedCart, removedProductIds });
+  } catch (error) {
+    logger.error({ error }, 'Could not validate cart - keeping it unchanged');
+    return actionSuccess({ cart, removedProductIds: [] });
+  }
+}
+
+/**
  * Add an item to the cart
  */
 export async function addToCart(

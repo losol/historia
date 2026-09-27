@@ -14,7 +14,7 @@ import { Link } from '@eventuras/ratio-ui-next';
 import { useRouter } from 'next/navigation';
 import { getDocUrl } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import RichText from '@/components/RichText';
-import { useSessionCart } from '@/lib/cart/use-session-cart';
+import { useCart } from '@/lib/cart';
 import { fromMinorUnits } from '@/lib/price';
 import type { Product as ProductType } from '@/payload-types';
 import { getImageUrl } from '@/utilities/image';
@@ -52,7 +52,7 @@ const labels = {
 export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
   const router = useRouter();
   const toast = useToast();
-  const { addToCart } = useSessionCart();
+  const { addToCart } = useCart();
   const [addingProductId, setAddingProductId] = React.useState<string | null>(null);
   const { locale } = props;
   const t = locale === 'en' ? labels.en : labels.no;
@@ -102,7 +102,8 @@ export const ProductsBlock: React.FC<ProductBlockProps> = (props) => {
           { error: result.error, productId: product.id },
           'Failed to add product to cart',
         );
-        toast.error(result.error?.message || t.failed);
+        // Server messages are for the log, not the customer.
+        toast.error(t.failed);
       }
     } catch (error) {
       logger.error({ error, productId: product.id }, 'Error adding product to cart');

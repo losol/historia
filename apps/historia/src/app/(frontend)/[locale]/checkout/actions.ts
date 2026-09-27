@@ -160,42 +160,6 @@ export async function calculateCart(
   }
 }
 
-/**
- * Validate cart items and identify products that can no longer be bought
- * Returns list of invalid product IDs that should be removed from cart
- */
-export async function validateCartProducts(
-  cartItems: Array<{ productId: string; quantity: number }>,
-): Promise<ServerActionResult<{ invalidProductIds: string[]; validProductIds: string[] }>> {
-  try {
-    if (!cartItems.length) {
-      return actionSuccess({ invalidProductIds: [], validProductIds: [] });
-    }
-
-    const payload = await getPayload({ config: configPromise });
-    const products = await findPurchasableProducts(
-      payload,
-      cartItems.map((item) => item.productId),
-      await getCurrentWebsiteId(),
-    );
-
-    const foundProductIds = new Set(products.map((p) => p.id));
-    const requestedProductIds = cartItems.map((item) => item.productId);
-
-    const invalidProductIds = requestedProductIds.filter((id) => !foundProductIds.has(id));
-    const validProductIds = requestedProductIds.filter((id) => foundProductIds.has(id));
-
-    if (invalidProductIds.length > 0) {
-      logger.warn({ invalidProductIds }, 'Invalid products in cart');
-    }
-
-    return actionSuccess({ invalidProductIds, validProductIds });
-  } catch (error) {
-    logger.error({ error, cartItems }, 'Failed to validate cart products');
-    return actionError(error instanceof Error ? error.message : 'Failed to validate cart');
-  }
-}
-
 // ============================================================================
 // Vipps Payment Actions
 // ============================================================================
