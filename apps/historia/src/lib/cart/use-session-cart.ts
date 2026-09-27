@@ -114,10 +114,7 @@ export function useSessionCart() {
     if (result.success && result.data.cleared) {
       setCart(null);
     } else if (!result.success) {
-      logger.error(
-        { errorMessage: result.error?.message, reference },
-        'Failed to clear cart after payment',
-      );
+      logger.error({ error: result.error, reference }, 'Failed to clear cart after payment');
     }
     return result;
   }, []);
