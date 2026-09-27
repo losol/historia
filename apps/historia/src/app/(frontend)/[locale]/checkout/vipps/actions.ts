@@ -10,7 +10,7 @@ import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import configPromise from '@payload-config';
-import { getPayload } from 'payload';
+import { getPayload, ValidationError } from 'payload';
 import type { Cart, SessionData } from '@/lib/cart/types';
 import { canTransitionTransaction } from '@/lib/commerce/orderStatusRules';
 import { getSessionContext } from '@/lib/session/sessionId';
@@ -155,6 +155,19 @@ function generateSecurePassword(): string {
   // Generate 32 random bytes and convert to base64
   // This creates a strong password that users won't need (guest checkout)
   return crypto.randomBytes(32).toString('base64');
+}
+
+/**
+ * Whether `error` is Payload's report of a unique index rejecting `field`: what a
+ * concurrent request for the same payment causes. Anything else must not be taken
+ * for a lost race.
+ */
+function isUniqueViolation(error: unknown, field: string): boolean {
+  if (!(error instanceof ValidationError)) return false;
+  const normalize = (value: string) => value.replaceAll('_', '').toLowerCase();
+  return error.data.errors.some(
+    (fieldError) => fieldError.path && normalize(fieldError.path) === normalize(field),
+  );
 }
 
 /** The order created for a payment, if there is one. */
@@ -512,6 +525,7 @@ export async function createOrderFromPayment({
             },
           });
         } catch (error) {
+          if (!isUniqueViolation(error, 'email')) throw error;
           const { docs } = await payload.find({
             collection: 'users',
             where: { email: { equals: vippsEmail } },
@@ -858,6 +872,7 @@ export async function createOrderFromPayment({
         },
       });
     } catch (error) {
+      if (!isUniqueViolation(error, 'paymentReference')) throw error;
       const concurrentOrder = await findOrderByPaymentReference(payload, paymentReference);
       if (!concurrentOrder) throw error;
       logger.info(
