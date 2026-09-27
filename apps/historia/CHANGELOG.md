@@ -1,5 +1,21 @@
 # @eventuras/historia
 
+## 0.28.0
+
+### Minor Changes
+
+- 6818e47: Websites get an Appearance section in their site settings: the ratio-ui theme (Default, Bureau or Ink) and the color scheme (Light, Dark, or Both, which follows the visitor's system setting and shows the light/dark toggle). The server renders them on `<html>` as `data-theme` and `data-color-scheme`, and the visitor's own choice is now stored as `data-color-scheme` under its own key instead of sharing `payload-theme` with the admin panel. Existing websites keep today's look: Default and Both.
+  
+  Site settings now live in `collections/Websites/siteSettings/`, one file per area, with the frontend helpers in `lib/site-settings/`.
+
+### Patch Changes
+
+- d9c91eb: Blocks follow the page's language. The archive block lists titles and links in the page's locale instead of the default one, and the products block's buttons, messages and "read more" link are in English on English pages.
+- 5c9d2dc: Collection lists show each document's image and lead on its card, and names for persons and organizations, which the list no longer fetched. The "Showing 1 - 20 of 25" line under the pagination is in the page's language and names the collection, e.g. "Viser 1 - 20 av 25 artikler".
+- 6a31c25: Collection lists and document pages show the requested language. They queried without a locale, so English pages listed Norwegian titles, linked to Norwegian slugs and showed Norwegian text. A document opened under the other language's slug is redirected to its own, and the redirects now keep the `/c/` in the path. A collection name from the other language (`/en/c/artikler/…`) is redirected too instead of failing with a 500, and an unknown one is a 404.
+- 6fa0d17: `/api/health` reports the `version` and `revision` (commit SHA) of the running image, so a deploy can check that the new build is the one answering. Both are `null` outside the Docker image.
+- d72be41: Image blocks render again when `NEXT_PUBLIC_CMS_URL` is set. Payload then returns absolute media URLs, and the image component put the site's URL in front of them once more (`https://sitehttps://site/api/media/…`), so any page with an image block failed with a 500. In development, cards and other optimized images from `localhost` load again: Next 16 refuses local addresses in the image optimizer, which is now allowed in development only.
+
 ## 0.27.0
 
 ### Minor Changes
