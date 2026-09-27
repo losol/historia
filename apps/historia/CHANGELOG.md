@@ -1,5 +1,13 @@
 # @eventuras/historia
 
+## 0.28.1
+
+### Patch Changes
+
+- 81a4512: Upgrade ratio-ui to 2.26.0. Its named themes are opt-in stylesheets now, so the frontend layout imports `themes/bureau.css` and `themes/ink.css`; without them a website set to Bureau or Ink would fall back to the default look.
+- c1dcd2d: Upgrade ratio-ui to 2.27.0 and import its Bureau fonts (Pixelify Sans, Archivo and Space Mono), so websites on the Bureau theme get its typefaces instead of system fonts. The browser only downloads them on pages that use Bureau. 2.27.0 also gives Bureau hard shadows and square corners throughout.
+- c6391ba: Remove `HeaderTheme`, left over from Payload's website template. It set `data-theme="dark"` or `"light"` on the `<header>` on some pages, which ratio-ui's `dark:` utilities read, so an article's header could be dark while the page was light. The header now follows the page's theme and color scheme like everything else.
+
 ## 0.28.0
 
 ### Minor Changes
