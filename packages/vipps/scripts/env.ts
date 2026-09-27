@@ -9,8 +9,11 @@ const REQUIRED = [
 
 type RequiredVar = (typeof REQUIRED)[number];
 
-/** True unless VIPPS_USE_TEST_MODE is exactly 'false'. */
-export const useTestMode = process.env.VIPPS_USE_TEST_MODE !== 'false';
+/**
+ * Same default as the app (see apps/historia/src/lib/vipps/config.ts): the test
+ * environment, so a script cannot reach production by forgetting a variable.
+ */
+const DEFAULT_API_URL = 'https://apitest.vipps.no';
 
 /**
  * Builds a VippsConfig from the environment for a CLI script.
@@ -35,7 +38,7 @@ export function vippsConfigFromEnv(systemName: string): VippsConfig {
   const env = values as Record<RequiredVar, string>;
 
   return {
-    apiUrl: useTestMode ? 'https://apitest.vipps.no' : 'https://api.vipps.no',
+    apiUrl: process.env.VIPPS_API_URL || DEFAULT_API_URL,
     clientId: env.VIPPS_CLIENT_ID,
     clientSecret: env.VIPPS_CLIENT_SECRET,
     merchantSerialNumber: env.VIPPS_MERCHANT_SERIAL_NUMBER,

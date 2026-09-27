@@ -73,18 +73,6 @@
       "type": "string",
       "description": "Vipps API subscription key (primary)"
     },
-    "VIPPS_SUBSCRIPTION_KEY_SECONDARY": {
-      "required": false,
-      "client": false,
-      "type": "string",
-      "description": "Vipps API subscription key (secondary/backup)"
-    },
-    "VIPPS_CALLBACK_TOKEN": {
-      "required": false,
-      "client": false,
-      "type": "string",
-      "description": "Secret token for validating Vipps callbacks"
-    },
     "NEXT_PUBLIC_FEATURE_SENTRY": {
       "required": false,
       "client": true,

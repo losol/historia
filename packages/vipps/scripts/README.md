@@ -11,7 +11,7 @@ VIPPS_CLIENT_ID=your-client-id
 VIPPS_CLIENT_SECRET=your-client-secret
 VIPPS_MERCHANT_SERIAL_NUMBER=your-msn
 VIPPS_SUBSCRIPTION_KEY=your-subscription-key
-VIPPS_IS_TEST=true  # or false for production
+VIPPS_API_URL=https://apitest.vipps.no  # or https://api.vipps.no for production
 VIPPS_WEBHOOK_SECRET=your-webhook-secret  # Only needed for webhook verification
 ```
 
