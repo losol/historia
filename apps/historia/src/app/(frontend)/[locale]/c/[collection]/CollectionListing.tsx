@@ -8,6 +8,7 @@ import { PageRange } from '@/components/PageRange';
 import { Pagination } from '@/components/Pagination';
 import {
   getOriginalCollectionName,
+  isSiteLocale,
   type PageCollectionsType,
   pageCollections,
 } from './pageCollections';
@@ -37,6 +38,7 @@ export async function CollectionListing({
   collection: string;
   page: number;
 }) {
+  if (!isSiteLocale(locale)) notFound();
   const payload = await getPayload({ config: configPromise });
 
   const originalCollectionName = getOriginalCollectionName(collection, locale);
