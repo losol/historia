@@ -98,6 +98,8 @@ jobs:
             "cms_secret=${{ secrets.CMS_SECRET }}"
             "sentry_auth_token=${{ secrets.CMS_SENTRY_AUTH_TOKEN }}"
           build-args: |
+            HISTORIA_VERSION=${{ steps.ver.outputs.version }}
+            HISTORIA_REVISION=${{ github.sha }}
             NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
             CMS_SENTRY_ORG=${{ secrets.CMS_SENTRY_ORG }}
             CMS_SENTRY_PROJECT=${{ secrets.CMS_SENTRY_PROJECT }}
