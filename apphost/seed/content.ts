@@ -1,6 +1,8 @@
 // The demo content: enough to see the site's pages and components in use after
 // `aspire run`, not a realistic dataset. Text is Norwegian, the default locale.
 
+import type { Palette } from './images.ts';
+
 // Lexical rich text, built from the few node types the demo needs.
 type LexicalNode = Record<string, unknown>;
 
@@ -85,7 +87,9 @@ export const homePage = {
         list('bullet', [
           'Artikler, nok til at listen blar over flere sider',
           'Riktekst med overskrifter, lister og lenker',
+          'Bilder, produkter og et artikkelarkiv',
         ]),
+        paragraph('Alle blokktypene er samlet på ', link('komponentsiden', '/no/komponenter'), '.'),
         heading('h3', 'Slik kommer du i gang'),
         list('number', [
           'Logg inn i admin med demobrukeren',
@@ -113,7 +117,9 @@ export const homePage = {
         list('bullet', [
           'Articles, enough for the list to span several pages',
           'Rich text with headings, lists and links',
+          'Images, products and an article archive',
         ]),
+        paragraph('Every block type is on the ', link('components page', '/en/components'), '.'),
         heading('h3', 'Getting started'),
         list('number', [
           'Sign in to the admin as the demo user',
@@ -177,4 +183,156 @@ export const articles = Array.from({ length: 25 }, (_, index) => {
       ],
     },
   };
+});
+
+// Images and products are created first; the pages that use them are built from
+// their ids.
+
+export const images: { file: string; no: string; en: string; palette: Palette }[] = [
+  {
+    file: 'solnedgang.png',
+    no: 'Solnedgang over havet',
+    en: 'Sunset over the sea',
+    palette: {
+      sky: [
+        [250, 176, 110],
+        [233, 110, 90],
+      ],
+      sea: [
+        [70, 90, 120],
+        [30, 45, 70],
+      ],
+      sun: [255, 226, 160],
+    },
+  },
+  {
+    file: 'morgen.png',
+    no: 'Morgen på fjorden',
+    en: 'Morning on the fjord',
+    palette: {
+      sky: [
+        [170, 205, 230],
+        [235, 240, 235],
+      ],
+      sea: [
+        [95, 140, 160],
+        [40, 80, 100],
+      ],
+      sun: [255, 250, 225],
+    },
+  },
+  {
+    file: 'natt.png',
+    no: 'Midnattssol',
+    en: 'Midnight sun',
+    palette: {
+      sky: [
+        [60, 50, 110],
+        [215, 130, 120],
+      ],
+      sea: [
+        [50, 50, 90],
+        [20, 20, 45],
+      ],
+      sun: [255, 200, 140],
+    },
+  },
+];
+
+export const products = [
+  {
+    // Prices are stored ex. VAT in øre: 19920 is 249 kr with 25 % VAT.
+    price: 19920,
+    no: {
+      title: 'Plakat: Fyret på odden',
+      slug: 'plakat-fyret',
+      lead: 'Trykk i A3 på matt papir.',
+    },
+    en: {
+      title: 'Poster: The lighthouse on the point',
+      slug: 'poster-lighthouse',
+      lead: 'A3 print on matte paper.',
+    },
+  },
+  {
+    price: 27920,
+    no: { title: 'Bok: Losene langs kysten', slug: 'bok-losene', lead: 'Innbundet, 240 sider.' },
+    en: { title: 'Book: The coastal pilots', slug: 'book-pilots', lead: 'Hardcover, 240 pages.' },
+  },
+];
+
+const imageBlock = (media: string, caption: string) => ({
+  blockType: 'image',
+  media,
+  caption: richText(paragraph(caption)),
+});
+
+const sectionIntro = (title: string, text: string) =>
+  contentBlock(heading('h2', title), paragraph(text));
+
+const productsBlock = (productIds: string[]) => ({
+  blockType: 'products',
+  products: productIds,
+  showImage: true,
+});
+
+// No description: it is not a localized field, so the English update would
+// overwrite the Norwegian one.
+const archiveBlock = () => ({
+  blockType: 'archive',
+  relationTo: 'articles',
+  limit: 6,
+  showImages: true,
+});
+
+/** One page with every block type a page can hold. */
+export const componentsPage = ({
+  mediaIds,
+  productIds,
+}: {
+  mediaIds: string[];
+  productIds: string[];
+}) => ({
+  no: {
+    name: 'Komponenter',
+    title: 'Komponenter',
+    slug: 'komponenter',
+    lead: 'Alle blokktypene en side kan ha, med demoinnhold.',
+    story: [
+      contentBlock(
+        heading('h2', 'Innhold'),
+        paragraph(
+          'En innholdsblokk er riktekst: overskrifter, avsnitt, ',
+          bold('uthevet tekst'),
+          ' og lister.',
+        ),
+        list('bullet', ['Punktliste', 'med flere punkter']),
+      ),
+      imageBlock(mediaIds[1], 'En bildeblokk med bildetekst.'),
+      productsBlock(productIds),
+      sectionIntro('Arkiv', 'Et arkiv viser de siste artiklene.'),
+      archiveBlock(),
+    ],
+  },
+  en: {
+    name: 'Components',
+    title: 'Components',
+    slug: 'components',
+    lead: 'Every block type a page can hold, with demo content.',
+    story: [
+      contentBlock(
+        heading('h2', 'Content'),
+        paragraph(
+          'A content block is rich text: headings, paragraphs, ',
+          bold('bold text'),
+          ' and lists.',
+        ),
+        list('bullet', ['A bulleted list', 'with several items']),
+      ),
+      imageBlock(mediaIds[1], 'An image block with a caption.'),
+      productsBlock(productIds),
+      sectionIntro('Archive', 'An archive shows the latest articles.'),
+      archiveBlock(),
+    ],
+  },
 });

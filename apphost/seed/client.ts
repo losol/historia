@@ -67,6 +67,30 @@ export class HistoriaClient {
     return doc;
   }
 
+  /**
+   * Uploads a file to an upload collection (e.g. media). Payload takes the file and,
+   * as JSON in `_payload`, the document's other fields.
+   */
+  async upload(
+    collection: string,
+    file: { name: string; type: string; data: Uint8Array },
+    data: Record<string, unknown>,
+  ): Promise<Doc> {
+    const form = new FormData();
+    // A copy on a plain ArrayBuffer, which is what Blob takes.
+    form.append('file', new Blob([new Uint8Array(file.data)], { type: file.type }), file.name);
+    form.append('_payload', JSON.stringify(data));
+    const res = await fetch(`${this.baseUrl}/api/${collection}`, {
+      method: 'POST',
+      headers: this.token ? { Authorization: `JWT ${this.token}` } : {},
+      body: form,
+    });
+    const text = await res.text();
+    if (!res.ok)
+      throw new Error(`POST /api/${collection} (upload) failed with ${res.status}: ${text}`);
+    return (JSON.parse(text) as { doc: Doc }).doc;
+  }
+
   /** Updates a document; with `locale`, only that locale's values of localized fields. */
   async update(
     collection: string,

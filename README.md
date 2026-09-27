@@ -54,9 +54,10 @@ aspire run
 | Dashboard | printed by `aspire run` |
 
 On an empty database the `seed` resource fills in a demo site through the REST
-API: a website for `localhost:3100`, a home page and 25 articles in Norwegian
-and English, and a system-admin, `admin@historia.local` with password
-`historia`. It does nothing once there are websites, pages or articles, so it
+API, in Norwegian and English: a website for `localhost:3100`, a home page, a
+components page with every page block type, 25 articles, two products and three
+generated images, and a system-admin, `admin@historia.local` with password
+`historia`. It does nothing once any of those collections has documents, so it
 never touches content you have added. The script lives in `apphost/seed/`,
 outside the app; it also runs by hand against any running Historia with
 `node apphost/seed/seed.ts` (see the top of `seed.ts`).
