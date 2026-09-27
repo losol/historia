@@ -14,6 +14,8 @@ import '@eventuras/ratio-ui/ratio-ui.css';
 // The named themes a website can pick in its settings (see lib/site-settings/appearance).
 // Opt-in since ratio-ui 2.26; without them data-theme falls back to the default look.
 import '@eventuras/ratio-ui/themes/bureau.css';
+// Only fetched when a page uses them, so sites on other themes don't download them.
+import '@eventuras/ratio-ui/themes/bureau-fonts.css';
 import '@eventuras/ratio-ui/themes/ink.css';
 import '@eventuras/ratio-ui/fonts.css';
 
