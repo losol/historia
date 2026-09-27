@@ -32,6 +32,8 @@ export function isValidProductId(productId: unknown): productId is string {
  * not a shipping line (those are priced by Vipps), and belonging to the site. The
  * Local API skips access control, so without these filters a draft, another
  * site's product or a free shipping product could be put in a cart and paid for.
+ * Without a website (no host to resolve it from) nothing is purchasable: failing
+ * closed beats pricing products from every site.
  */
 export async function findPurchasableProducts(
   payload: Payload,
@@ -39,7 +41,7 @@ export async function findPurchasableProducts(
   websiteId: string | null,
 ): Promise<Product[]> {
   const ids = [...new Set(productIds.filter(isValidProductId))];
-  if (ids.length === 0) return [];
+  if (ids.length === 0 || !websiteId) return [];
 
   const { docs } = await payload.find({
     collection: 'products',
@@ -48,7 +50,7 @@ export async function findPurchasableProducts(
         { id: { in: ids } },
         { _status: { equals: 'published' } },
         { productType: { not_equals: 'shipping' } },
-        ...(websiteId ? [{ tenant: { equals: websiteId } }] : []),
+        { tenant: { equals: websiteId } },
       ],
     },
     limit: ids.length,
