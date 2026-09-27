@@ -8,7 +8,7 @@ import { Image } from '@eventuras/ratio-ui-next/Image';
 import configPromise from '@payload-config';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
-import { permanentRedirect, redirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { type CollectionSlug, getPayload } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
@@ -21,9 +21,9 @@ import type { Product } from '@/payload-types';
 import { getImageProps } from '@/utilities/image';
 import {
   getLocalizedCollectionName,
-  getOriginalCollectionName,
   type PageCollectionsType,
   pageCollections,
+  resolvePageCollection,
 } from '../pageCollections';
 import PageClient from './page.client';
 
@@ -72,10 +72,13 @@ export async function generateStaticParams() {
     slug: string;
   }> = [];
 
-  const fetchCollectionDocs = async (collection: string) => {
+  const fetchCollectionDocs = async (collection: string, locale: string) => {
     const result = await payload.find({
       collection: collection as CollectionSlug,
       draft: false,
+      // Slugs are localized, so each locale has its own paths.
+      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+      locale,
       limit: 1000,
       overrideAccess: false,
       pagination: false,
@@ -88,7 +91,7 @@ export async function generateStaticParams() {
   for (const locale of locales) {
     for (const collection of pageCollections) {
       try {
-        const documents = await fetchCollectionDocs(collection);
+        const documents = await fetchCollectionDocs(collection, locale);
 
         const localizedCollectionName = getLocalizedCollectionName(collection, locale);
 
@@ -130,32 +133,34 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 
   if (!parsed) {
     // Invalid slug format, redirect to 404
-    return <PayloadRedirects url={`/${locale}/${collection}/${combinedSlug}`} />;
+    return <PayloadRedirects url={`/${locale}/c/${collection}/${combinedSlug}`} />;
   }
 
   const { slug, resourceId } = parsed;
 
-  const originalCollectionName = getOriginalCollectionName(collection, locale);
+  const originalCollectionName = resolvePageCollection(collection, locale);
+  if (!originalCollectionName) notFound();
   const localizedCollectionName = getLocalizedCollectionName(originalCollectionName, locale);
 
   // Redirect if the provided collection name is not localized
   if (collection !== localizedCollectionName) {
-    redirect(`/${locale}/${localizedCollectionName}/${combinedSlug}`);
+    redirect(`/${locale}/c/${localizedCollectionName}/${combinedSlug}`);
   }
 
   const document = await queryDocumentByResourceId({
     collection: originalCollectionName as PageCollectionsType,
     resourceId,
+    locale,
   });
 
   if (!document) {
-    return <PayloadRedirects url={`/${locale}/${localizedCollectionName}/${combinedSlug}`} />;
+    return <PayloadRedirects url={`/${locale}/c/${localizedCollectionName}/${combinedSlug}`} />;
   }
 
   // Check for slug mismatch and redirect permanently to the correct URL (308 Permanent Redirect)
   if (document.slug !== slug) {
     const correctCombinedSlug = `${document.slug}--${resourceId}`;
-    permanentRedirect(`/${locale}/${localizedCollectionName}/${correctCombinedSlug}`);
+    permanentRedirect(`/${locale}/c/${localizedCollectionName}/${correctCombinedSlug}`);
   }
 
   const titleToUse = 'title' in document ? document.title : document.name;
@@ -172,7 +177,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 
         <PayloadRedirects
           disableNotFound
-          url={`/${locale}/${localizedCollectionName}/${combinedSlug}`}
+          url={`/${locale}/c/${localizedCollectionName}/${combinedSlug}`}
         />
 
         {draft && <LivePreviewListener />}
@@ -219,12 +224,16 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   }
 
   const { resourceId } = parsed;
-  const originalCollectionName = getOriginalCollectionName(collection, locale);
+  const originalCollectionName = resolvePageCollection(collection, locale);
+  if (!originalCollectionName) return {};
 
   const document = await queryDocumentByResourceId({
     collection: originalCollectionName as PageCollectionsType,
     resourceId,
+    locale,
   });
+  // The page itself answers 404; generateMeta needs a document.
+  if (!document) return {};
 
   const website = await getCurrentWebsite();
 
@@ -232,13 +241,23 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 const queryDocumentByResourceId = cache(
-  async ({ collection, resourceId }: { collection: PageCollectionsType; resourceId: string }) => {
+  async ({
+    collection,
+    resourceId,
+    locale,
+  }: {
+    collection: PageCollectionsType;
+    resourceId: string;
+    locale: string;
+  }) => {
     const { isEnabled: draft } = await draftMode();
     const payload = await getPayload({ config: configPromise });
 
     const result = await payload.find({
       collection,
       draft,
+      // @ts-expect-error - Payload's locale parameter type doesn't match our string type
+      locale,
       limit: 1,
       overrideAccess: draft,
       pagination: false,
