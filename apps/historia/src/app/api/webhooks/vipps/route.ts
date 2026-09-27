@@ -12,6 +12,11 @@ import {
 } from '@eventuras/vipps/webhooks-v1';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
+import {
+  canTransitionOrderFromPayment,
+  canTransitionTransaction,
+  type TransactionStatus,
+} from '@/lib/commerce/orderStatusRules';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
 import type { Transaction, User } from '@/payload-types';
@@ -20,18 +25,6 @@ const logger = Logger.create({
   namespace: 'historia:api:webhooks:vipps',
   context: { module: 'VippsWebhookHandler' },
 });
-
-/**
- * Valid transaction statuses based on Transactions collection
- */
-type TransactionStatus =
-  | 'pending'
-  | 'authorized'
-  | 'captured'
-  | 'completed'
-  | 'failed'
-  | 'refunded'
-  | 'partially-refunded';
 
 /**
  * Update user with verified data from Vipps
@@ -775,12 +768,31 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
     }
   }
 
+  // Events arrive late, twice or out of order, and the return page writes the same
+  // transaction. Only a step forward changes the status; the payment details are
+  // stored either way.
+  const statusAdvances = canTransitionTransaction(transaction.status, newStatus);
+  const effectiveStatus = (statusAdvances ? newStatus : transaction.status) as TransactionStatus;
+  if (!statusAdvances && transaction.status !== newStatus) {
+    logger.warn(
+      {
+        transactionId: transaction.id,
+        currentStatus: transaction.status,
+        ignoredStatus: newStatus,
+        eventType: payload.name,
+        reference: payload.reference,
+        businessEventId,
+      },
+      'Payment event would move the transaction backwards - keeping current status',
+    );
+  }
+
   // Update transaction status and store full payment details if available
   await payloadInstance.update({
     collection: 'transactions',
     id: transaction.id,
     data: {
-      status: newStatus as TransactionStatus,
+      ...(statusAdvances && { status: newStatus as TransactionStatus }),
       // Vipps redacts PII to "[Expired]" after its retention period — keep
       // the values stored at payment time instead of overwriting them.
       ...(paymentDetails && {
@@ -797,12 +809,12 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       transactionId: transaction.id,
       orderId: transaction.order,
       oldStatus: transaction.status,
-      newStatus,
+      newStatus: effectiveStatus,
       eventType: payload.name,
       reference: payload.reference,
       businessEventId,
     },
-    'Transaction status updated successfully',
+    'Transaction updated from payment event',
   );
 
   // Trigger revalidation for SSE endpoints and pages
@@ -960,8 +972,9 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
     }
   }
 
-  // Update order status based on transaction status
-  await updateOrderStatus(transaction, newStatus as TransactionStatus, payload);
+  // Update order status from the transaction's status as it now stands, so an out-of-
+  // order event cannot move the order either.
+  await updateOrderStatus(transaction, effectiveStatus, payload);
 
   logger.info(
     {
@@ -1017,6 +1030,7 @@ async function updateOrderStatus(
     captured: 'completed', // Payment captured, order can be fulfilled
     completed: 'completed', // Payment completed (same as captured)
     failed: 'canceled', // Payment failed or cancelled
+    cancelled: 'canceled', // Authorization cancelled by the merchant
     refunded: 'canceled', // Payment refunded, treat as cancelled
     'partially-refunded': 'completed', // Partial refund doesn't cancel the order
   };
@@ -1047,27 +1061,27 @@ async function updateOrderStatus(
       id: orderId,
     });
 
-    // On hold and canceled are set by a person, or by the amount check when an order
-    // does not match its payment. A payment event must not release them.
-    if (order.status === 'on-hold' || order.status === 'canceled') {
-      logger.warn(
-        {
-          orderId,
-          currentStatus: order.status,
-          wouldBecome: newOrderStatus,
-          transactionStatus,
-          reference: vippsPayload?.reference,
-        },
-        'Order is on hold or canceled - payment event does not change its status',
-      );
-      return;
-    }
-
     // Skip if order already has the correct status
     if (order.status === newOrderStatus) {
       logger.debug(
         { orderId, status: newOrderStatus },
         'Order status already set, skipping update',
+      );
+      return;
+    }
+
+    // Only forward: on-hold and canceled stay (set by a person, or by the amount check),
+    // and a completed order only goes to canceled on a full refund.
+    if (!canTransitionOrderFromPayment(order.status, newOrderStatus)) {
+      logger.warn(
+        {
+          orderId,
+          currentStatus: order.status,
+          ignoredStatus: newOrderStatus,
+          transactionStatus,
+          reference: vippsPayload?.reference,
+        },
+        'Payment event would not move the order forward - keeping current status',
       );
       return;
     }

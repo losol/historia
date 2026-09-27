@@ -23,6 +23,7 @@ import * as migration_20260922_163328_payload_3_90 from './20260922_163328_paylo
 import * as migration_20260927_132137_website_appearance from './20260927_132137_website_appearance';
 import * as migration_20260927_181158_media_object_key from './20260927_181158_media_object_key';
 import * as migration_20260927_194530_cart_amount from './20260927_194530_cart_amount';
+import * as migration_20260927_201404_order_payment_reference from './20260927_201404_order_payment_reference';
 
 export const migrations = [
   {
@@ -149,5 +150,10 @@ export const migrations = [
     up: migration_20260927_194530_cart_amount.up,
     down: migration_20260927_194530_cart_amount.down,
     name: '20260927_194530_cart_amount',
+  },
+  {
+    up: migration_20260927_201404_order_payment_reference.up,
+    down: migration_20260927_201404_order_payment_reference.down,
+    name: '20260927_201404_order_payment_reference',
   },
 ];

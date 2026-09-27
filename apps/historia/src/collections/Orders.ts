@@ -67,6 +67,21 @@ export const Orders: CollectionConfig = {
       },
     },
     {
+      // The payment this order was created for. Unique, so the webhook and the return
+      // page, which both create the order for a payment, cannot create two: the second
+      // insert fails and that caller uses the first order.
+      name: 'paymentReference',
+      type: 'text',
+      required: false,
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Payment provider reference this order was created from',
+      },
+    },
+    {
       name: 'userEmail',
       type: 'email',
       required: true,
