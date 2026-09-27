@@ -18,8 +18,15 @@ interface FooterClientProps {
 export const FooterClient: React.FC<FooterClientProps> = ({ navigation }) => {
   const locale = useLocale();
 
+  // The toggle hides itself unless visitors may switch, and does not depend on navigation.
+  const themeToggle = (
+    <Box className="clear-both">
+      <ThemeToggle />
+    </Box>
+  );
+
   if (!navigation || navigation.length === 0) {
-    return null;
+    return themeToggle;
   }
 
   return (
@@ -95,9 +102,7 @@ export const FooterClient: React.FC<FooterClientProps> = ({ navigation }) => {
           </div>
         ))}
       </Grid>
-      <Box className="clear-both">
-        <ThemeToggle />
-      </Box>
+      {themeToggle}
     </>
   );
 };

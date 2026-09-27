@@ -320,6 +320,16 @@ export interface Website {
       }[]
     | null;
   siteSettings?: {
+    appearance?: {
+      /**
+       * The ratio-ui theme: colors, fonts and shapes.
+       */
+      theme?: ('default' | 'bureau' | 'ink') | null;
+      /**
+       * Light, dark, or both with a toggle for the visitor.
+       */
+      colorScheme?: ('light' | 'dark' | 'both') | null;
+    };
     footer?: {
       /**
        * Navigation for the footer
@@ -3710,6 +3720,12 @@ export interface WebsitesSelect<T extends boolean = true> {
   siteSettings?:
     | T
     | {
+        appearance?:
+          | T
+          | {
+              theme?: T;
+              colorScheme?: T;
+            };
         footer?:
           | T
           | {

@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { headers } from 'next/headers';
@@ -68,8 +69,10 @@ export async function getCurrentWebsiteId(): Promise<string | null> {
  *
  * @returns The website object or null if headers are not available
  * @throws {Error} If host header exists but no matching website is found
+ *
+ * Cached per request, so the layout and the header share one lookup.
  */
-export async function getCurrentWebsite(): Promise<Website | null> {
+export const getCurrentWebsite = cache(async (): Promise<Website | null> => {
   const payload = await getPayload({ config: configPromise });
   const requestHeaders = await headers();
 
@@ -140,4 +143,4 @@ export async function getCurrentWebsite(): Promise<Website | null> {
   throw new Error(
     `No website configuration found for host: ${host}. Please configure the domain in the website settings.`,
   );
-}
+});
