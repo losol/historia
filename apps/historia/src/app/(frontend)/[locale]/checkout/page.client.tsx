@@ -140,13 +140,8 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
     setSubmitting(true);
 
     try {
-      const result = await createVippsPayment({
-        items: items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-        userLanguage: locale,
-      });
+      // The server prices the cart from the session, not from what the page shows.
+      const result = await createVippsPayment({ userLanguage: locale });
 
       if (!result.success) {
         alert(`Betalingsfeil: ${result.error.message}`);

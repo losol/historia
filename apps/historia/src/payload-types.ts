@@ -1472,6 +1472,14 @@ export interface Cart {
    */
   paymentReference?: string | null;
   /**
+   * In minor units (øre). Set during payment creation; shipping is added by Vipps.
+   */
+  amount?: number | null;
+  /**
+   * Currency code (ISO 4217) of the amount
+   */
+  currency?: string | null;
+  /**
    * Cart status tracking
    */
   status: 'draft' | 'payment-initiated' | 'completed' | 'cancelled';
@@ -2883,6 +2891,8 @@ export interface CartsSelect<T extends boolean = true> {
         id?: T;
       };
   paymentReference?: T;
+  amount?: T;
+  currency?: T;
   status?: T;
   order?: T;
   secret?: T;

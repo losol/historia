@@ -17,12 +17,14 @@ import {
 import configPromise from '@payload-config';
 import { headers } from 'next/headers';
 import { getPayload } from 'payload';
+import { isSiteLocale } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import { setCartPaymentReference } from '@/app/actions/cart';
 import { appConfig } from '@/config.server';
 import { saveCartToDatabase } from '@/lib/cart/saveCartToDatabase';
+import { findPurchasableProducts, isValidQuantity } from '@/lib/commerce/cartValidation';
 import { SHIPPING_OPTIONS } from '@/lib/shipping/options';
 import { getVippsConfig } from '@/lib/vipps/config';
-import type { Product } from '@/payload-types';
+import { getCurrentWebsiteId } from '@/lib/website';
 import { getMeUser } from '@/utilities/getMeUser';
 
 const logger = Logger.create({
@@ -56,11 +58,18 @@ export interface CartSummary {
   totalVat: number; // in minor units
   totalIncVat: number; // in minor units
   currency: string;
+  /**
+   * Lines left out because they cannot be bought: unknown, unpublished, from another
+   * website, or with an invalid quantity. Checkout must not start while any remain.
+   */
+  unavailableProductIds: string[];
 }
 
 /**
  * Calculate cart summary with all prices and VAT
- * All calculations done server-side for security and consistency
+ * All calculations done server-side for security and consistency. Prices come from
+ * the database; only product ids and quantities are taken from the caller, and those
+ * are validated.
  */
 export async function calculateCart(
   cartItems: Array<{ productId: string; quantity: number }>,
@@ -73,21 +82,31 @@ export async function calculateCart(
         totalVat: 0,
         totalIncVat: 0,
         currency: 'NOK',
+        unavailableProductIds: [],
       });
     }
 
-    const products = await fetchProductsByIds(cartItems.map((item) => item.productId));
+    const payload = await getPayload({ config: configPromise });
+    const products = await findPurchasableProducts(
+      payload,
+      cartItems.map((item) => item.productId),
+      await getCurrentWebsiteId(),
+    );
 
     // Build line items with calculations
     const items: CartLineItem[] = [];
+    const unavailableProductIds: string[] = [];
     let subtotalExVat = 0;
     let totalVat = 0;
-    const currency = products[0]?.price?.currency || 'NOK';
 
     for (const cartItem of cartItems) {
       const product = products.find((p) => p.id === cartItem.productId);
-      if (!product) {
-        logger.warn({ productId: cartItem.productId }, 'Product not found in cart');
+      if (!product || !isValidQuantity(cartItem.quantity)) {
+        logger.warn(
+          { productId: cartItem.productId, quantity: cartItem.quantity, found: !!product },
+          'Cart line cannot be bought: product unavailable or quantity invalid',
+        );
+        unavailableProductIds.push(cartItem.productId);
         continue;
       }
 
@@ -119,12 +138,20 @@ export async function calculateCart(
       totalVat += vatAmountTotal;
     }
 
+    // One payment has one currency; summing across currencies would charge nonsense.
+    const currencies = [...new Set(items.map((item) => item.currency))];
+    if (currencies.length > 1) {
+      logger.error({ currencies, cartItems }, 'Cart mixes currencies - cannot be priced');
+      return actionError('Handlekurven inneholder varer i ulike valutaer');
+    }
+
     const summary: CartSummary = {
       items,
       subtotalExVat,
       totalVat,
       totalIncVat: subtotalExVat + totalVat,
-      currency,
+      currency: currencies[0] ?? 'NOK',
+      unavailableProductIds,
     };
 
     return actionSuccess(summary);
@@ -135,26 +162,7 @@ export async function calculateCart(
 }
 
 /**
- * Fetch products by IDs (internal helper)
- */
-async function fetchProductsByIds(productIds: string[]): Promise<Product[]> {
-  const payload = await getPayload({ config: configPromise });
-
-  const { docs } = await payload.find({
-    collection: 'products',
-    where: {
-      id: {
-        in: productIds,
-      },
-    },
-    limit: productIds.length,
-  });
-
-  return docs;
-}
-
-/**
- * Validate cart items and identify products that no longer exist
+ * Validate cart items and identify products that can no longer be bought
  * Returns list of invalid product IDs that should be removed from cart
  */
 export async function validateCartProducts(
@@ -165,7 +173,12 @@ export async function validateCartProducts(
       return actionSuccess({ invalidProductIds: [], validProductIds: [] });
     }
 
-    const products = await fetchProductsByIds(cartItems.map((item) => item.productId));
+    const payload = await getPayload({ config: configPromise });
+    const products = await findPurchasableProducts(
+      payload,
+      cartItems.map((item) => item.productId),
+      await getCurrentWebsiteId(),
+    );
 
     const foundProductIds = new Set(products.map((p) => p.id));
     const requestedProductIds = cartItems.map((item) => item.productId);
@@ -189,42 +202,60 @@ export async function validateCartProducts(
 // ============================================================================
 
 interface CreateVippsPaymentParams {
-  items: Array<{
-    productId: string;
-    quantity: number;
-  }>;
   userLanguage?: string;
 }
 
 /**
  * Create Vipps ePayment (WEB_REDIRECT flow)
- * Uses the new ePayment API instead of the old Checkout API
- * All price calculations are done server-side
+ * Uses the new ePayment API instead of the old Checkout API.
+ *
+ * The amount is computed from the cart as it is saved to the database here, the same
+ * lines the order is later built from, never from items sent by the browser. The
+ * amount and the payment reference are stored on that cart before Vipps is called,
+ * so every payment Vipps knows about can be matched to its cart and checked exactly.
  */
 export async function createVippsPayment({
-  items,
   userLanguage = 'no',
-}: CreateVippsPaymentParams): Promise<ServerActionResult<CreatePaymentResponse>> {
+}: CreateVippsPaymentParams = {}): Promise<ServerActionResult<CreatePaymentResponse>> {
+  const locale = isSiteLocale(userLanguage) ? userLanguage : 'no';
+  let cartId: string | undefined;
+  let reference: string | undefined;
+
   try {
     // STEP 1: Save cart to database for secure payment validation
     // This ensures cart persists during payment flow even if session expires
     const saveResult = await saveCartToDatabase();
     if (!saveResult.success) {
-      logger.error({ error: saveResult.error }, 'Failed to save cart to database');
-      return actionError('Failed to save cart to database');
+      logger.error({ error: saveResult.error }, 'Checkout failed: could not save cart to database');
+      return actionError('Kunne ikke lagre handlekurven. Prøv igjen om litt.');
     }
 
-    const { cartId } = saveResult.data;
+    cartId = saveResult.data.cartId;
     logger.info({ cartId }, 'Cart saved to database successfully');
 
-    // STEP 2: Calculate cart totals server-side
-    const cartResult = await calculateCart(items);
+    // STEP 2: Calculate cart totals server-side, from the lines just saved
+    const cartResult = await calculateCart(saveResult.data.items);
     if (!cartResult.success) {
-      logger.error({ error: cartResult.error }, 'Failed to calculate cart');
+      logger.error({ error: cartResult.error, cartId }, 'Checkout failed: could not price cart');
       return actionError('Kunne ikke beregne handlekurv');
     }
 
     const cart: CartSummary = cartResult.data;
+
+    if (cart.unavailableProductIds.length > 0) {
+      logger.warn(
+        { cartId, unavailableProductIds: cart.unavailableProductIds },
+        'Checkout stopped: cart has lines that cannot be bought',
+      );
+      return actionError(
+        'Noen varer i handlekurven er ikke lenger tilgjengelige. Fjern dem og prøv igjen.',
+      );
+    }
+
+    if (cart.items.length === 0 || cart.totalIncVat <= 0) {
+      logger.warn({ cartId, totalIncVat: cart.totalIncVat }, 'Checkout stopped: nothing to pay');
+      return actionError('Handlekurven er tom');
+    }
 
     // Try to get current user for phone number (optional)
     let phoneNumber: string | undefined;
@@ -246,7 +277,7 @@ export async function createVippsPayment({
     }
 
     // Generate unique payment reference using UUID
-    const reference = crypto.randomUUID();
+    reference = crypto.randomUUID();
 
     // Build payment description from cart items
     const productNames = cart.items.map((item) => item.title).join(', ');
@@ -259,7 +290,7 @@ export async function createVippsPayment({
       id: item.productId,
       totalAmount: item.lineTotalIncVat,
       totalAmountExcludingTax: item.lineTotal,
-      totalTaxAmount: item.vatAmount,
+      totalTaxAmount: item.vatAmountTotal, // for the whole line, not one unit
       taxRate: item.vatRate * 100, // Vipps expects taxRate in basis points (25% = 2500)
     }));
 
@@ -294,7 +325,7 @@ export async function createVippsPayment({
         scope: 'name phoneNumber address email',
       },
       reference,
-      returnUrl: `${baseUrl}/${userLanguage}/checkout/vipps?reference=${reference}`,
+      returnUrl: `${baseUrl}/${locale}/checkout/vipps?reference=${reference}`,
       userFlow: 'WEB_REDIRECT',
       paymentDescription,
       receipt: {
@@ -325,50 +356,72 @@ export async function createVippsPayment({
       },
     };
 
-    // Get Vipps configuration
-    const vippsConfig = getVippsConfig();
-
-    // Create payment using ePayment API client
-    const paymentResponse = await createPayment(vippsConfig, paymentRequest);
-
-    // Store payment reference in cart session
-    await setCartPaymentReference(reference);
-
-    // Update cart in database with payment reference and status for recovery if session is lost
+    // STEP 3: Record the reference and the amount on the cart before Vipps knows about
+    // the payment. Order creation reads the cart only from the database, so a payment
+    // whose reference is not stored there could never become an order.
+    const payload = await getPayload({ config: configPromise });
     try {
-      const payload = await getPayload({ config: configPromise });
       await payload.update({
         collection: 'carts',
         id: cartId,
         data: {
           paymentReference: reference,
+          amount: cart.totalIncVat,
+          currency: cart.currency,
           status: 'payment-initiated',
         },
         overrideAccess: true, // We have the cartId from saveCartToDatabase
       });
-      logger.debug(
-        { cartId, reference },
-        'Cart updated with payment reference and status=payment-initiated',
-      );
     } catch (error) {
-      // Non-critical - cart can still be recovered via session
-      logger.warn(
+      logger.error(
         { error, cartId, reference },
-        'Failed to update cart with payment reference and status',
+        'Checkout failed: could not store payment reference on cart - payment not started',
+      );
+      return actionError('Kunne ikke starte betaling. Prøv igjen om litt.');
+    }
+
+    // STEP 4: Create the payment at Vipps
+    const vippsConfig = getVippsConfig();
+    const paymentResponse = await createPayment(vippsConfig, paymentRequest);
+
+    // Store payment reference in cart session. The database cart already has it, so
+    // the order can still be created if this fails, but the checkout page would not
+    // know about the pending payment.
+    const sessionResult = await setCartPaymentReference(reference);
+    if (!sessionResult.success) {
+      logger.error(
+        { cartId, reference, error: sessionResult.error },
+        'Payment created but its reference could not be stored in the session',
       );
     }
 
-    logger.info({ reference }, 'Vipps payment created');
+    logger.info(
+      { reference, cartId, amount: cart.totalIncVat, currency: cart.currency },
+      'Vipps payment created',
+    );
 
     return actionSuccess(paymentResponse);
   } catch (error) {
-    logger.error(
-      {
-        error,
-        errorMessage: error instanceof Error ? error.message : String(error),
-      },
-      'Error creating Vipps ePayment',
-    );
+    logger.error({ error, cartId, reference }, 'Checkout failed: error creating Vipps ePayment');
+
+    // The cart was marked as waiting for this payment; it will never come.
+    if (cartId && reference) {
+      try {
+        const payload = await getPayload({ config: configPromise });
+        await payload.update({
+          collection: 'carts',
+          id: cartId,
+          data: { status: 'cancelled' },
+          overrideAccess: true,
+        });
+      } catch (updateError) {
+        logger.error(
+          { error: updateError, cartId, reference },
+          'Could not mark cart as cancelled after failed payment creation',
+        );
+      }
+    }
+
     return actionError('Kunne ikke starte betaling. Prøv igjen om litt.');
   }
 }

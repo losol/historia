@@ -29,7 +29,7 @@ const logger = Logger.create({
  * @returns Cart ID and secret for payment flow, or error
  */
 export async function saveCartToDatabase(): Promise<
-  ServerActionResult<{ cartId: string; cartSecret: string }>
+  ServerActionResult<{ cartId: string; cartSecret: string; items: CartItem[] }>
 > {
   try {
     logger.info('Saving cart to database');
@@ -71,18 +71,17 @@ export async function saveCartToDatabase(): Promise<
     };
 
     // Get or create session ID for rate limiting
-    // This provides a stable identifier across requests for the same session
-    let sessionId = session.data.sessionId as string | undefined;
+    // This provides a stable identifier across requests for the same session.
+    // Kept in sessionData, which the second write below spreads: spreading the original
+    // session.data there dropped the id again, so every attempt got a new one and the
+    // rate limit never applied.
+    let sessionData = session.data;
+    let sessionId = sessionData.sessionId as string | undefined;
     if (!sessionId) {
       sessionId = crypto.randomUUID();
+      sessionData = { ...sessionData, sessionId };
       // Persist the session ID for future requests
-      await createAndPersistSession({
-        ...session,
-        data: {
-          ...session.data,
-          sessionId,
-        },
-      });
+      await createAndPersistSession({ ...session, data: sessionData });
     }
 
     // Create cart in database
@@ -121,7 +120,7 @@ export async function saveCartToDatabase(): Promise<
     await createAndPersistSession({
       ...session,
       data: {
-        ...session.data,
+        ...sessionData,
         cartId: String(result.id),
         cartSecret: cartSecret,
       },
@@ -133,6 +132,7 @@ export async function saveCartToDatabase(): Promise<
       {
         cartId: String(result.id),
         cartSecret: cartSecret,
+        items: cartData.items,
       },
       'Cart saved successfully',
     );
