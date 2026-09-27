@@ -1,40 +1,19 @@
 'use client';
 import type React from 'react';
-import { useEffect, useState } from 'react';
 import { Navbar } from '@eventuras/ratio-ui/core/Navbar';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { CartButton } from '@/components/CartButton';
 import { useLocale } from '@/hooks/useLocale';
-import { useHeaderTheme } from '@/providers/HeaderTheme';
 
 interface HeaderClientProps {
   title?: string;
 }
 
 export const HeaderClient: React.FC<HeaderClientProps> = ({ title }) => {
-  const [theme, setTheme] = useState<string | null>(null);
-  const { headerTheme, setHeaderTheme } = useHeaderTheme();
-  const pathname = usePathname();
   const locale = useLocale();
 
-  // pathname is not read in the body: it is there so the theme resets on every navigation.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on navigation
-  useEffect(() => {
-    if (headerTheme !== null) {
-      setHeaderTheme(null);
-    }
-  }, [pathname, headerTheme, setHeaderTheme]);
-
-  useEffect(() => {
-    if (headerTheme && headerTheme !== theme) {
-      // Use setTimeout to avoid setState in render
-      setTimeout(() => setTheme(headerTheme), 0);
-    }
-  }, [headerTheme, theme]);
-
   return (
-    <header className="relative z-20" data-theme={theme ?? undefined}>
+    <header className="relative z-20">
       <Navbar bgColor="bg-transparent">
         {title && (
           <Navbar.Brand>

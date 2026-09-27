@@ -14,7 +14,6 @@ import { Hero } from '@/heros/Hero';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
 import type { PagesSelect } from '@/payload-types';
-import PageClient from './page.client';
 
 // Read locales and default locale from environment variables, fallback to 'en'
 const logger = Logger.create({
@@ -175,7 +174,6 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 
   return (
     <>
-      <PageClient />
       <LivePreviewListener />
       {breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 1 && (
         <nav className="mb-4">
