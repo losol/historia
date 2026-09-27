@@ -1,6 +1,7 @@
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
 import type { CollectionAfterChangeHook } from 'payload';
+import { maskEmail } from '@/lib/observability/maskEmail';
 import type { Order, Product, Shipment, User, Website } from '@/payload-types';
 
 const logger = Logger.create({
@@ -108,7 +109,7 @@ export const sendShipmentNotification: CollectionAfterChangeHook<Shipment> = asy
       {
         shipmentId: doc.id,
         orderId: order.id,
-        email: order.userEmail,
+        email: maskEmail(order.userEmail),
       },
       'Shipment notification email sent successfully',
     );

@@ -1,5 +1,3 @@
-'use server';
-
 import {
   actionError,
   actionSuccess,
@@ -11,6 +9,8 @@ import configPromise from '@payload-config';
 import { getPayload } from 'payload';
 import { getCurrentWebsiteId } from '../website';
 import type { CartItem } from './types';
+
+// Not a server action: called while creating a payment, never from the browser.
 
 const logger = Logger.create({
   namespace: 'historia:carts:saveToDatabase',

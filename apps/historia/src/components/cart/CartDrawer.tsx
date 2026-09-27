@@ -9,6 +9,7 @@ import { NumberField } from '@eventuras/ratio-ui/forms';
 import { Drawer } from '@eventuras/ratio-ui/layout/Drawer';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart';
+import { cartLineItemLabels } from '@/lib/cart/labels';
 import { removedNotice } from '@/lib/cart/removedNotice';
 import { useCartSummary } from '@/lib/cart/use-cart-summary';
 import { fromMinorUnits } from '@/lib/price';
@@ -104,6 +105,7 @@ export function CartDrawer({ isOpen, onClose, locale }: Readonly<CartDrawerProps
                   onQuantityChange={updateCartItem}
                   onRemove={removeFromCart}
                   testIdPrefix="cartdrawer"
+                  labels={cartLineItemLabels(locale)}
                   QuantityField={NumberField}
                 />
               </div>

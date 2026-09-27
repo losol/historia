@@ -18,7 +18,7 @@ import configPromise from '@payload-config';
 import { headers } from 'next/headers';
 import { getPayload } from 'payload';
 import { isSiteLocale } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
-import { setCartPaymentReference } from '@/app/actions/cart';
+import { setCartPaymentReference } from '@/lib/cart/paymentReference';
 import { saveCartToDatabase } from '@/lib/cart/saveCartToDatabase';
 import { findPurchasableProducts, isValidQuantity } from '@/lib/commerce/cartValidation';
 import { SHIPPING_OPTIONS } from '@/lib/shipping/options';

@@ -8,6 +8,7 @@ import {
 import { Logger } from '@eventuras/logger';
 import { getPaymentDetails, mergeExpiredPaymentDetails } from '@eventuras/vipps/epayment-v1';
 import { getPayload } from 'payload';
+import { maskEmail } from '@/lib/observability/maskEmail';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
 
@@ -89,7 +90,7 @@ export async function updateTransactionDetails(
           logger.info(
             {
               userId: customerId,
-              email: paymentDetails.userDetails.email,
+              email: maskEmail(paymentDetails.userDetails.email),
               transactionId,
             },
             'Found and will link existing user from Vipps email',
@@ -99,7 +100,7 @@ export async function updateTransactionDetails(
         logger.warn(
           {
             error,
-            email: paymentDetails.userDetails?.email,
+            email: maskEmail(paymentDetails.userDetails?.email),
             transactionId,
           },
           'Failed to lookup user by email',

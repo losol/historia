@@ -1,5 +1,3 @@
-'use server';
-
 import {
   actionError,
   actionSuccess,
@@ -8,10 +6,13 @@ import {
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
 import { getPayload } from 'payload';
+import { maskEmail } from '@/lib/observability/maskEmail';
 import { reportCritical } from '@/lib/observability/reportCritical';
 import { getCurrentWebsiteId } from '@/lib/website';
 import config from '@/payload.config';
 import type { Website } from '@/payload-types';
+
+// Not a server action: it sends email, so only server code may call it.
 
 const logger = Logger.create({
   namespace: 'historia:checkout:vipps',
@@ -52,7 +53,7 @@ export async function notifyOrphanedPayment(
     } = details;
 
     logger.info(
-      { paymentReference, customerEmail, amount },
+      { paymentReference, customerEmail: maskEmail(customerEmail), amount },
       'Creating orphaned payment notification',
     );
 

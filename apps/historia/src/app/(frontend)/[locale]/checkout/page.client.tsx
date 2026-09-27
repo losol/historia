@@ -17,6 +17,7 @@ import { useToast } from '@eventuras/ratio-ui/toast';
 import { Link } from '@eventuras/ratio-ui-next';
 import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import { useCart } from '@/lib/cart';
+import { cartLineItemLabels, orderSummaryLabels } from '@/lib/cart/labels';
 import { removedNotice } from '@/lib/cart/removedNotice';
 import { useCartSummary } from '@/lib/cart/use-cart-summary';
 import { fromMinorUnits } from '@/lib/price';
@@ -79,6 +80,7 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
   // prices follow when the server has recomputed them.
   const quantities = new Map(items.map((item) => [item.productId, item.quantity]));
   const lines = (cart?.items ?? []).filter((item) => quantities.has(item.productId));
+  const summaryText = orderSummaryLabels(locale);
 
   // The payment is priced from the cart on the server: wait until every change has
   // reached it and the prices shown are for the lines shown.
@@ -202,7 +204,8 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
               }}
               locale={locale}
               formatPrice={formatPrice}
-              title="Ordresammendrag"
+              title={summaryText.title}
+              labels={summaryText.labels}
               showVatBreakdown
             >
               {lines.map((item) => (
@@ -223,6 +226,7 @@ export function CheckoutPageClient({ locale }: Readonly<CheckoutPageClientProps>
                   onQuantityChange={updateCartItem}
                   onRemove={removeFromCart}
                   testIdPrefix="checkout"
+                  labels={cartLineItemLabels(locale)}
                   QuantityField={NumberField}
                 />
               ))}
