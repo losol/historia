@@ -70,6 +70,30 @@ export const Carts: CollectionConfig = {
       },
     },
     {
+      // What the customer was asked to pay for the items, so the order can be checked
+      // against it exactly. Prices may change between payment and order.
+      name: 'amount',
+      label: 'Amount (inc. VAT, ex. shipping)',
+      type: 'number',
+      required: false,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'In minor units (øre). Set during payment creation; shipping is added by Vipps.',
+      },
+    },
+    {
+      name: 'currency',
+      type: 'text',
+      required: false,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Currency code (ISO 4217) of the amount',
+      },
+    },
+    {
       name: 'status',
       type: 'select',
       required: true,

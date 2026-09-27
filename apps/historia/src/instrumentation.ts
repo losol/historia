@@ -3,6 +3,10 @@ import { logStartupConfig } from './utilities/logStartupConfig';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Before anything logs, so errors are logged with their message and stack.
+    const { configureLogger } = await import('./utilities/configureLogger');
+    configureLogger();
+
     // Log startup configuration once on server startup
     logStartupConfig();
 

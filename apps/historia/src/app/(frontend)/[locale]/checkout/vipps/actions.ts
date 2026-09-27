@@ -182,6 +182,10 @@ export async function createOrderFromPayment({
   const sessionContext = await getSessionContext();
 
   let cart: Cart | undefined;
+  // What the customer was asked to pay for the items (inc. VAT, ex. shipping), stored on
+  // the cart when the payment was created. Missing on carts from before it was stored.
+  let cartAmount: number | null = null;
+  let cartCurrency: string | null = null;
 
   try {
     const payload = await getPayload({ config: configPromise });
@@ -209,11 +213,14 @@ export async function createOrderFromPayment({
         })),
         paymentReference: paymentReference,
       };
+      cartAmount = typeof cartDoc.amount === 'number' ? cartDoc.amount : null;
+      cartCurrency = cartDoc.currency ?? null;
 
       logger.info(
         {
           ...sessionContext,
           cartId: cartDoc.id,
+          cartAmount,
           itemCount: cart?.items.length || 0,
           paymentReference,
         },
@@ -237,72 +244,6 @@ export async function createOrderFromPayment({
       },
       'Failed to retrieve cart from database',
     );
-  }
-
-  if (!cart) {
-    logger.warn(
-      {
-        ...sessionContext,
-        paymentReference,
-      },
-      'No cart ID or secret in session - attempting to find cart by payment reference',
-    );
-
-    // Fallback: Try to find cart by payment reference
-    // This handles cases where session was lost (browser closed, cookie expired, etc.)
-    // but cart was saved to database during payment initiation
-    try {
-      const payload = await getPayload({ config: configPromise });
-
-      const cartResults = await payload.find({
-        collection: 'carts',
-        where: {
-          paymentReference: {
-            equals: paymentReference,
-          },
-        },
-        limit: 1,
-        overrideAccess: true, // Session is lost, but we have payment reference
-      });
-
-      if (cartResults.docs && cartResults.docs.length > 0) {
-        const recoveredCart = cartResults.docs[0];
-
-        if (recoveredCart?.items?.length > 0) {
-          cart = {
-            items: recoveredCart.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-            })),
-            paymentReference: paymentReference,
-          };
-
-          logger.info(
-            {
-              ...sessionContext,
-              cartId: recoveredCart.id,
-              itemCount: cart.items.length,
-              paymentReference,
-            },
-            'Successfully recovered cart from database using payment reference',
-          );
-        }
-      } else {
-        logger.error(
-          { ...sessionContext, paymentReference },
-          'Cart not found in database by payment reference',
-        );
-      }
-    } catch (error) {
-      logger.error(
-        {
-          ...sessionContext,
-          error,
-          paymentReference,
-        },
-        'Failed to recover cart from database',
-      );
-    }
   }
 
   try {
@@ -599,9 +540,9 @@ export async function createOrderFromPayment({
         product: product.id,
         quantity: item.quantity,
         price: {
-          amountExVat: product.price?.amountExVat || 0,
+          amountExVat: product.price?.amountExVat ?? 0,
           currency: product.price?.currency || 'NOK',
-          vatRate: product.price?.vatRate || 25,
+          vatRate: product.price?.vatRate ?? 25,
         },
       };
     });
@@ -721,60 +662,45 @@ export async function createOrderFromPayment({
       }
     }
 
-    // Calculate order total and validate against authorized amount
-    // Note: calculatedTotal is ex VAT, while Vipps includes VAT + shipping
-    const calculatedTotal = orderItems.reduce((sum, item) => {
-      const itemTotal = (item.price.amountExVat || 0) * item.quantity;
-      return sum + itemTotal;
-    }, 0);
-
-    // Vipps amount is in øre (minor units), same as calculatedTotal
+    // Check the authorized amount against what the customer was asked to pay: the cart's
+    // stored amount (inc. VAT) plus the shipping Vipps added. It must match exactly.
+    // A mismatch does not stop the order: the money is authorized, and dropping the order
+    // would leave a paid payment with nothing to fulfil. The order is put on hold for a
+    // person to check instead, and the mismatch is logged and recorded.
     const authorizedAmount = paymentDetails.aggregate.authorizedAmount.value;
+    const authorizedCurrency = paymentDetails.aggregate.authorizedAmount.currency;
+    const shippingCost = paymentDetails.shippingDetails?.shippingCost ?? 0;
+    const itemsAmount =
+      cartAmount ??
+      // Carts from before the amount was stored: recompute from today's prices.
+      cart.items.reduce((sum, item) => {
+        const product = products.find((p) => p.id === item.productId);
+        return sum + (product?.price?.amountIncVat ?? 0) * item.quantity;
+      }, 0);
+    const expectedAmount = itemsAmount + shippingCost;
+    const currencyMatches = !cartCurrency || cartCurrency === authorizedCurrency;
+    const amountMatches = authorizedAmount === expectedAmount && currencyMatches;
 
-    logger.info(
-      {
-        calculatedTotal,
-        calculatedTotalNOK: calculatedTotal / 100,
-        authorizedAmount,
-        authorizedAmountNOK: authorizedAmount / 100,
-        difference: authorizedAmount - calculatedTotal,
-        orderItems: orderItems.map((i) => ({
-          productId: i.product,
-          quantity: i.quantity,
-          unitPrice: i.price.amountExVat,
-          total: i.price.amountExVat * i.quantity,
-        })),
-      },
-      'Validating payment amount',
-    );
+    const amountCheck = {
+      paymentReference,
+      authorizedAmount,
+      authorizedCurrency,
+      expectedAmount,
+      itemsAmount,
+      shippingCost,
+      cartCurrency,
+      amountSource: cartAmount === null ? 'recomputed-from-products' : 'cart',
+      difference: authorizedAmount - expectedAmount,
+    };
 
-    // Accept payment if authorized amount >= order total
-    // (Vipps includes VAT + shipping, our total is ex VAT)
-    if (authorizedAmount < calculatedTotal) {
+    if (amountMatches) {
+      logger.info(amountCheck, 'Payment amount matches the cart');
+    } else {
       logger.error(
-        {
-          calculatedTotal,
-          calculatedTotalNOK: calculatedTotal / 100,
-          authorizedAmount,
-          authorizedAmountNOK: authorizedAmount / 100,
-          difference: calculatedTotal - authorizedAmount,
-          paymentReference,
-        },
-        'Payment amount insufficient - authorized less than order total',
-      );
-      return actionError(
-        `Payment amount insufficient: authorized ${authorizedAmount / 100} NOK but order total is ${calculatedTotal / 100} NOK (ex VAT)`,
+        amountCheck,
+        'CRITICAL: Authorized amount does not match the cart - order will be created on hold for manual review',
       );
     }
-
-    logger.info(
-      {
-        authorizedAmount,
-        calculatedTotal,
-        overpayment: authorizedAmount - calculatedTotal,
-      },
-      'Payment amount validated - authorized amount covers order total',
-    );
 
     // Get user details from Historia account
     const user = await payload.findByID({
@@ -845,7 +771,7 @@ export async function createOrderFromPayment({
       data: {
         customer: effectiveUserId,
         userEmail: user.email,
-        status: 'pending',
+        status: amountMatches ? 'pending' : 'on-hold',
         currency: paymentDetails.aggregate.authorizedAmount.currency,
         tenant: websiteId,
         items: orderItems,
@@ -864,6 +790,27 @@ export async function createOrderFromPayment({
       },
       'Order created successfully',
     );
+
+    if (!amountMatches) {
+      // A record next to the order, so the mismatch can be found in the admin and not
+      // only in the logs.
+      try {
+        await payload.create({
+          collection: 'business-events',
+          data: {
+            eventType: 'payment.amount_mismatch',
+            source: 'historia',
+            externalReference: paymentReference,
+            data: { ...amountCheck, orderId: order.id },
+          },
+        });
+      } catch (error) {
+        logger.error(
+          { error, ...amountCheck, orderId: order.id },
+          'Could not record the payment amount mismatch as a business event',
+        );
+      }
+    }
 
     // Update cart status to completed and link to order
     // Idempotent: Only update if not already completed (prevents race condition with webhook)

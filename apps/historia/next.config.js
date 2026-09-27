@@ -26,6 +26,11 @@ const allowedImageDomains = getAllowedDomainsFromAllowedOrigins(allowedOrigins) 
 const nextConfig = {
   output: 'standalone',
 
+  // One logger for the whole server. Bundled, every route got its own copy of the
+  // Logger class, so the configuration set in instrumentation.ts (error
+  // serialization) never reached the loggers in routes and server actions.
+  serverExternalPackages: ['@eventuras/logger'],
+
   experimental: {
     serverActions: {
       // Increased from default 1mb to 10mb to support rich text content with:

@@ -1047,6 +1047,22 @@ async function updateOrderStatus(
       id: orderId,
     });
 
+    // On hold and canceled are set by a person, or by the amount check when an order
+    // does not match its payment. A payment event must not release them.
+    if (order.status === 'on-hold' || order.status === 'canceled') {
+      logger.warn(
+        {
+          orderId,
+          currentStatus: order.status,
+          wouldBecome: newOrderStatus,
+          transactionStatus,
+          reference: vippsPayload?.reference,
+        },
+        'Order is on hold or canceled - payment event does not change its status',
+      );
+      return;
+    }
+
     // Skip if order already has the correct status
     if (order.status === newOrderStatus) {
       logger.debug(

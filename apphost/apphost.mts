@@ -40,6 +40,13 @@ const cmsSecret = await builder.addParameter('cms-secret', {
   secret: true,
 });
 
+// Encrypts the session cookie that holds the cart (32 bytes as hex). Pinned for the
+// same reason: a new one per run would empty every cart on restart.
+const sessionSecret = await builder.addParameter('session-secret', {
+  value: '2edf41814ce64753520276d823d83502a549b96a2a5595314243419db6a6794e',
+  secret: true,
+});
+
 // Order confirmations and password resets are mail, so development needs somewhere
 // for it to land. Mailpit's web UI is where you read it.
 const mailpit = await builder
@@ -56,6 +63,7 @@ const sharedEnvironment = {
   // and silently falls back to SQLite for anything else.
   CMS_DATABASE_URL: await db.uriExpression(),
   CMS_SECRET: cmsSecret,
+  SESSION_SECRET: sessionSecret,
   NEXT_PUBLIC_CMS_URL: historiaUrl,
   // Must match the locale enum the migrations create. Note that .env.example
   // suggests `nb`, which these migrations do not know.

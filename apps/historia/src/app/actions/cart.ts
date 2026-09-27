@@ -8,7 +8,16 @@ import {
 import type { Session } from '@eventuras/fides-auth-next';
 import { createSession, getCurrentSession, setSessionCookie } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import type { Cart, CartItem, CustomerInfo, SessionData } from '@/lib/cart/types';
+import {
+  findPurchasableProducts,
+  isValidProductId,
+  isValidQuantity,
+  MAX_ITEM_QUANTITY,
+} from '@/lib/commerce/cartValidation';
+import { getCurrentWebsiteId } from '@/lib/website';
 
 const logger = Logger.create({
   namespace: 'historia:cart-actions',
@@ -55,8 +64,21 @@ export async function addToCart(
   try {
     logger.info({ productId, quantity }, 'Adding item to cart');
 
-    if (quantity <= 0) {
-      return actionError('Quantity must be greater than 0');
+    // Server actions can be called with any arguments, not only from our buttons.
+    if (!isValidProductId(productId) || !isValidQuantity(quantity)) {
+      logger.warn({ productId, quantity }, 'Rejected add to cart: invalid product id or quantity');
+      return actionError('Invalid product or quantity');
+    }
+
+    const payload = await getPayload({ config: configPromise });
+    const [product] = await findPurchasableProducts(
+      payload,
+      [productId],
+      await getCurrentWebsiteId(),
+    );
+    if (!product) {
+      logger.warn({ productId }, 'Rejected add to cart: product is not for sale on this website');
+      return actionError('This product is not available');
     }
 
     const session = await getCurrentSession();
@@ -74,11 +96,16 @@ export async function addToCart(
     let updatedItems: CartItem[];
     if (existingItemIndex >= 0) {
       // Update quantity of existing item
+      const newQuantity = existingItems[existingItemIndex].quantity + quantity;
+      if (!isValidQuantity(newQuantity)) {
+        logger.warn(
+          { productId, currentQuantity: existingItems[existingItemIndex].quantity, quantity },
+          'Rejected add to cart: line would exceed the maximum quantity',
+        );
+        return actionError(`At most ${MAX_ITEM_QUANTITY} of one product`);
+      }
       updatedItems = [...existingItems];
-      updatedItems[existingItemIndex] = {
-        productId,
-        quantity: updatedItems[existingItemIndex].quantity + quantity,
-      };
+      updatedItems[existingItemIndex] = { productId, quantity: newQuantity };
       logger.info(
         { productId, newQuantity: updatedItems[existingItemIndex].quantity },
         'Updated existing cart item',
@@ -131,8 +158,10 @@ export async function updateCartItem(
   try {
     logger.info({ productId, quantity }, 'Updating cart item');
 
-    if (quantity < 0) {
-      return actionError('Quantity cannot be negative');
+    // 0 removes the line; anything else must be a valid quantity.
+    if (!isValidProductId(productId) || (quantity !== 0 && !isValidQuantity(quantity))) {
+      logger.warn({ productId, quantity }, 'Rejected cart update: invalid product id or quantity');
+      return actionError('Invalid product or quantity');
     }
 
     const session = await getCurrentSession();

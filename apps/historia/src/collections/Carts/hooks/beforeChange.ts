@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { Logger } from '@eventuras/logger';
 import type { CollectionBeforeChangeHook } from 'payload';
+import { isValidQuantity } from '@/lib/commerce/cartValidation';
 import { checkRateLimit } from '../rateLimit';
 
 const logger = Logger.create({
@@ -76,9 +77,16 @@ export const beforeChangeCart: CollectionBeforeChangeHook = async ({ data, opera
 
       item.productId = sanitizedProductId;
 
-      // Sanitize quantity - ensure it's a positive integer with reasonable max
-      const quantity = Math.max(1, Math.min(9999, Math.floor(Number(item.quantity) || 1)));
-      item.quantity = quantity;
+      // Reject rather than round: the payment is priced from these same lines, so a
+      // quantity changed here would make the order differ from what was paid.
+      if (!isValidQuantity(item.quantity)) {
+        logger.error(
+          { productId: sanitizedProductId, quantity: item.quantity },
+          'Invalid cart quantity',
+        );
+        throw new Error(`Invalid quantity for product ${sanitizedProductId}`);
+      }
+      const quantity = item.quantity;
 
       // Fetch product to validate existence and check inventory
       const productId = item.productId;
