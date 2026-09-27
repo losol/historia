@@ -8,6 +8,7 @@ import {
 import { Logger } from '@eventuras/logger';
 import { notitiaTemplates } from '@eventuras/notitia-templates';
 import { getPayload } from 'payload';
+import { reportCritical } from '@/lib/observability/reportCritical';
 import { getCurrentWebsiteId } from '@/lib/website';
 import config from '@/payload.config';
 import type { Website } from '@/payload-types';
@@ -57,6 +58,24 @@ export async function notifyOrphanedPayment(
 
     const payload = await getPayload({ config });
 
+    // One alert per payment. The return page (on every load), its client fallback and
+    // the webhook can all get here for the same payment; staff needs to hear once.
+    const alreadyNotified = await payload.find({
+      collection: 'business-events',
+      where: {
+        and: [
+          { eventType: { equals: 'payment.orphaned' } },
+          { externalReference: { equals: paymentReference } },
+        ],
+      },
+      limit: 1,
+      depth: 0,
+    });
+    if (alreadyNotified.docs.length > 0) {
+      logger.info({ paymentReference }, 'Orphaned payment already reported - not notifying again');
+      return actionSuccess(undefined);
+    }
+
     // Create business event for tracking
     await payload.create({
       collection: 'business-events',
@@ -79,20 +98,34 @@ export async function notifyOrphanedPayment(
 
     logger.info({ paymentReference }, 'Business event created for orphaned payment');
 
-    // Get website/tenant ID from parameter or detect from request headers
+    // The website the payment was made on: as given, else the cart's, else the host's.
+    // In the webhook the host is the webhook's, not the shop's.
     let websiteId: string | null = providedWebsiteId ?? null;
     if (!websiteId) {
-      websiteId = await getCurrentWebsiteId();
-      logger.info({ paymentReference, websiteId }, 'Detected website ID from request headers');
-    } else {
-      logger.info({ paymentReference, websiteId }, 'Using provided website ID (webhook context)');
+      const carts = await payload.find({
+        collection: 'carts',
+        where: { paymentReference: { equals: paymentReference } },
+        limit: 1,
+        depth: 0,
+      });
+      const tenant = carts.docs[0]?.tenant;
+      websiteId = (typeof tenant === 'object' ? tenant?.id : tenant) ?? null;
+    }
+    if (!websiteId) {
+      websiteId = await getCurrentWebsiteId().catch((error: unknown) => {
+        logger.error({ error, paymentReference }, 'Could not resolve website from host');
+        return null;
+      });
     }
 
     if (!websiteId) {
-      logger.error(
-        { paymentReference },
-        'CRITICAL: No website context found - cannot send orphaned payment notification to sales team',
-      );
+      reportCritical(logger, 'Orphaned payment: no website found - sales team not notified', {
+        area: 'checkout',
+        paymentReference,
+        amount,
+        currency,
+        paymentState,
+      });
       return actionError('Cannot determine website/tenant - notification not sent');
     }
 
@@ -102,25 +135,26 @@ export async function notifyOrphanedPayment(
       depth: 2, // Populate user relationship in contactPoints
     })) as Website;
 
-    // Get sales contact emails
+    // Get sales contact emails. The Websites afterRead hook strips everything but the
+    // names from contact users, so each user is read on its own for the email.
     const salesEmails: string[] = [];
-    if (website.contactPoints) {
-      const salesContacts = website.contactPoints.filter((cp) => cp.contactType === 'sales');
-
-      for (const contact of salesContacts) {
-        if (
-          contact.user &&
-          typeof contact.user === 'object' &&
-          'email' in contact.user &&
-          contact.user.email
-        ) {
-          salesEmails.push(contact.user.email);
-        }
+    for (const contact of website.contactPoints ?? []) {
+      if (contact.contactType !== 'sales' || !contact.user) continue;
+      const userId = typeof contact.user === 'object' ? contact.user.id : contact.user;
+      try {
+        const user = await payload.findByID({ collection: 'users', id: userId, depth: 0 });
+        if (user?.email) salesEmails.push(user.email);
+      } catch (error) {
+        logger.error({ error, paymentReference, userId }, 'Could not read sales contact user');
       }
     }
 
     if (salesEmails.length === 0) {
-      logger.warn({ paymentReference, websiteId }, 'No sales contact emails found for website');
+      reportCritical(
+        logger,
+        'Orphaned payment: website has no sales contact with an email - nobody notified',
+        { area: 'checkout', paymentReference, websiteId, amount, currency, paymentState },
+      );
       return actionSuccess(undefined);
     }
 
@@ -148,6 +182,7 @@ export async function notifyOrphanedPayment(
     });
 
     // Send email to all sales contacts
+    let sent = 0;
     for (const email of salesEmails) {
       try {
         await payload.sendEmail({
@@ -156,6 +191,7 @@ export async function notifyOrphanedPayment(
           html: emailHtml,
         });
 
+        sent += 1;
         logger.info(
           { paymentReference, recipient: email },
           'Orphaned payment notification sent to sales contact',
@@ -168,10 +204,18 @@ export async function notifyOrphanedPayment(
       }
     }
 
-    logger.info(
-      { paymentReference, recipientCount: salesEmails.length },
-      'Orphaned payment notifications sent successfully',
-    );
+    if (sent === 0) {
+      reportCritical(
+        logger,
+        'Orphaned payment: every notification email failed - nobody notified',
+        { area: 'checkout', paymentReference, websiteId, recipientCount: salesEmails.length },
+      );
+    } else {
+      logger.info(
+        { paymentReference, sent, recipientCount: salesEmails.length },
+        'Orphaned payment notifications sent',
+      );
+    }
 
     return actionSuccess(undefined);
   } catch (error) {

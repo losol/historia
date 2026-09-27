@@ -114,8 +114,14 @@ export async function GET(
             limit: 1,
           });
 
-          if (transactions.docs.length === 0) {
-            logger.debug({ reference, pollCount }, 'Transaction not found yet');
+          // Ask Vipps directly while the transaction is missing or still pending: the
+          // webhook may be late, or not come at all for an aborted payment.
+          const pendingTransaction = transactions.docs[0];
+          if (!pendingTransaction || pendingTransaction.status === 'pending') {
+            logger.debug(
+              { reference, pollCount, hasTransaction: !!pendingTransaction },
+              'Transaction not found yet or still pending',
+            );
 
             // Fallback: After 3 polls (9 seconds), try polling Vipps API directly
             // This handles cases where webhook is not configured/arrives late
@@ -146,6 +152,32 @@ export async function GET(
                 // Check if payment is authorized or captured
                 const isAuthorized = paymentDetails.state === 'AUTHORIZED';
                 const isCaptured = paymentDetails.aggregate.capturedAmount.value > 0;
+
+                // A payment that ended without money (the customer aborted, it expired,
+                // or it was cancelled) will not change: say so now, with the reason the
+                // page shows, instead of polling until the timeout.
+                const terminalState = ['ABORTED', 'EXPIRED', 'TERMINATED'].find(
+                  (state) => state === paymentDetails.state,
+                );
+                if (terminalState && !isCaptured) {
+                  logger.info(
+                    { reference, state: paymentDetails.state },
+                    'Payment ended without authorization (Vipps API)',
+                  );
+                  controller.enqueue(
+                    encoder.encode(
+                      `data: ${JSON.stringify({
+                        status: 'failed',
+                        failureReason: terminalState.toLowerCase(),
+                        source: 'vipps-api-fallback',
+                      })}\n\n`,
+                    ),
+                  );
+                  isActive = false;
+                  clearInterval(keepaliveInterval);
+                  controller.close();
+                  return;
+                }
 
                 if (isAuthorized || isCaptured) {
                   const status = isCaptured ? 'captured' : 'authorized';
@@ -181,7 +213,7 @@ export async function GET(
               }
             }
 
-            // No transaction yet - webhook hasn't arrived or hasn't been processed
+            // No decision yet - webhook hasn't arrived or hasn't been processed
             // Continue polling
             return;
           }
@@ -249,7 +281,7 @@ export async function GET(
           }
 
           // Transaction exists but status is not authorized/captured yet
-          if (transaction.status === 'failed') {
+          if (transaction.status === 'failed' || transaction.status === 'cancelled') {
             logger.info(
               { reference, transactionId: transaction.id, status: transaction.status },
               'Transaction failed, sending failure status',

@@ -67,7 +67,8 @@ export function PaymentStatusSSE({ reference, onStatusChange }: Readonly<Payment
         // Handle timeout
         if (data.timeout) {
           logger.warn({ reference }, 'SSE connection timeout');
-          toast.info('Payment status check timed out. Please refresh the page.');
+          // The page shows what to do; leaving it on its spinner told the customer nothing.
+          onStatusChange?.('timeout');
           eventSource.close();
           return;
         }
