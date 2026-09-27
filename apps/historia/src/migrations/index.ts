@@ -136,6 +136,6 @@ export const migrations = [
   {
     up: migration_20260927_132137_website_appearance.up,
     down: migration_20260927_132137_website_appearance.down,
-    name: '20260927_132137_website_appearance'
+    name: '20260927_132137_website_appearance',
   },
 ];
