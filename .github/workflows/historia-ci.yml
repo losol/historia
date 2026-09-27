@@ -102,7 +102,21 @@ jobs:
 
       # A collection changed without a migration is invisible until deploy:
       # development on SQLite pushes the schema, production does not.
+      #
+      # The S3 vars matter here even though nothing is uploaded. s3Storage is
+      # enabled only when they are all present, and the plugin contributes
+      # columns to `media` (`_objectkey`). Without them the plugin is inert, so
+      # the diff this step generates is incomplete and a missing column ships
+      # unnoticed — which is exactly how prod started 500ing on
+      # `media._objectkey`. The values only have to be non-empty: the adapter
+      # has no onInit and builds its client lazily, so nothing contacts S3.
       - name: Check the schema matches the collections
+        env:
+          CMS_MEDIA_S3_ACCESS_KEY_ID: ci-not-used
+          CMS_MEDIA_S3_SECRET_ACCESS_KEY: ci-not-used
+          CMS_MEDIA_S3_ENDPOINT: https://s3.invalid
+          CMS_MEDIA_S3_REGION: auto
+          CMS_MEDIA_S3_BUCKET: ci-not-used
         run: |
           pnpm --filter @eventuras/historia exec payload migrate:create ci-schema-check --skip-empty
           if [ -n "$(git status --porcelain apps/historia/src/migrations)" ]; then
