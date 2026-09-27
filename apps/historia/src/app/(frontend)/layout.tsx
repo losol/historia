@@ -30,8 +30,8 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
   const { isEnabled } = await draftMode();
   const resolvedParams = params ? await params : {};
   const locale = resolvedParams.locale || process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'no';
-  // An unknown host throws; the header reports that, so the layout falls back to the defaults.
-  const website = await getCurrentWebsite().catch(() => null);
+  // Cached per request: the header and footer read the same website.
+  const website = await getCurrentWebsite();
   const appearance = getAppearance(website);
   const colorSchemeSwitchable = appearance.colorScheme === 'both';
 
