@@ -567,7 +567,9 @@ export async function createOrderFromPayment({
     logger.info(
       {
         hasShippingDetails: !!paymentDetails.shippingDetails,
-        shippingDetails: paymentDetails.shippingDetails,
+        // The option and cost only; the shipping details also hold the customer's address.
+        shippingOptionId: paymentDetails.shippingDetails?.shippingOptionId,
+        shippingCost: paymentDetails.shippingDetails?.shippingCost,
         paymentState: paymentDetails.state,
       },
       'Checking for shipping details from Vipps',
@@ -670,7 +672,8 @@ export async function createOrderFromPayment({
             errorMessage: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined,
             paymentReference,
-            shippingDetails: paymentDetails.shippingDetails,
+            shippingOptionId: paymentDetails.shippingDetails?.shippingOptionId,
+            shippingCost: paymentDetails.shippingDetails?.shippingCost,
           },
           'Failed to add shipping line item - continuing without shipping',
         );
