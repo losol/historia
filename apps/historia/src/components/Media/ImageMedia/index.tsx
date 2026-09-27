@@ -44,7 +44,9 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     height = fullHeight ?? undefined;
     alt = description?.root.children.toString() || '';
 
-    src = `${getClientSideURL()}${url}`;
+    // Payload returns absolute URLs when serverURL is set, as it is wherever
+    // NEXT_PUBLIC_CMS_URL is, and with cloud storage. Only a relative one needs the host.
+    src = url?.startsWith('/') ? `${getClientSideURL()}${url}` : (url ?? '');
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined);
