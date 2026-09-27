@@ -7,7 +7,7 @@
  * @see https://developer.vippsmobilepay.com/docs/APIs/webhooks-api/request-authentication/
  */
 
-import { createHash, createHmac } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import type { WebhookPayload } from './types';
 
 /**
@@ -153,12 +153,22 @@ export function getEventType(payload: WebhookPayload): string {
  *
  * @see https://developer.vippsmobilepay.com/docs/APIs/webhooks-api/request-authentication/
  */
+/**
+ * Compare two strings in constant time, so the time taken does not reveal how much
+ * of a forged signature matched.
+ */
+function safeEqual(actual: string, expected: string): boolean {
+  const a = Buffer.from(actual);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export function verifyWebhookSignature(request: WebhookRequest, secret: string): boolean {
   try {
     // Step 1: Verify content hash
     const expectedContentHash = createHash('sha256').update(request.body).digest('base64');
 
-    if (request.headers['x-ms-content-sha256'] !== expectedContentHash) {
+    if (!safeEqual(request.headers['x-ms-content-sha256'], expectedContentHash)) {
       return false;
     }
 
@@ -174,7 +184,7 @@ export function verifyWebhookSignature(request: WebhookRequest, secret: string):
 
     const expectedAuth = `HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=${expectedSignature}`;
 
-    return request.headers.authorization === expectedAuth;
+    return safeEqual(request.headers.authorization, expectedAuth);
   } catch (error) {
     console.error('Error verifying webhook signature:', error);
     return false;

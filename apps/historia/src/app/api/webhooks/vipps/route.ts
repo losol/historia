@@ -17,6 +17,7 @@ import {
   canTransitionTransaction,
   type TransactionStatus,
 } from '@/lib/commerce/orderStatusRules';
+import { reportCritical } from '@/lib/observability/reportCritical';
 import { getVippsConfig } from '@/lib/vipps/config';
 import config from '@/payload.config';
 import type { Transaction, User } from '@/payload-types';
@@ -221,13 +222,9 @@ export async function POST(request: NextRequest) {
     // Read raw body for signature verification
     const rawBody = await request.text();
 
+    // Length only: the body carries the customer's name, email, phone and address.
     logger.info(
-      {
-        bodyLength: rawBody.length,
-        bodyPreview: rawBody.substring(0, 500), // Increased from 200 to see more
-        fullBody: rawBody, // Log complete payload for debugging
-        isEmptyBody: rawBody.length === 0,
-      },
+      { bodyLength: rawBody.length, isEmptyBody: rawBody.length === 0 },
       'Vipps webhook body received',
     );
 
@@ -289,7 +286,6 @@ export async function POST(request: NextRequest) {
           host,
           pathAndQuery: url.pathname + url.search,
           contentSha256: xMsContentSha256,
-          authHeader: `${authorization?.substring(0, 50)}...`, // Log first 50 chars only
           bodyLength: rawBody.length,
           expectedSignatureFormat:
             'HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=...',
@@ -301,17 +297,17 @@ export async function POST(request: NextRequest) {
 
     logger.info('Webhook signature verified successfully');
 
-    // Parse webhook payload
-    const payload = parseWebhookPayload(rawBody);
-    if (!payload) {
-      logger.error(
-        {
-          rawBody: rawBody.substring(0, 500), // Log first 500 chars to avoid huge logs
-          bodyLength: rawBody.length,
-          xMsDate,
-          host,
-        },
-        'CRITICAL: Failed to parse webhook payload - invalid JSON or structure',
+    // Parse webhook payload. A signed body that does not parse will not parse on a
+    // retry either: answer 400, not the 500 that makes Vipps send it again forever.
+    let payload: WebhookPayload;
+    try {
+      payload = parseWebhookPayload(rawBody);
+    } catch (error) {
+      reportCritical(
+        logger,
+        'Signed Vipps webhook with a payload that cannot be parsed',
+        { area: 'payment-webhook', bodyLength: rawBody.length, xMsDate },
+        error,
       );
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
@@ -319,12 +315,15 @@ export async function POST(request: NextRequest) {
     // Convert PaymentEventName to WebhookEventType
     const eventType = getEventType(payload);
 
-    // Use idempotencyKey when available, with a composite fallback to ensure uniqueness across event types
-    const eventId =
-      payload.idempotencyKey ??
-      (payload.pspReference && eventType
-        ? `${payload.pspReference}-${eventType}`
-        : payload.pspReference);
+    // Identifies one delivery of one event: a retry resends the same body, so the same
+    // id. The idempotency key alone is not enough: operations can reuse one (two
+    // partial refunds of an order) and then the second event was dropped as a duplicate.
+    const eventId = [
+      payload.pspReference,
+      payload.name,
+      payload.idempotencyKey ?? '',
+      payload.timestamp,
+    ].join(':');
 
     logger.info(
       {
@@ -337,7 +336,11 @@ export async function POST(request: NextRequest) {
       'Webhook payload parsed',
     );
 
-    // Check for duplicate webhook using externalId (idempotency)
+    // Idempotency: each event is stored once, by its id. A stored event without an
+    // error has been processed (or is being processed by a concurrent delivery) and is
+    // acknowledged again. A stored event with an error failed earlier and is processed
+    // again: that is what a retry is for, and before, the retry was dropped as a
+    // duplicate, so a failed AUTHORIZED left its order pending for good.
     const payloadInstance = await getPayload({ config });
     const existingEvent = await payloadInstance.find({
       collection: 'business-events',
@@ -349,69 +352,120 @@ export async function POST(request: NextRequest) {
       limit: 1,
     });
 
-    if (existingEvent.docs.length > 0) {
+    const previous = existingEvent.docs[0];
+    if (previous && !previous.error) {
       logger.info({ eventId }, 'Event already processed (duplicate)');
       return NextResponse.json({ received: true, duplicate: true });
     }
 
-    // Store business event in database
-    const businessEvent = await payloadInstance.create({
-      collection: 'business-events',
-      data: {
-        eventType,
-        source: 'vipps',
-        externalReference: payload.reference,
-        externalId: eventId,
-        data: JSON.parse(JSON.stringify(payload)),
-      },
-    });
+    // A failed operation (e.g. a capture or refund Vipps could not do) is reported with
+    // success: false. It changes nothing about the payment, so it is recorded and
+    // acknowledged, not applied as if it had happened.
+    if (payload.success === false) {
+      if (!previous) {
+        await payloadInstance.create({
+          collection: 'business-events',
+          data: {
+            eventType,
+            source: 'vipps',
+            externalReference: payload.reference,
+            externalId: eventId,
+            data: JSON.parse(JSON.stringify(payload)),
+          },
+        });
+      }
+      logger.warn(
+        {
+          eventId,
+          eventType: payload.name,
+          reference: payload.reference,
+          pspReference: payload.pspReference,
+        },
+        'Vipps reports a failed operation (success: false) - recorded, payment not changed',
+      );
+      return NextResponse.json({ received: true, applied: false });
+    }
 
-    logger.info({ eventId, businessEventId: businessEvent.id }, 'Business event stored');
+    let businessEventId: string;
+    if (previous) {
+      businessEventId = previous.id;
+      logger.warn(
+        { eventId, businessEventId, previousError: previous.error },
+        'Retrying payment event that failed before',
+      );
+      await payloadInstance.update({
+        collection: 'business-events',
+        id: businessEventId,
+        data: { error: null },
+      });
+    } else {
+      // Store business event in database
+      const businessEvent = await payloadInstance.create({
+        collection: 'business-events',
+        data: {
+          eventType,
+          source: 'vipps',
+          externalReference: payload.reference,
+          externalId: eventId,
+          data: JSON.parse(JSON.stringify(payload)),
+        },
+      });
+      businessEventId = businessEvent.id;
+      logger.info({ eventId, businessEventId }, 'Business event stored');
+    }
 
     // Process business event
     try {
-      await processPaymentEvent(businessEvent.id, payload);
+      await processPaymentEvent(businessEventId, payload);
 
       logger.info({ eventId, duration: Date.now() - startTime }, 'Webhook processed successfully');
     } catch (error) {
-      // Log error but still return 200 to acknowledge receipt
-      logger.error(
+      // Record the failure on the event, so the retry processes it again, and answer 500
+      // so Vipps retries. A 200 here acknowledged an event that was never applied.
+      try {
+        await payloadInstance.update({
+          collection: 'business-events',
+          id: businessEventId,
+          data: {
+            error:
+              error instanceof Error
+                ? `${error.name}: ${error.message}\n${error.stack || ''}`
+                : String(error),
+          },
+        });
+      } catch (updateError) {
+        logger.error(
+          { error: updateError, eventId, businessEventId },
+          'Could not record the processing error on the business event',
+        );
+      }
+
+      reportCritical(
+        logger,
+        'Payment event could not be processed - Vipps will retry',
         {
-          error,
-          errorName: error instanceof Error ? error.name : 'Unknown',
-          errorMessage: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
+          area: 'payment-webhook',
+          paymentReference: payload.reference,
           eventId,
-          businessEventId: businessEvent.id,
-          payloadReference: payload.reference,
-          payloadEventType: payload.name,
-          payloadAmount: payload.amount,
-          payloadPspReference: payload.pspReference,
-          webhookUrl: url.toString(),
-          webhookHost: host,
+          businessEventId,
+          eventType: payload.name,
+          pspReference: payload.pspReference,
+          amount: payload.amount,
+          retry: !!previous,
         },
-        'Error processing payment event - business event stored but processing failed',
+        error,
       );
 
-      // Update business event with detailed error information
-      await payloadInstance.update({
-        collection: 'business-events',
-        id: businessEvent.id,
-        data: {
-          error:
-            error instanceof Error
-              ? `${error.name}: ${error.message}\n${error.stack || ''}`
-              : String(error),
-        },
-      });
+      return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
     }
 
-    // Always return 200 to acknowledge receipt
     return NextResponse.json({ received: true });
   } catch (error) {
-    logger.error(
+    reportCritical(
+      logger,
+      'Unexpected error handling webhook - Vipps will retry',
       {
-        error,
+        area: 'payment-webhook',
         errorName: error instanceof Error ? error.name : 'Unknown',
         errorMessage: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
@@ -427,7 +481,7 @@ export async function POST(request: NextRequest) {
           hasContentHash: !!request.headers.get('x-ms-content-sha256'),
         },
       },
-      'CRITICAL: Unexpected error handling webhook - Vipps will retry',
+      error,
     );
 
     // Return 500 to indicate failure - Vipps will retry
@@ -555,59 +609,48 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       throw error; // Re-throw to be caught by outer try-catch
     }
 
-    // Map event name to transaction status
-    const statusMap: Record<string, string> = {
-      CREATED: 'pending',
-      AUTHORIZED: 'authorized',
-      CAPTURED: 'captured',
-      CANCELLED: 'failed',
-      ABORTED: 'failed',
-      EXPIRED: 'failed',
-      TERMINATED: 'failed',
-      REFUNDED: 'refunded',
-    };
-
-    const transactionStatus = statusMap[payload.name] || 'pending';
-
-    // Create transaction without order (will be linked later by SSE)
-    transaction = await payloadInstance.create({
-      collection: 'transactions',
-      data: {
-        order: null, // No order yet - SSE will link it
-        paymentReference: payload.reference,
-        amount: payload.amount.value,
-        currency: payload.amount.currency,
-        status: transactionStatus as TransactionStatus,
-        paymentMethod: 'vipps',
-        customer: null, // Don't know customer yet
-        tenant: tenantId,
-      },
-      draft: false,
-    });
+    // Create the transaction as pending and let this event continue through the normal
+    // flow below, which moves the status forward and, for AUTHORIZED, creates the order.
+    // Returning here left an AUTHORIZED that arrived before CREATED without an order.
+    try {
+      transaction = await payloadInstance.create({
+        collection: 'transactions',
+        data: {
+          order: null,
+          paymentReference: payload.reference,
+          amount: payload.amount.value,
+          currency: payload.amount.currency,
+          status: 'pending',
+          paymentMethod: 'vipps',
+          customer: null, // Don't know customer yet
+          tenant: tenantId,
+        },
+        draft: false,
+      });
+    } catch (error) {
+      // Two events for the same payment (CREATED and AUTHORIZED) can arrive together;
+      // paymentReference is unique, so the second create fails and uses the first.
+      const concurrent = await payloadInstance.find({
+        collection: 'transactions',
+        where: { paymentReference: { equals: payload.reference } },
+        limit: 1,
+      });
+      if (!concurrent.docs[0]) throw error;
+      transaction = concurrent.docs[0];
+      logger.info(
+        { transactionId: transaction.id, reference: payload.reference, businessEventId },
+        'Transaction was created by a concurrent event for the same payment - using it',
+      );
+    }
 
     logger.info(
       {
         transactionId: transaction.id,
         reference: payload.reference,
-        status: transactionStatus,
         businessEventId,
       },
-      'Orphaned transaction created - SSE will link to order',
+      'Transaction created for payment without one - continuing with the event',
     );
-
-    // Update business event with transaction relationship
-    await payloadInstance.update({
-      collection: 'business-events',
-      id: businessEventId,
-      data: {
-        entity: {
-          relationTo: 'transactions',
-          value: transaction.id,
-        },
-      },
-    });
-
-    return; // Transaction created, SSE will handle order creation and linking
   } else {
     transaction = transactions.docs[0];
   }
@@ -897,16 +940,17 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
         );
       } else {
         // Order creation failed - this is a critical issue
-        logger.error(
+        reportCritical(
+          logger,
+          'Automatic order creation from webhook failed - paid payment without order',
           {
-            reference: payload.reference,
+            area: 'payment-webhook',
+            paymentReference: payload.reference,
             transactionId: transaction.id,
-            error: orderResult.error,
             errorMessage: orderResult.error.message,
             paymentState: paymentDetails.state,
             authorizedAmount: paymentDetails.aggregate.authorizedAmount,
           },
-          'Automatic order creation from webhook failed - creating orphaned payment notification',
         );
 
         // Send orphaned payment notification for manual handling
@@ -933,9 +977,11 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
       }
     } catch (error) {
       // Unexpected error during automatic order creation
-      logger.error(
+      reportCritical(
+        logger,
+        'Unexpected error during automatic order creation from webhook',
         {
-          error,
+          area: 'payment-webhook',
           errorName: error instanceof Error ? error.name : 'Unknown',
           errorMessage: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
@@ -943,7 +989,7 @@ async function processPaymentEvent(businessEventId: string, payload: WebhookPayl
           transactionId: transaction.id,
           paymentState: paymentDetails?.state,
         },
-        'CRITICAL: Unexpected error during automatic order creation from webhook',
+        error,
       );
 
       // Send orphaned payment notification
@@ -1207,9 +1253,11 @@ async function updateOrderStatus(
       'Order status updated based on transaction status',
     );
   } catch (error) {
-    logger.error(
+    reportCritical(
+      logger,
+      'Failed to update order status - transaction updated but order status not synced',
       {
-        error,
+        area: 'payment-webhook',
         errorName: error instanceof Error ? error.name : 'Unknown',
         errorMessage: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
@@ -1220,7 +1268,7 @@ async function updateOrderStatus(
         vippsReference: vippsPayload?.reference,
         vippsEventType: vippsPayload?.name,
       },
-      'CRITICAL: Failed to update order status - transaction updated but order status not synced',
+      error,
     );
     // Don't throw - we've already processed the transaction update successfully
   }

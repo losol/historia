@@ -13,6 +13,7 @@ import configPromise from '@payload-config';
 import { getPayload, ValidationError } from 'payload';
 import type { Cart, SessionData } from '@/lib/cart/types';
 import { canTransitionTransaction } from '@/lib/commerce/orderStatusRules';
+import { reportCritical } from '@/lib/observability/reportCritical';
 import { getSessionContext } from '@/lib/session/sessionId';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { Order, Product, Transaction, User } from '@/payload-types';
@@ -227,6 +228,9 @@ export async function createOrderFromPayment({
   // the cart when the payment was created. Missing on carts from before it was stored.
   let cartAmount: number | null = null;
   let cartCurrency: string | null = null;
+  // The website the cart was filled on. The webhook calls this too, and its host is
+  // the webhook's, not the shop's, so the host cannot say which website the order is for.
+  let cartTenantId: string | null = null;
 
   try {
     const payload = await getPayload({ config: configPromise });
@@ -256,6 +260,10 @@ export async function createOrderFromPayment({
       };
       cartAmount = typeof cartDoc.amount === 'number' ? cartDoc.amount : null;
       cartCurrency = cartDoc.currency ?? null;
+      cartTenantId =
+        typeof cartDoc.tenant === 'object'
+          ? (cartDoc.tenant?.id ?? null)
+          : (cartDoc.tenant ?? null);
 
       logger.info(
         {
@@ -309,15 +317,17 @@ export async function createOrderFromPayment({
       ) {
         const customerEmail = paymentDetails.profile?.email || paymentDetails.userDetails?.email;
 
-        logger.error(
+        reportCritical(
+          logger,
+          'Payment is AUTHORIZED but cart unavailable - requires manual order creation!',
           {
+            area: 'checkout',
             ...sessionContext,
             paymentReference,
             customerEmail,
             amount: paymentDetails.aggregate.authorizedAmount.value,
             currency: paymentDetails.aggregate.authorizedAmount.currency,
           },
-          'CRITICAL: Payment is AUTHORIZED but cart unavailable - requires manual order creation!',
         );
 
         // Create business event and notify sales team
@@ -564,7 +574,7 @@ export async function createOrderFromPayment({
     }
 
     // Get the current website/tenant ID
-    const websiteId = await getCurrentWebsiteId();
+    const websiteId = cartTenantId ?? (await getCurrentWebsiteId().catch(() => null));
     if (!websiteId) {
       logger.error({ paymentReference }, 'Cannot create order without website/tenant');
       return actionError('Website configuration not found');
@@ -600,8 +610,11 @@ export async function createOrderFromPayment({
         .map((i) => i.productId)
         .filter((id) => !products.find((p) => p.id === id));
 
-      logger.error(
+      reportCritical(
+        logger,
+        'Not all products found - products may have been deleted or are in different tenant',
         {
+          area: 'checkout',
           expected: cart.items.length,
           found: products.length,
           requestedIds: cart.items.map((i) => i.productId),
@@ -614,7 +627,6 @@ export async function createOrderFromPayment({
           })),
           websiteId,
         },
-        'CRITICAL: Not all products found - products may have been deleted or are in different tenant',
       );
       return actionError('Some products not found');
     }
@@ -783,9 +795,10 @@ export async function createOrderFromPayment({
     if (amountMatches) {
       logger.info(amountCheck, 'Payment amount matches the cart');
     } else {
-      logger.error(
-        amountCheck,
-        'CRITICAL: Authorized amount does not match the cart - order will be created on hold for manual review',
+      reportCritical(
+        logger,
+        'Authorized amount does not match the cart - order will be created on hold for manual review',
+        { area: 'checkout', ...amountCheck },
       );
     }
 
@@ -796,17 +809,15 @@ export async function createOrderFromPayment({
     });
 
     if (!user?.email) {
-      logger.error(
-        {
-          paymentReference,
-          userId: effectiveUserId,
-          hasUser: !!user,
-          hasEmail: !!user?.email,
-          paymentState: paymentDetails.state,
-          authorizedAmount: paymentDetails.aggregate.authorizedAmount,
-        },
-        'CRITICAL: User or user email not found - cannot create order',
-      );
+      reportCritical(logger, 'User or user email not found - cannot create order', {
+        area: 'checkout',
+        paymentReference,
+        userId: effectiveUserId,
+        hasUser: !!user,
+        hasEmail: !!user?.email,
+        paymentState: paymentDetails.state,
+        authorizedAmount: paymentDetails.aggregate.authorizedAmount,
+      });
       return actionError('User account information not found');
     }
 
@@ -1368,10 +1379,12 @@ export async function createOrderFromPayment({
     });
   } catch (error) {
     const totalTime = Date.now() - startTime;
-    logger.error(
+    reportCritical(
+      logger,
+      'Error creating order from payment - payment may be authorized but order not created',
       {
+        area: 'checkout',
         ...sessionContext,
-        error,
         errorName: error instanceof Error ? error.name : 'Unknown',
         errorMessage: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
@@ -1385,7 +1398,7 @@ export async function createOrderFromPayment({
         customerEmail: paymentDetails?.profile?.email || paymentDetails?.userDetails?.email,
         totalTimeMs: totalTime,
       },
-      'CRITICAL: Error creating order from payment - payment may be authorized but order not created',
+      error,
     );
     return actionError(error instanceof Error ? error.message : 'Failed to create order');
   }
