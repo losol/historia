@@ -17,7 +17,7 @@
  */
 
 import { getPaymentDetails } from '@eventuras/vipps/epayment-v1';
-import type { VippsConfig } from '@eventuras/vipps/vipps-core';
+import { resolveApiUrl, type VippsConfig } from '@eventuras/vipps/vipps-core';
 
 // Color codes for terminal output
 const colors = {
@@ -90,8 +90,7 @@ async function main() {
     clientSecret,
     subscriptionKey,
     merchantSerialNumber,
-    // Same variable and default as the app itself (src/lib/vipps/config.ts).
-    apiUrl: process.env.VIPPS_API_URL || 'https://apitest.vipps.no',
+    apiUrl: resolveApiUrl(process.env.VIPPS_API_URL),
     systemName: 'eventuras-historia',
     systemVersion: '1.0.0',
     pluginName: '',

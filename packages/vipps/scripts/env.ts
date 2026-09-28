@@ -1,4 +1,4 @@
-import type { VippsConfig } from '../src/vipps-core';
+import { resolveApiUrl, type VippsConfig } from '../src/vipps-core';
 
 const REQUIRED = [
   'VIPPS_CLIENT_ID',
@@ -8,12 +8,6 @@ const REQUIRED = [
 ] as const;
 
 type RequiredVar = (typeof REQUIRED)[number];
-
-/**
- * Same default as the app (see apps/historia/src/lib/vipps/config.ts): the test
- * environment, so a script cannot reach production by forgetting a variable.
- */
-const DEFAULT_API_URL = 'https://apitest.vipps.no';
 
 /**
  * Builds a VippsConfig from the environment for a CLI script.
@@ -38,7 +32,7 @@ export function vippsConfigFromEnv(systemName: string): VippsConfig {
   const env = values as Record<RequiredVar, string>;
 
   return {
-    apiUrl: process.env.VIPPS_API_URL || DEFAULT_API_URL,
+    apiUrl: resolveApiUrl(process.env.VIPPS_API_URL),
     clientId: env.VIPPS_CLIENT_ID,
     clientSecret: env.VIPPS_CLIENT_SECRET,
     merchantSerialNumber: env.VIPPS_MERCHANT_SERIAL_NUMBER,

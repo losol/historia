@@ -4,7 +4,7 @@
  * Centralizes Vipps configuration from environment variables.
  */
 
-import type { VippsConfig } from '@eventuras/vipps/vipps-core';
+import { resolveApiUrl, type VippsConfig } from '@eventuras/vipps/vipps-core';
 import { appConfig } from '@/config.server';
 
 /**
@@ -12,7 +12,7 @@ import { appConfig } from '@/config.server';
  */
 export function getVippsConfig(): VippsConfig {
   const config: VippsConfig = {
-    apiUrl: (appConfig.env.VIPPS_API_URL as string | undefined) || 'https://apitest.vipps.no',
+    apiUrl: resolveApiUrl(appConfig.env.VIPPS_API_URL as string | undefined),
     merchantSerialNumber: appConfig.env.VIPPS_MERCHANT_SERIAL_NUMBER as string,
     clientId: appConfig.env.VIPPS_CLIENT_ID as string,
     clientSecret: appConfig.env.VIPPS_CLIENT_SECRET as string,
