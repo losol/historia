@@ -44,8 +44,8 @@ Copy `.env.example` to `.env` and set:
 # no auth strategy, /api/auth/vipps/* answers 404, no button on the admin login.
 VIPPS_LOGIN_ENABLED=true
 
-# 'test' or 'production' (default: test)
-VIPPS_LOGIN_ENVIRONMENT=test
+# The environment comes from VIPPS_API_URL, shared with ePayment
+# (default: https://apitest.vipps.no).
 
 # Vipps Login credentials (separate from the ePayment VIPPS_CLIENT_ID/SECRET)
 VIPPS_LOGIN_CLIENT_ID=your-client-id-from-vipps-portal
@@ -120,7 +120,7 @@ The URL changes every time; for a stable one, use a named tunnel as described in
 
 ```bash
 VIPPS_LOGIN_ENABLED=true
-VIPPS_LOGIN_ENVIRONMENT=production
+VIPPS_API_URL=https://api.vipps.no
 VIPPS_LOGIN_CLIENT_ID=production-client-id
 VIPPS_LOGIN_CLIENT_SECRET=production-client-secret
 CMS_ALLOWED_ORIGINS=https://your-domain.com
@@ -129,7 +129,7 @@ NEXT_PUBLIC_CMS_URL=https://your-domain.com
 
 Checklist:
 
-- [ ] Production Vipps Login credentials, and `VIPPS_LOGIN_ENVIRONMENT=production`
+- [ ] Production Vipps Login credentials, and `VIPPS_API_URL=https://api.vipps.no`
 - [ ] A strong, stable `CMS_SECRET` (it signs the Payload session cookie)
 - [ ] HTTPS for all URLs
 - [ ] `CMS_ALLOWED_ORIGINS` lists every public origin
