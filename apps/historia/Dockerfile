@@ -74,7 +74,10 @@ ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
 ENV CMS_SENTRY_ORG=${CMS_SENTRY_ORG}
 ENV CMS_SENTRY_PROJECT=${CMS_SENTRY_PROJECT}
 ENV NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII=${NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII}
-# Note: CMS_SENTRY_AUTH_TOKEN is mounted as BuildKit secret during build (not stored in image)
+# The commit names the Sentry release the source maps are uploaded for.
+ARG HISTORIA_REVISION
+ENV HISTORIA_REVISION=${HISTORIA_REVISION}
+# Note: the Sentry auth token is mounted as BuildKit secret during build (not stored in image)
 
 COPY --from=install /app ./
 # Source lands on top of the installed tree; .dockerignore keeps node_modules
@@ -90,7 +93,7 @@ WORKDIR /app/apps/historia
 # Increase Node.js heap size for large builds
 RUN --mount=type=cache,id=next-cache,target=/app/apps/historia/.next/cache \
   --mount=type=secret,id=sentry_auth_token \
-  export CMS_SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token 2>/dev/null || echo "") && \
+  export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token 2>/dev/null || echo "") && \
   export NODE_OPTIONS="--max-old-space-size=4096" && \
   pnpm next build --experimental-build-mode compile
 

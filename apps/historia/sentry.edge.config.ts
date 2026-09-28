@@ -4,27 +4,16 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { sentryInitOptions } from '@/lib/observability/sentryOptions';
 
-const isSentryEnabled = process.env.NEXT_PUBLIC_FEATURE_SENTRY === 'true';
-const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const { enabled: isSentryEnabled, ...sentryOptions } = sentryInitOptions();
 
-if (isSentryEnabled && sentryDsn) {
-  Sentry.init({
-    dsn: sentryDsn,
-
-    // Enable logs to be sent to Sentry
-    enableLogs: true,
-
-    // Enable sending user PII (Personally Identifiable Information).
-    // Can be controlled via NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII ('true' to enable, 'false' to disable).
-    sendDefaultPii: process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII
-      ? process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true'
-      : false,
-  });
+if (isSentryEnabled) {
+  Sentry.init(sentryOptions);
 
   console.log('[Sentry] Edge runtime initialized successfully');
 } else {
   console.log(
-    `[Sentry] Edge runtime disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!sentryDsn})`,
+    `[Sentry] Edge runtime disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!process.env.NEXT_PUBLIC_SENTRY_DSN})`,
   );
 }
