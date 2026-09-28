@@ -1,5 +1,13 @@
 # @eventuras/payload-vipps-auth
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [063c396]
+- Updated dependencies [fe0d986]
+  - @eventuras/vipps@0.2.11
+
 ## 0.2.0
 
 ### Minor Changes
