@@ -30,7 +30,6 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       CMS_SECRET: ${{ secrets.CMS_SECRET }}
       CMS_SENTRY_AUTH_TOKEN: ${{ secrets.CMS_SENTRY_AUTH_TOKEN }}
-      NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
       CMS_SENTRY_ORG: ${{ secrets.CMS_SENTRY_ORG }}
       CMS_SENTRY_PROJECT: ${{ secrets.CMS_SENTRY_PROJECT }}
 

@@ -1,4 +1,5 @@
 import { resolveApiUrl } from '@eventuras/vipps/vipps-core';
+import { sentryRuntimeConfig } from '@/lib/observability/sentryOptions';
 
 /**
  * Log startup configuration to help debug production issues
@@ -22,10 +23,12 @@ export function logStartupConfig() {
   console.log(`   Next.js URL: ${process.env.NEXT_PUBLIC_CMS_URL || 'not set'}`);
   console.log(`   Default Locale: ${process.env.NEXT_PUBLIC_CMS_DEFAULT_LOCALE || 'not set'}`);
 
+  const sentryConfig = sentryRuntimeConfig();
+
   // Feature Flags
   console.log('\n🚀 Feature Flags:');
   const features = {
-    'Sentry Error Tracking': process.env.NEXT_PUBLIC_FEATURE_SENTRY === 'true',
+    'Sentry Error Tracking': sentryConfig !== null,
   };
 
   Object.entries(features).forEach(([name, enabled]) => {
@@ -34,19 +37,11 @@ export function logStartupConfig() {
   });
 
   // Sentry Configuration (only if enabled)
-  if (process.env.NEXT_PUBLIC_FEATURE_SENTRY === 'true') {
+  if (sentryConfig) {
     console.log('\n🔍 Sentry Configuration:');
-    console.log(
-      `   Server DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`,
-    );
-    console.log(
-      `   Client DSN: ${process.env.NEXT_PUBLIC_SENTRY_DSN ? '✅ configured' : '❌ missing'}`,
-    );
-    console.log(`   Organization: ${process.env.CMS_SENTRY_ORG || 'not set'}`);
-    console.log(`   Project: ${process.env.CMS_SENTRY_PROJECT || 'not set'}`);
-    console.log(
-      `   Send PII: ${process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true' ? 'yes' : 'no'}`,
-    );
+    console.log(`   DSN: ✅ configured`);
+    console.log(`   Environment: ${sentryConfig.environment ?? 'production (default)'}`);
+    console.log(`   Send PII: ${sentryConfig.sendDefaultPii ? 'yes' : 'no'}`);
   }
 
   // OpenTelemetry Configuration

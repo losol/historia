@@ -6,20 +6,18 @@ import { setupOpenTelemetryLogger } from '@eventuras/logger/opentelemetry';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import * as Sentry from '@sentry/nextjs';
-import { sentryInitOptions } from '@/lib/observability/sentryOptions';
+import { sentryInitOptions, sentryRuntimeConfig } from '@/lib/observability/sentryOptions';
 
-const { enabled: isSentryEnabled, ...sentryOptions } = sentryInitOptions();
+const sentryConfig = sentryRuntimeConfig();
 
-if (isSentryEnabled) {
-  Sentry.init(sentryOptions);
+if (sentryConfig) {
+  Sentry.init(sentryInitOptions(sentryConfig));
 
   console.log(
-    `[Sentry] Server-side initialized (environment=${sentryOptions.environment ?? 'production'})`,
+    `[Sentry] Server-side initialized (environment=${sentryConfig.environment ?? 'production'})`,
   );
 } else {
-  console.log(
-    `[Sentry] Server-side disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!process.env.NEXT_PUBLIC_SENTRY_DSN})`,
-  );
+  console.log('[Sentry] Server-side disabled (SENTRY_DSN is not set)');
 }
 
 // Set up OpenTelemetry logger integration

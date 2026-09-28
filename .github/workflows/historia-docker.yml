@@ -20,8 +20,6 @@ on:
         required: false
       CMS_SENTRY_AUTH_TOKEN:
         required: false
-      NEXT_PUBLIC_SENTRY_DSN:
-        required: false
       CMS_SENTRY_ORG:
         required: false
       CMS_SENTRY_PROJECT:
@@ -99,8 +97,6 @@ jobs:
           build-args: |
             HISTORIA_VERSION=${{ steps.ver.outputs.version }}
             HISTORIA_REVISION=${{ github.sha }}
-            NEXT_PUBLIC_FEATURE_SENTRY=${{ secrets.NEXT_PUBLIC_SENTRY_DSN != '' }}
-            NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
             CMS_SENTRY_ORG=${{ secrets.CMS_SENTRY_ORG }}
             CMS_SENTRY_PROJECT=${{ secrets.CMS_SENTRY_PROJECT }}
 

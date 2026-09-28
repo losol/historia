@@ -33,8 +33,8 @@ function withoutPersonalData(value: unknown, depth = 0): unknown {
  * order, an amount that does not match, a payment event that could not be processed.
  *
  * Always logged at error level, like any other error. When Sentry is set up (the
- * server config initialises it only with NEXT_PUBLIC_FEATURE_SENTRY=true and a
- * DSN), it is also sent to Sentry as an issue, so it can raise an alert: these
+ * server config initialises it when SENTRY_DSN is set), it is also sent to Sentry as
+ * an issue, so it can raise an alert: these
  * failures are caught and handled, so nothing else reaches Sentry for them.
  * Issues are grouped by area and message, not by the payment, so one broken path
  * is one issue with every payment it hit as an event. Customer details (email,
