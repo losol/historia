@@ -29,8 +29,7 @@ export async function GET() {
   if (!client) {
     return NextResponse.json({
       enabled: false,
-      reason:
-        'Sentry is not initialised: set NEXT_PUBLIC_FEATURE_SENTRY=true and NEXT_PUBLIC_SENTRY_DSN at build time.',
+      reason: 'Sentry is not initialised: set SENTRY_DSN in the environment and restart.',
     });
   }
 

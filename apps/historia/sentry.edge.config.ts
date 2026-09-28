@@ -4,16 +4,16 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
-import { sentryInitOptions } from '@/lib/observability/sentryOptions';
+import { sentryInitOptions, sentryRuntimeConfig } from '@/lib/observability/sentryOptions';
 
-const { enabled: isSentryEnabled, ...sentryOptions } = sentryInitOptions();
+const sentryConfig = sentryRuntimeConfig();
 
-if (isSentryEnabled) {
-  Sentry.init(sentryOptions);
+if (sentryConfig) {
+  Sentry.init(sentryInitOptions(sentryConfig));
 
-  console.log('[Sentry] Edge runtime initialized successfully');
-} else {
   console.log(
-    `[Sentry] Edge runtime disabled (NEXT_PUBLIC_FEATURE_SENTRY=${process.env.NEXT_PUBLIC_FEATURE_SENTRY}, has DSN=${!!process.env.NEXT_PUBLIC_SENTRY_DSN})`,
+    `[Sentry] Edge runtime initialized (environment=${sentryConfig.environment ?? 'production'})`,
   );
+} else {
+  console.log('[Sentry] Edge runtime disabled (SENTRY_DSN is not set)');
 }

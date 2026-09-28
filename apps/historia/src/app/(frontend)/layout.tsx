@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { AdminBar } from '@/components/AdminBar';
 import { Footer } from '@/components/Footer/Component';
+import { SentryConfigMeta } from '@/components/SentryConfigMeta';
 import { Header } from '@/Header/Component';
 import { getAppearance, htmlThemeAttributes } from '@/lib/site-settings/appearance';
 import { getCurrentWebsite } from '@/lib/website';
@@ -45,6 +46,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
     <html lang={locale} suppressHydrationWarning {...htmlThemeAttributes(appearance)}>
       <head>
         {colorSchemeSwitchable && <InitTheme />}
+        <SentryConfigMeta />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>

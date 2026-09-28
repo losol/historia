@@ -73,11 +73,23 @@
       "type": "string",
       "description": "Vipps API subscription key (primary)"
     },
-    "NEXT_PUBLIC_FEATURE_SENTRY": {
+    "SENTRY_DSN": {
       "required": false,
-      "client": true,
+      "client": false,
+      "type": "string",
+      "description": "Sentry DSN. Sentry is on when set; read at runtime and handed to the browser by the frontend layout"
+    },
+    "SENTRY_ENVIRONMENT": {
+      "required": false,
+      "client": false,
+      "type": "string",
+      "description": "Sentry environment, e.g. staging or production (read at runtime)"
+    },
+    "SENTRY_SEND_DEFAULT_PII": {
+      "required": false,
+      "client": false,
       "type": "bool",
-      "description": "Enable Sentry error tracking",
+      "description": "Let Sentry send personal data such as IP addresses",
       "default": "false"
     },
     "CMS_SENTRY_ORG": {
@@ -91,19 +103,6 @@
       "client": false,
       "type": "string",
       "description": "Sentry project slug"
-    },
-    "NEXT_PUBLIC_SENTRY_DSN": {
-      "required": false,
-      "client": true,
-      "type": "string",
-      "description": "Sentry DSN for error tracking"
-    },
-    "NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII": {
-      "required": false,
-      "client": true,
-      "type": "bool",
-      "description": "Enable sending user PII to Sentry",
-      "default": "true"
     },
     "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT": {
       "required": false,
