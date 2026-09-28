@@ -17,11 +17,7 @@ if (isSentryEnabled && sentryDsn) {
     // Enable logs to be sent to Sentry
     enableLogs: true,
 
-    // Enable sending user PII (Personally Identifiable Information).
-    // Can be controlled via NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII ('true' to enable, 'false' to disable).
-    sendDefaultPii: process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII
-      ? process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true'
-      : true,
+    sendDefaultPii: process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true',
   });
 
   console.log('[Sentry] Server-side initialized successfully');
