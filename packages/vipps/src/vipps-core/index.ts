@@ -28,6 +28,25 @@ export interface VippsConfig {
   pluginVersion: string;
 }
 
+/** Used when no API URL is configured: the test environment, never production. */
+export const DEFAULT_VIPPS_API_URL = 'https://apitest.vipps.no';
+
+/**
+ * Resolves the Vipps API base URL from an environment value.
+ *
+ * Trailing slashes are stripped because every caller builds endpoints as
+ * `${config.apiUrl}/...`. A pasted `https://api.vipps.no/` would otherwise
+ * produce `//accesstoken/get`, and Vipps sits behind a gateway that routes on
+ * the exact path, so that is a 404 rather than a cosmetic problem.
+ *
+ * Whitespace-only values are treated as unset: an env var present but blank is
+ * a misconfiguration, not a request for an empty base URL.
+ */
+export function resolveApiUrl(value?: string | null): string {
+  const trimmed = value?.trim();
+  return (trimmed || DEFAULT_VIPPS_API_URL).replace(/\/+$/, '');
+}
+
 /**
  * Amount object for payments
  */

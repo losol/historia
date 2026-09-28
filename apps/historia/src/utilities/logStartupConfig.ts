@@ -1,3 +1,5 @@
+import { resolveApiUrl } from '@eventuras/vipps/vipps-core';
+
 /**
  * Log startup configuration to help debug production issues
  * Shows which features are enabled and key environment variables
@@ -126,7 +128,7 @@ export function logStartupConfig() {
   }
   // Vipps Configuration
   console.log('\n💳 Payment (Vipps):');
-  const vippsApiUrl = process.env.VIPPS_API_URL || 'https://apitest.vipps.no';
+  const vippsApiUrl = resolveApiUrl(process.env.VIPPS_API_URL);
   console.log(`   API: ${vippsApiUrl}${vippsApiUrl.includes('apitest') ? ' (test)' : ''}`);
   console.log(`   Client ID: ${process.env.VIPPS_CLIENT_ID ? '✅ configured' : '❌ missing'}`);
   console.log(
