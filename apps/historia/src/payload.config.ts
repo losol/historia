@@ -219,7 +219,8 @@ export default buildConfig({
     afterError: [
       async (args) => {
         // Only capture errors if Sentry was initialised (see sentry.server.config.ts).
-        if (!Sentry.getClient()) {
+        const sentryClient = Sentry.getClient();
+        if (!sentryClient) {
           return;
         }
 
@@ -241,9 +242,11 @@ export default buildConfig({
               user: {
                 id: args.req.user.id,
                 collection: args.req.user.collection,
-                // The IP address is personal data: only with the PII opt-in, like the SDK.
-                ...(process.env.NEXT_PUBLIC_CMS_SENTRY_SEND_DEFAULT_PII === 'true' && {
-                  ip_address: args.req.headers?.get('X-Forwarded-For') ?? undefined,
+                // The IP address is personal data: only with the SDK's PII opt-in. The
+                // header lists every proxy; the client's address is the first entry.
+                ...(sentryClient.getOptions().sendDefaultPii && {
+                  ip_address:
+                    args.req.headers?.get('X-Forwarded-For')?.split(',')[0]?.trim() || undefined,
                 }),
               },
             }),
