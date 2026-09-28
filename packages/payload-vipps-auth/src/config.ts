@@ -2,8 +2,8 @@
  * Configuration utilities for Vipps Auth Plugin
  */
 
-import { VippsEnvironments } from '@eventuras/fides-auth/providers/vipps';
 import { Logger } from '@eventuras/logger';
+import { resolveApiUrl } from '@eventuras/vipps/vipps-core';
 import type { ResolvedVippsAuthConfig, VippsAuthPluginConfig } from './types';
 
 const logger = Logger.create({
@@ -21,10 +21,10 @@ const logger = Logger.create({
 export function resolveConfig(config: VippsAuthPluginConfig): ResolvedVippsAuthConfig {
   const { clientId, clientSecret, redirectUri, subscriptionKey, merchantSerialNumber } = config;
 
-  // Map environment to Vipps API URL
-  const environment = config.environment || 'test';
-  const apiUrl =
-    environment === 'production' ? VippsEnvironments.Production : VippsEnvironments.Test;
+  // The same URL the payments client uses; resolveApiUrl applies the test
+  // default and strips a trailing slash, which matters because getVippsIssuer
+  // builds the issuer as `${apiUrl}/access-management-1.0/access/`.
+  const apiUrl = resolveApiUrl(config.apiUrl);
 
   // Validate required fields
   if (!clientId) {

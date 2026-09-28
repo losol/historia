@@ -11,7 +11,7 @@ import { getVippsLoginEnv } from '@/lib/vipps/login-config';
 import { getAllowedVippsLoginDomains, getPublicRequestOrigin } from '../_utils/request-origin';
 
 export async function GET(request: Request) {
-  const { enabled, clientId, clientSecret, environment } = getVippsLoginEnv();
+  const { enabled, clientId, clientSecret, apiUrl } = getVippsLoginEnv();
 
   // The whole Vipps Login surface is off unless it is enabled, instead of failing with a 500.
   if (!enabled) {
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const pluginConfig = resolveConfig({
     clientId,
     clientSecret,
-    environment,
+    apiUrl,
     redirectUri: `${origin}/api/auth/vipps/callback`,
   });
 

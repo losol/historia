@@ -53,8 +53,9 @@ export default buildConfig({
       // Useful for environment-specific configuration
       enabled: process.env.VIPPS_LOGIN_ENABLED !== 'false',
       
-      // Optional: Vipps API environment (default: 'test')
-      environment: process.env.VIPPS_LOGIN_ENVIRONMENT === 'production' ? 'production' : 'test',
+      // Optional: Vipps API base URL, shared with ePayment
+      // (default: https://apitest.vipps.no)
+      apiUrl: process.env.VIPPS_API_URL,
       
       // Optional: Override redirect URI (default: computed from request)
       // redirectUri: process.env.VIPPS_LOGIN_REDIRECT_URI,
@@ -165,8 +166,8 @@ interface VippsAuthPluginConfig {
   /** OAuth redirect URI / callback URL (optional, computed from request if not provided) */
   redirectUri?: string;
   
-  /** Vipps API environment (optional, default: 'test') */
-  environment?: 'test' | 'production';
+  /** Vipps API base URL, same value as ePayment's (optional, default: 'https://apitest.vipps.no') */
+  apiUrl?: string;
   
   /** OpenID Connect scopes (optional) */
   scope?: string;

@@ -32,10 +32,14 @@ export interface VippsAuthPluginConfig {
   redirectUri?: string;
 
   /**
-   * Vipps API environment
-   * @default 'test'
+   * Vipps API base URL, the same value the payments client uses
+   * (`VIPPS_API_URL`). Vipps Login's OIDC issuer is this URL plus
+   * `/access-management-1.0/access/`, so it is the same environment selector —
+   * it does not need one of its own.
+   *
+   * @default 'https://apitest.vipps.no'
    */
-  environment?: 'test' | 'production';
+  apiUrl?: string;
 
   /**
    * OpenID Connect scopes
@@ -103,7 +107,7 @@ export interface ResolvedVippsAuthConfig
       | 'merchantSerialNumber'
       | 'redirectUri'
       | 'enabled'
-      | 'environment'
+      | 'apiUrl'
     >
   > {
   apiUrl: string;
