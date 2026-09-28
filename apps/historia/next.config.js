@@ -1,5 +1,5 @@
 import { withPayload } from '@payloadcms/next/withPayload';
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import redirects from './redirects.js';
 import {
   allowedOrigins,
@@ -79,6 +79,11 @@ export default withSentryConfig(withPayload(nextConfig), {
   project: process.env.CMS_SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
+  // Name the release after the commit the image is built from (a Docker build arg),
+  // so events and the uploaded source maps match. Outside Docker the plugin falls
+  // back to detecting the commit from git.
+  release: process.env.HISTORIA_REVISION ? { name: process.env.HISTORIA_REVISION } : undefined,
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
@@ -95,12 +100,6 @@ export default withSentryConfig(withPayload(nextConfig), {
   tunnelRoute: '/monitoring',
 
   webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-
     // Tree-shaking options for reducing bundle size
     treeshake: {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
