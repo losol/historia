@@ -31,7 +31,7 @@
     "uuid": "^14.0.2"
   },
   "devDependencies": {
-    "@eventuras/typescript-config": "^1.1.0",
+    "@eventuras/typescript-config": "^1.1.1",
     "@eventuras/vite-config": "^0.4.0",
     "@payloadcms/next": "3.90.1",
     "@types/node": "^24.12.0",
