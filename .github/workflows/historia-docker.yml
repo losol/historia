@@ -94,9 +94,17 @@ jobs:
           secrets: |
             "cms_secret=${{ secrets.CMS_SECRET }}"
             "sentry_auth_token=${{ secrets.CMS_SENTRY_AUTH_TOKEN }}"
+          # NEXT_PUBLIC_CMS_URL and CMS_ALLOWED_ORIGINS are baked into
+          # next.config.js's images.remotePatterns at build time, as the
+          # Dockerfile notes. They were declared as ARGs but never passed, so the
+          # allowlist shipped as just localhost — which dangerouslyAllowLocalIP
+          # then rejects outside development, so every /_next/image request 400d.
+          # Not secrets: a public URL and a domain list, hence vars.
           build-args: |
             HISTORIA_VERSION=${{ steps.ver.outputs.version }}
             HISTORIA_REVISION=${{ github.sha }}
+            NEXT_PUBLIC_CMS_URL=${{ vars.NEXT_PUBLIC_CMS_URL }}
+            CMS_ALLOWED_ORIGINS=${{ vars.CMS_ALLOWED_ORIGINS }}
             CMS_SENTRY_ORG=${{ secrets.CMS_SENTRY_ORG }}
             CMS_SENTRY_PROJECT=${{ secrets.CMS_SENTRY_PROJECT }}
 

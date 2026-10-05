@@ -5,10 +5,25 @@ import type { StaticImageData } from 'next/image';
 import NextImage from 'next/image';
 import { cssVariables } from '@/cssVariables';
 import { cn } from '@/utilities/cn';
-import { getClientSideURL } from '@/utilities/getURL';
+import { getClientSideURL, getServerSideURL } from '@/utilities/getURL';
 import type { Props as MediaProps } from '../types';
 
 const { breakpoints } = cssVariables;
+
+/**
+ * Strips the origin from a media URL that points back at this site, so it can be
+ * optimised as a local path. Anything on another host is returned unchanged.
+ */
+function toSameOriginPath(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith('/')) return url;
+
+  const ownOrigins = [getClientSideURL(), getServerSideURL()].filter(Boolean);
+  for (const origin of ownOrigins) {
+    if (url.startsWith(`${origin}/`)) return url.slice(origin.length);
+  }
+  return url;
+}
 
 // A base64 encoded image to use as a placeholder while the image is loading
 const placeholderBlur =
@@ -44,9 +59,17 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     height = fullHeight ?? undefined;
     alt = description?.root.children.toString() || '';
 
-    // Payload returns absolute URLs when serverURL is set, as it is wherever
-    // NEXT_PUBLIC_CMS_URL is, and with cloud storage. Only a relative one needs the host.
-    src = url?.startsWith('/') ? `${getClientSideURL()}${url}` : (url ?? '');
+    // Reduce our own media URLs to a path. next/image optimises a local path
+    // without consulting images.remotePatterns, which is baked into the build —
+    // so this is what lets media render on any tenant domain without rebuilding
+    // the image for each one. Payload serves media from its own route and makes
+    // the URL absolute via serverURL, and the previous code made relative ones
+    // absolute too, so every image depended on an allowlist that is populated at
+    // build time from env vars the Docker workflow never passed.
+    //
+    // A genuinely foreign host (a CDN, or storage with Payload's access control
+    // disabled) is left absolute and still needs a remotePatterns entry.
+    src = toSameOriginPath(url) ?? '';
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined);
