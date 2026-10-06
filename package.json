@@ -17,7 +17,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
     "@changesets/cli": "^3.0.3",
-    "tsx": "^4.23.12"
+    "tsx": "^4.23.15"
   },
   "packageManager": "pnpm@11.8.0",
   "engines": {
