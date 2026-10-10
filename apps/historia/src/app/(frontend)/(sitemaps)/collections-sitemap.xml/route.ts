@@ -1,84 +1,21 @@
-import { Logger } from '@eventuras/logger';
-import config from '@payload-config';
 import { unstable_cache } from 'next/cache';
 import { getServerSideSitemap } from 'next-sitemap';
-import { getPayload } from 'payload';
-import {
-  getLocalizedCollectionName,
-  pageCollections,
-} from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
+import { pageCollections } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
+import { collectionSitemapEntries, getSitemapSite } from '@/lib/sitemap';
 
-const logger = Logger.create({
-  namespace: 'historia:sitemap',
-  context: { module: 'CollectionsSitemap' },
-});
-
+// Cached per site (the arguments are part of the key) and rebuilt hourly.
 const getCollectionsSitemap = unstable_cache(
-  async () => {
-    const payload = await getPayload({ config });
-    const SITE_URL =
-      process.env.NEXT_PUBLIC_CMS_URL ||
-      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-      'https://example.com';
-
-    const locales = process.env.NEXT_PUBLIC_CMS_LOCALES?.split(',') || ['en'];
-
-    const allSitemapEntries = [];
-
-    for (const locale of locales) {
-      for (const collection of pageCollections) {
-        try {
-          const results = await payload.find({
-            collection,
-            overrideAccess: false,
-            draft: false,
-            depth: 0,
-            limit: 1000,
-            pagination: false,
-            where: {
-              _status: {
-                equals: 'published',
-              },
-            },
-            select: {
-              slug: true,
-              resourceId: true,
-              updatedAt: true,
-            },
-          });
-
-          const dateFallback = new Date().toISOString();
-          const localizedCollectionName = getLocalizedCollectionName(collection, locale);
-
-          const sitemapEntries = results.docs
-            ? results.docs
-                .filter((doc) => Boolean(doc?.slug) && Boolean(doc?.resourceId))
-                .map((doc) => {
-                  const combinedSlug = `${doc.slug}--${doc.resourceId}`;
-                  return {
-                    loc: `${SITE_URL}/${locale}/${localizedCollectionName}/${combinedSlug}`,
-                    lastmod: doc.updatedAt || dateFallback,
-                  };
-                })
-            : [];
-
-          allSitemapEntries.push(...sitemapEntries);
-        } catch (error) {
-          logger.error({ error, collection, locale }, 'Failed to generate collection sitemap');
-        }
-      }
-    }
-
-    return allSitemapEntries;
-  },
+  (origin: string, websiteId: string) =>
+    collectionSitemapEntries(origin, websiteId, pageCollections),
   ['collections-sitemap'],
-  {
-    tags: ['collections-sitemap'],
-  },
+  { tags: ['collections-sitemap'], revalidate: 60 * 60 },
 );
 
 export async function GET() {
-  const sitemap = await getCollectionsSitemap();
+  const site = await getSitemapSite();
+  if (!site) {
+    return new Response('No website is configured for this host', { status: 404 });
+  }
 
-  return getServerSideSitemap(sitemap);
+  return getServerSideSitemap(await getCollectionsSitemap(site.origin, site.websiteId));
 }

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
+import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { config } from '@/fields/config';
 import { contentLocations } from '@/fields/contentLocations';
@@ -19,7 +20,7 @@ import { title } from '@/fields/title';
 export const Happenings: CollectionConfig = {
   slug: 'happenings',
   access: {
-    read: anyone,
+    read: siteScoped(anyone),
     create: accessOR(admins, siteEditors),
     update: accessOR(admins, siteEditors),
     delete: admins,

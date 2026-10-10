@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { authenticatedOrFirstWebsite } from '@/access/authenticatedOrFirstWebsite';
+import { siteScoped } from '@/access/siteScoped';
 import { name } from '@/fields/name';
 import { metaField } from '@/fields/seo';
 import { summary } from '@/fields/summary';
@@ -14,7 +15,8 @@ export const Websites: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    read: anyone,
+    // Visitors see the website of the domain they are on; members theirs.
+    read: siteScoped(anyone, 'id'),
     create: authenticatedOrFirstWebsite,
     update: admins,
     delete: admins,

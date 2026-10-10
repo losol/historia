@@ -5,6 +5,8 @@ import { headers } from 'next/headers';
 import { getPayload } from 'payload';
 import { allowedOrigins } from '@/config/allowed-origins';
 import type { Website } from '@/payload-types';
+import { findWebsiteForHost } from '@/utilities/findWebsiteForHost';
+import { getRequestHost } from '@/utilities/requestHost';
 
 const logger = Logger.create({
   namespace: 'historia:lib',
@@ -76,9 +78,9 @@ export const getCurrentWebsite = cache(async (): Promise<Website | null> => {
   const payload = await getPayload({ config: configPromise });
   const requestHeaders = await headers();
 
-  // When behind a reverse proxy, X-Forwarded-Host contains the original host
-  // Otherwise fall back to the standard Host header
-  const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host');
+  // Behind the reverse proxy X-Forwarded-Host carries the host the visitor asked for.
+  // Access control resolves the website from the same host (see access/siteScoped).
+  const host = getRequestHost(requestHeaders);
 
   if (!host) {
     // During static generation, headers are not available - return null instead of throwing
@@ -99,24 +101,11 @@ export const getCurrentWebsite = cache(async (): Promise<Website | null> => {
     throw new Error(`Host ${host} is not in the allowed origins list`);
   }
 
-  // Find website by domain
-  const website = await payload.find({
-    collection: 'websites',
-    pagination: false,
-    limit: 1,
-    where: {
-      domains: {
-        contains: host,
-      },
-    },
-  });
+  const website = await findWebsiteForHost(payload, host);
 
-  if (website.docs.length && website.docs[0]) {
-    logger.info(
-      { host, websiteId: website.docs[0].id, title: website.docs[0].title },
-      'Found website for host',
-    );
-    return website.docs[0];
+  if (website) {
+    logger.info({ host, websiteId: website.id, title: website.title }, 'Found website for host');
+    return website;
   }
 
   // No match found - fail fast to prevent serving wrong content

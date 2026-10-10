@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { publishedOnly } from '@/access/publishedOnly';
 import { siteEditors } from '@/access/siteRoleAccess';
+import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
@@ -25,7 +26,7 @@ export const Articles: CollectionConfig = {
   slug: 'articles',
   access: {
     create: accessOR(admins, siteEditors),
-    read: publishedOnly,
+    read: siteScoped(publishedOnly),
     readVersions: admins,
     update: accessOR(admins, siteEditors),
     delete: admins,

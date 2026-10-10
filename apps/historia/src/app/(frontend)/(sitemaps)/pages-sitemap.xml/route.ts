@@ -1,64 +1,19 @@
-import config from '@payload-config';
 import { unstable_cache } from 'next/cache';
 import { getServerSideSitemap } from 'next-sitemap';
-import { getPayload } from 'payload';
+import { getSitemapSite, pageSitemapEntries } from '@/lib/sitemap';
 
-const getPagesSitemap = unstable_cache(
-  async () => {
-    const payload = await getPayload({ config });
-    const SITE_URL =
-      process.env.NEXT_PUBLIC_CMS_URL ||
-      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-      'https://example.com';
-
-    const results = await payload.find({
-      collection: 'pages',
-      overrideAccess: false,
-      draft: false,
-      depth: 0,
-      limit: 1000,
-      pagination: false,
-      where: {
-        _status: {
-          equals: 'published',
-        },
-      },
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
-    });
-
-    const dateFallback = new Date().toISOString();
-
-    const defaultSitemap = [
-      {
-        loc: `${SITE_URL}/search`,
-        lastmod: dateFallback,
-      },
-    ];
-
-    const sitemap = results.docs
-      ? results.docs
-          .filter((page) => Boolean(page?.slug))
-          .map((page) => {
-            return {
-              loc: page?.slug === 'home' ? `${SITE_URL}/` : `${SITE_URL}/${page?.slug}`,
-              lastmod: page.updatedAt || dateFallback,
-            };
-          })
-      : [];
-
-    return [...defaultSitemap, ...sitemap];
-  },
-  ['pages-sitemap'],
-  {
-    tags: ['pages-sitemap'],
-  },
-);
+// Cached per site (the arguments are part of the key), cleared when a page is
+// published, and in any case rebuilt hourly.
+const getPagesSitemap = unstable_cache(pageSitemapEntries, ['pages-sitemap'], {
+  tags: ['pages-sitemap'],
+  revalidate: 60 * 60,
+});
 
 export async function GET() {
-  const sitemap = await getPagesSitemap();
+  const site = await getSitemapSite();
+  if (!site) {
+    return new Response('No website is configured for this host', { status: 404 });
+  }
 
-  return getServerSideSitemap(sitemap);
+  return getServerSideSitemap(await getPagesSitemap(site.origin, site.websiteId));
 }
