@@ -19,9 +19,9 @@ import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { populatePublishedAt } from '../../hooks/populatePublishedAt';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
-import { revalidateDelete, revalidatePage } from './hooks/revalidatePage';
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -88,9 +88,9 @@ export const Pages: CollectionConfig<'pages'> = {
     breadcrumbs: true,
   },
   hooks: {
-    afterChange: [revalidatePage],
+    afterChange: [revalidateSitemap],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   versions: {
     drafts: {

@@ -15,8 +15,8 @@ import { slugField } from '@/fields/slug';
 import { startDate } from '@/fields/startDate';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { populatePublishedAt } from '../../hooks/populatePublishedAt';
-import { revalidateDelete, revalidatePage } from './hooks/revalidateCase';
 
 export const Cases: CollectionConfig<'cases'> = {
   slug: 'cases',
@@ -52,9 +52,9 @@ export const Cases: CollectionConfig<'cases'> = {
     slug: true,
   },
   hooks: {
-    afterChange: [revalidatePage],
+    afterChange: [revalidateSitemap],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   versions: {
     drafts: {

@@ -7,6 +7,7 @@ import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
@@ -47,6 +48,10 @@ export const Notes: CollectionConfig = {
     create: accessOR(admins, siteEditors),
     update: accessOR(admins, siteEditors),
     delete: admins,
+  },
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   fields: [
     {

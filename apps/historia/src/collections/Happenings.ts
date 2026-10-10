@@ -16,6 +16,7 @@ import { slugField } from '@/fields/slug';
 import { startDate } from '@/fields/startDate';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 
 export const Happenings: CollectionConfig = {
   slug: 'happenings',
@@ -27,6 +28,10 @@ export const Happenings: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+  },
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   fields: [
     {

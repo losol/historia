@@ -13,6 +13,7 @@ import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 
 export const Products: CollectionConfig = {
@@ -41,6 +42,10 @@ export const Products: CollectionConfig = {
   },
   versions: {
     drafts: true,
+  },
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   fields: [
     {

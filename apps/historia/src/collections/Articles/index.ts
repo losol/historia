@@ -19,8 +19,8 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { generatePreviewPath } from '../../utilities/generatePreviewPath';
-import { revalidateArticle } from './hooks/revalidateArticle';
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -82,7 +82,8 @@ export const Articles: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateArticle],
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   versions: {
     drafts: {

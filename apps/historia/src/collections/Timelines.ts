@@ -11,6 +11,7 @@ import resourceId from '@/fields/resourceId';
 import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 
 export const Timelines: CollectionConfig = {
@@ -50,6 +51,10 @@ export const Timelines: CollectionConfig = {
       autosave: true,
     },
     maxPerDoc: 50,
+  },
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   fields: [
     {
