@@ -16,7 +16,9 @@ import { seoPlugin } from '@payloadcms/plugin-seo';
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { s3Storage } from '@payloadcms/storage-s3';
 import type { Plugin } from 'payload';
+import { anyone } from '@/access/anyone';
 import { isSystemAdmin } from '@/access/isSystemAdmin';
+import { siteScoped } from '@/access/siteScoped';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
 import { mergeVippsAddress } from '@/lib/vipps/login-address';
 import { getVippsLoginEnv } from '@/lib/vipps/login-config';
@@ -195,6 +197,10 @@ export const plugins: Plugin[] = [
     collections: ['articles', 'notes', 'pages'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
+      // Visitors search the site they are on; see beforeSyncWithSearch for the tenant.
+      access: {
+        read: siteScoped(anyone),
+      },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields];
       },
