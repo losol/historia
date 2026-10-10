@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
-import { anyone } from '@/access/anyone';
+import { authenticatedOrPublished } from '@/access/authenticatedOrPublished';
 import { siteEditors } from '@/access/siteRoleAccess';
 import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
@@ -42,7 +42,7 @@ export const Timelines: CollectionConfig = {
   access: {
     create: accessOR(admins, siteEditors),
     delete: admins,
-    read: siteScoped(anyone),
+    read: siteScoped(authenticatedOrPublished),
     update: accessOR(admins, siteEditors),
   },
   versions: {
