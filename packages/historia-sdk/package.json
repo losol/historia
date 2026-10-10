@@ -1,10 +1,9 @@
 {
   "name": "@eventuras/historia-sdk",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Small client for reading Historia content, such as products, from other sites",
   "keywords": [
     "historia",
-    "payload",
     "cms",
     "sdk",
     "products"
