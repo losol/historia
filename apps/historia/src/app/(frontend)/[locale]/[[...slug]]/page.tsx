@@ -101,10 +101,11 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const fullPath = slug?.length ? `/${slug.join('/')}` : undefined;
   const currentSlug = slug?.length ? slug.at(-1) : undefined;
 
+  const homePageId = await getHomePageId();
+
   let page: Awaited<ReturnType<typeof queryPage>> | undefined;
   if (!currentSlug || !fullPath) {
     // Homepage
-    const homePageId = await getHomePageId();
     if (homePageId) {
       page = await queryPage({ id: homePageId, locale, draft: false });
     }
@@ -120,8 +121,10 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   }
 
   const website = await getCurrentWebsite();
+  // The home page is canonical at the locale root, wherever its breadcrumbs put it.
+  const path = page.id === homePageId || !fullPath ? `/${locale}` : `/${locale}${fullPath}`;
 
-  return generateMeta({ doc: page, website });
+  return generateMeta({ doc: page, website, path });
 }
 
 // Page component

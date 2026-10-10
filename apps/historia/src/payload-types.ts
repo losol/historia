@@ -300,6 +300,9 @@ export interface Website {
    */
   title: string;
   summary?: string | null;
+  /**
+   * Every host the site is served on. The first is the canonical one.
+   */
   domains?: string[] | null;
   homePage?: (string | null) | Page;
   /**

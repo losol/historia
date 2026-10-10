@@ -22,6 +22,12 @@ export interface GenerateMetaOptions {
   website?: Website | null;
 
   /**
+   * The path the document is served at, locale first (`/no/c/artikler/slug--id`).
+   * With the website's first domain it makes the canonical URL.
+   */
+  path?: string;
+
+  /**
    * Optional base URL override (defaults to getServerSideURL())
    */
   baseUrl?: string;
@@ -49,12 +55,12 @@ export interface GenerateMetaOptions {
  *   const doc = await fetchArticle(params.slug);
  *   const website = await getCurrentWebsite();
  *
- *   return generateMeta({ doc, website });
+ *   return generateMeta({ doc, website, path: `/${params.locale}/c/artikler/${doc.slug}--${doc.resourceId}` });
  * }
  * ```
  */
 export async function generateMeta(options: GenerateMetaOptions): Promise<Metadata> {
-  const { doc, website, baseUrl } = options;
+  const { doc, website, path, baseUrl } = options;
 
   const serverUrl = baseUrl || getServerSideURL();
 
@@ -82,26 +88,17 @@ export async function generateMeta(options: GenerateMetaOptions): Promise<Metada
   const image = docImage || websiteImage;
   const imageData = image ? getImageURL(image, serverUrl) : null;
 
-  // Canonical URL - use website's primary domain if available
-  let canonicalUrl: string | undefined;
-  if (doc.slug && doc.locale) {
-    const domain =
-      website?.domains && website.domains.length > 0 ? website.domains[0] : new URL(serverUrl).host;
-
-    // Build URL based on collection type
-    if (doc.resourceId) {
-      // Collection document: /locale/c/collection/slug--resourceId
-      const collection = 'collection'; // TODO: Pass collection name or derive from doc
-      canonicalUrl = `https://${domain}/${doc.locale}/c/${collection}/${doc.slug}--${doc.resourceId}`;
-    } else {
-      // Page document: /locale/slug
-      canonicalUrl = `https://${domain}/${doc.locale}/${doc.slug}`;
-    }
-  }
+  // The site's first domain is its canonical one; https except in development.
+  const domain = website?.domains?.[0];
+  const canonical =
+    path && domain
+      ? `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${domain}${path}`
+      : undefined;
 
   return {
     title,
     description,
+    alternates: canonical ? { canonical } : undefined,
     openGraph: {
       title,
       description: description || undefined,
@@ -114,7 +111,7 @@ export async function generateMeta(options: GenerateMetaOptions): Promise<Metada
             },
           ]
         : undefined,
-      url: canonicalUrl,
+      url: canonical,
     },
     twitter: {
       card: 'summary_large_image',
