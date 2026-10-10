@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { bio } from '@/fields/bio';
 import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { image } from '../fields/image';
@@ -19,6 +20,8 @@ export const Persons: CollectionConfig = {
     useAsTitle: 'name',
   },
   hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
     beforeValidate: [
       ({ data }) => {
         if (!data) return data;

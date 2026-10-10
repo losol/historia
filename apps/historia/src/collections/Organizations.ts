@@ -10,6 +10,7 @@ import { name } from '@/fields/name';
 import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
 import { url } from '@/fields/url';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
 
 export const Organizations: CollectionConfig = {
   slug: 'organizations',
@@ -21,6 +22,10 @@ export const Organizations: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
+  },
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
   },
   fields: [
     name,
