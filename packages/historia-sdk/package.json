@@ -1,9 +1,24 @@
 {
   "name": "@eventuras/historia-sdk",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.0",
   "description": "Small client for reading Historia content, such as products, from other sites",
+  "keywords": [
+    "historia",
+    "payload",
+    "cms",
+    "sdk",
+    "products"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/losol/historia.git",
+    "directory": "packages/historia-sdk"
+  },
+  "homepage": "https://github.com/losol/historia/tree/main/packages/historia-sdk#readme",
   "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,6 +29,13 @@
     "dist"
   ],
   "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",
     "dev": "vite build --watch",

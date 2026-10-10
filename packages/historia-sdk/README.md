@@ -2,6 +2,10 @@
 
 A small client for reading Historia content from other sites, for example a shop's products on a municipality's website. It is plain TypeScript with no runtime dependencies. It runs in browsers, Node 18+ and edge runtimes.
 
+```sh
+npm install @eventuras/historia-sdk
+```
+
 ```ts
 import { createHistoriaClient, formatPrice } from '@eventuras/historia-sdk';
 
@@ -64,3 +68,15 @@ A failed request throws `HistoriaError` with `status`, the HTTP status, or 0 whe
 ## From the browser
 
 Calling from another site's browser needs that site's origin in Historia's `CMS_ALLOWED_ORIGINS` (CORS). From a server, for example a Next.js server component, no setup is needed.
+
+## Releasing (maintainers)
+
+Versions go through changesets like the rest of the repo. When a "chore: version packages" PR is merged, the release job tags the release and publishes the SDK to npm if its version is not there yet (`scripts/release-publish.sh`). It uses trusted publishing (OIDC), so no npm token is stored.
+
+The first version is published by hand, because npm can only trust a workflow for a package that exists:
+
+1. Check out the "chore: version packages" branch that carries the SDK's first version. Run `pnpm install`, then `pnpm --filter @eventuras/historia-sdk build`.
+2. Run `cd packages/historia-sdk && npm publish --access public`, logged in to npm as an owner of the `@eventuras` scope.
+3. On npmjs.com, under the package's Settings → Trusted publishing, add GitHub Actions with repository `losol/historia` and workflow `historia.yml`.
+4. Merge the version PR. The release job sees the version on npm and skips it; later versions are published by the job.
+

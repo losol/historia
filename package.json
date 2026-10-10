@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "changeset": "changeset",
+    "changeset:publish": "sh scripts/release-publish.sh",
     "changeset:tag": "changeset git-tag",
     "changeset:version": "changeset version",
     "dev": "pnpm --filter @eventuras/historia dev",
