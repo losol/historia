@@ -48,7 +48,7 @@
     "handlebars": "^4.7.9"
   },
   "devDependencies": {
-    "@eventuras/typescript-config": "^1.1.0",
+    "@eventuras/typescript-config": "^1.1.1",
     "@eventuras/vite-config": "^0.4.0",
     "@types/handlebars": "^4.1.0",
     "@types/node": "^24.12.0",
