@@ -117,51 +117,6 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  multiTenantPlugin<Config>({
-    tenantsSlug: 'websites',
-    cleanupAfterTenantDelete: false,
-    collections: {
-      articles: {},
-      carts: {},
-      cases: {},
-      happenings: {},
-      instructions: {},
-      notes: {},
-      orders: {},
-      pages: {},
-      products: {},
-      quotes: {},
-      shipments: {},
-      sources: {},
-      terms: {},
-      timelines: {},
-      topics: {},
-      transactions: {},
-    },
-    tenantField: {
-      access: {
-        read: () => true,
-        update: ({ req }) => {
-          // Check if user is from 'users' collection before passing to functions
-          if (req.user && 'email' in req.user) {
-            if (isSystemAdmin(req.user)) {
-              return true;
-            }
-            return getUserTenantIDs(req.user).length > 0;
-          }
-          return false;
-        },
-      },
-    },
-    tenantsArrayField: {
-      includeDefaultField: false,
-    },
-    useUsersTenantFilter: false,
-    userHasAccessToAllTenants: (user) => {
-      // Check if user is from 'users' collection before passing to isSystemAdmin
-      return user && 'email' in user && isSystemAdmin(user);
-    },
-  }),
   nestedDocsPlugin({
     collections: ['pages'],
     generateLabel: (_, doc) => doc.title as string,
@@ -197,13 +152,60 @@ export const plugins: Plugin[] = [
     collections: ['articles', 'notes', 'pages'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
-      // Visitors search the site they are on; see beforeSyncWithSearch for the tenant.
+      // Visitors search the site they are on; the multi-tenant plugin scopes members.
       access: {
         read: siteScoped(anyone),
       },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields];
       },
+    },
+  }),
+  // After searchPlugin, which adds the search collection this scopes.
+  multiTenantPlugin<Config>({
+    tenantsSlug: 'websites',
+    cleanupAfterTenantDelete: false,
+    collections: {
+      articles: {},
+      carts: {},
+      cases: {},
+      happenings: {},
+      instructions: {},
+      notes: {},
+      orders: {},
+      pages: {},
+      products: {},
+      quotes: {},
+      shipments: {},
+      sources: {},
+      terms: {},
+      timelines: {},
+      search: {},
+      topics: {},
+      transactions: {},
+    },
+    tenantField: {
+      access: {
+        read: () => true,
+        update: ({ req }) => {
+          // Check if user is from 'users' collection before passing to functions
+          if (req.user && 'email' in req.user) {
+            if (isSystemAdmin(req.user)) {
+              return true;
+            }
+            return getUserTenantIDs(req.user).length > 0;
+          }
+          return false;
+        },
+      },
+    },
+    tenantsArrayField: {
+      includeDefaultField: false,
+    },
+    useUsersTenantFilter: false,
+    userHasAccessToAllTenants: (user) => {
+      // Check if user is from 'users' collection before passing to isSystemAdmin
+      return user && 'email' in user && isSystemAdmin(user);
     },
   }),
   // No collections: the SEO fields are placed by hand via `@/fields/seo`.

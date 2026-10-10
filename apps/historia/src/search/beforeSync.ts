@@ -23,6 +23,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc 
       description: meta?.description,
     },
     topics: [],
+    // The multi-tenant plugin's field on search: the website of the indexed document.
     tenant: typeof tenant === 'object' && tenant !== null ? tenant.id : (tenant ?? null),
   };
 

@@ -483,7 +483,6 @@ export interface Media {
           }
       )[]
     | null;
-  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -2293,6 +2292,7 @@ export interface FormSubmission {
  */
 export interface Search {
   id: string;
+  tenant?: (string | null) | Website;
   title?: string | null;
   priority?: number | null;
   doc:
@@ -2308,7 +2308,6 @@ export interface Search {
         relationTo: 'pages';
         value: string | Page;
       };
-  tenant?: (string | null) | Website;
   slug?: string | null;
   meta?: {
     title?: string | null;
@@ -3110,7 +3109,6 @@ export interface MediaSelect<T extends boolean = true> {
   attributionUrl?: T;
   collection?: T;
   relatedContent?: T;
-  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -4030,10 +4028,10 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
  * via the `definition` "search_select".
  */
 export interface SearchSelect<T extends boolean = true> {
+  tenant?: T;
   title?: T;
   priority?: T;
   doc?: T;
-  tenant?: T;
   slug?: T;
   meta?:
     | T
