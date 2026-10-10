@@ -29,9 +29,6 @@ export interface ImageField {
  */
 export interface SEODocument extends SEOFields {
   title?: string | null;
-  slug?: string | null;
-  resourceId?: string | null;
-  locale?: string | null;
   image?: string | Media | ImageField | null;
   featuredImage?: string | Media | null;
   lead?: string | null;

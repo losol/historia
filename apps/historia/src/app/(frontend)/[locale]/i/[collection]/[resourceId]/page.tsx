@@ -14,7 +14,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
 import { siteWhere } from '@/lib/siteWhere';
-import { getCurrentWebsiteId } from '@/lib/website';
+import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import type { Quote, Source } from '@/payload-types';
 import { extractPlainText, generateQuoteJsonLd, generateSourceJsonLd } from '@/utilities/json-ld';
 
@@ -30,6 +30,16 @@ const collectionMap: Record<string, CollectionSlug> = {
   sitat: 'quotes', // Norwegian
   kilde: 'sources', // Norwegian
 };
+
+// The collection's name in a locale's URLs, for the canonical URL.
+const urlName = (collection: CollectionSlug, locale: string): string =>
+  collection === 'quotes'
+    ? locale === 'no'
+      ? 'sitat'
+      : 'quote'
+    : locale === 'no'
+      ? 'kilde'
+      : 'source';
 
 export async function generateStaticParams() {
   // Skip static generation during build (ISR will handle runtime generation)
@@ -353,6 +363,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     return {};
   }
 
+  const website = await getCurrentWebsite();
+  const path = `/${locale}/i/${urlName(collectionSlug, locale)}/${resourceId}`;
+
   if (collectionSlug === 'quotes') {
     const quote = doc as Quote;
     const author =
@@ -364,6 +377,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     const quoteText = extractPlainText(quote.quote).substring(0, 160);
 
     return generateMeta({
+      website,
+      path,
       doc: {
         title: `${quoteText} — ${authorName}`,
         meta: {
@@ -404,6 +419,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     const description = authorNames ? `By ${authorNames}` : source.publisher || '';
 
     return generateMeta({
+      website,
+      path,
       doc: {
         title: source.title || 'Source',
         meta: {

@@ -3,6 +3,7 @@ import type { Metadata } from 'next/types';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
 import { CollectionListing } from '../../CollectionListing';
+import { getLocalizedCollectionName, resolvePageCollection } from '../../pageCollections';
 
 type Args = {
   params: Promise<{
@@ -25,11 +26,19 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { collection, pageNumber } = await paramsPromise;
+  const { collection, locale, pageNumber } = await paramsPromise;
   // The URL segment is the localized name (e.g. `people`, `artikler`), as in the page heading.
   const capitalizedCollection = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const website = await getCurrentWebsite();
+  const name = resolvePageCollection(collection, locale);
+  const path = name
+    ? `/${locale}/c/${getLocalizedCollectionName(name, locale)}/page/${pageNumber}`
+    : undefined;
 
-  return generateMeta({ doc: { title: `${capitalizedCollection} - ${pageNumber}` }, website });
+  return generateMeta({
+    doc: { title: `${capitalizedCollection} - ${pageNumber}` },
+    website,
+    path,
+  });
 }

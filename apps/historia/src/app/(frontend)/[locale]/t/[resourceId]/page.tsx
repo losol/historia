@@ -15,7 +15,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
 import { siteWhere } from '@/lib/siteWhere';
-import { getCurrentWebsiteId } from '@/lib/website';
+import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import type { Term } from '@/payload-types';
 import { extractPlainText, generateTermJsonLd } from '@/utilities/json-ld';
 
@@ -300,7 +300,11 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     primaryDefinition?.shortDefinition ||
     extractPlainText(primaryDefinition?.definition).substring(0, 160);
 
+  const website = await getCurrentWebsite();
+
   return generateMeta({
+    website,
+    path: `/${locale}/t/${resourceId}`,
     doc: {
       title: term.title || term.term || 'Term',
       meta: {

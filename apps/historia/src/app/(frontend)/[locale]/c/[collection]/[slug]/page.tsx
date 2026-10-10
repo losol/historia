@@ -21,6 +21,7 @@ import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import type { Product } from '@/payload-types';
 import { getImageProps } from '@/utilities/image';
 import {
+  getDocUrl,
   getLocalizedCollectionName,
   type PageCollectionsType,
   pageCollections,
@@ -236,8 +237,14 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!document) return {};
 
   const website = await getCurrentWebsite();
+  const path = getDocUrl({
+    locale,
+    collection: originalCollectionName,
+    resourceId,
+    slug: document.slug ?? parsed.slug,
+  });
 
-  return generateMeta({ doc: document, website });
+  return generateMeta({ doc: document, website, path });
 }
 
 const queryDocumentByResourceId = cache(

@@ -55,6 +55,9 @@ export const Websites: CollectionConfig = {
       label: 'Domains',
       type: 'text',
       hasMany: true,
+      admin: {
+        description: 'Every host the site is served on. The first is the canonical one.',
+      },
     },
     {
       name: 'homePage',

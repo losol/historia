@@ -5,7 +5,11 @@ import { type CollectionSlug, getPayload } from 'payload';
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
 import { CollectionListing } from './CollectionListing';
-import { getLocalizedCollectionName, pageCollections } from './pageCollections';
+import {
+  getLocalizedCollectionName,
+  pageCollections,
+  resolvePageCollection,
+} from './pageCollections';
 
 const logger = Logger.create({
   namespace: 'historia:pages',
@@ -32,19 +36,16 @@ export async function generateMetadata({
     collection: string;
   }>;
 }): Promise<Metadata> {
-  const { collection } = await paramsPromise;
+  const { collection, locale } = await paramsPromise;
 
   // The URL segment is the localized name (e.g. `people`, `artikler`), as in the page heading.
   const capitalizedCollection = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const website = await getCurrentWebsite();
+  const name = resolvePageCollection(collection, locale);
+  const path = name ? `/${locale}/c/${getLocalizedCollectionName(name, locale)}` : undefined;
 
-  // Create a minimal doc object for collection pages
-  const doc = {
-    title: capitalizedCollection,
-  };
-
-  return generateMeta({ doc, website });
+  return generateMeta({ doc: { title: capitalizedCollection }, website, path });
 }
 
 export async function generateStaticParams() {

@@ -5,7 +5,7 @@ Generic helpers for SEO metadata generation in Next.js applications.
 ## Features
 
 - ✅ **Smart fallbacks** - Multi-level fallback chain for title, description, image
-- ✅ **Multi-tenant aware** - Uses website domain for canonical URLs
+- ✅ **Canonical URL** - The website's first domain plus the `path` you pass, as `<link rel="canonical">` and `og:url`
 - ✅ **Optimized images** - Automatically uses socialShare format (1200×630px)
 - ✅ **Open Graph + Twitter** - Complete social media meta tags
 - ✅ **Type-safe** - Full TypeScript support
@@ -27,7 +27,7 @@ export async function generateMetadata({
   const doc = await fetchArticle(params.slug);
   const website = await getCurrentWebsite();
 
-  return generateMeta({ doc, website });
+  return generateMeta({ doc, website, path: `/${params.locale}/c/artikler/${doc.slug}--${doc.resourceId}` });
 }
 ```
 
@@ -129,7 +129,6 @@ When moved to `libs/seo`:
 
 - JSON-LD structured data generation
 - Robots meta tag helpers
-- Canonical URL utilities
 - Sitemap helpers
 - Schema.org markup builders
 
