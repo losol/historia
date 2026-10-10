@@ -6,13 +6,14 @@ import resourceId from '@/fields/resourceId';
 import { slugField } from '@/fields/slug';
 import { title } from '@/fields/title';
 import { anyone } from '../access/anyone';
+import { siteScoped } from '../access/siteScoped';
 
 export const Topics: CollectionConfig = {
   slug: 'topics',
   access: {
     create: admins,
     delete: admins,
-    read: anyone,
+    read: siteScoped(anyone),
     update: admins,
   },
   admin: {

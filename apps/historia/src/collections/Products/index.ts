@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteCommerceManagers } from '@/access/siteRoleAccess';
+import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { currency } from '@/fields/currency';
 import { description } from '@/fields/description';
@@ -17,7 +18,7 @@ import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 export const Products: CollectionConfig = {
   slug: 'products',
   access: {
-    read: anyone,
+    read: siteScoped(anyone),
     create: accessOR(admins, siteCommerceManagers),
     update: accessOR(admins, siteCommerceManagers),
     delete: admins,

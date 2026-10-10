@@ -4,6 +4,7 @@ import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 import { admins } from '../access/admins';
 import { anyone } from '../access/anyone';
 import { siteEditors } from '../access/siteRoleAccess';
+import { siteScoped } from '../access/siteScoped';
 import { accessOR } from '../access/utils/accessOR';
 
 export const Sources: CollectionConfig = {
@@ -30,7 +31,7 @@ export const Sources: CollectionConfig = {
     },
   },
   access: {
-    read: anyone,
+    read: siteScoped(anyone),
     create: accessOR(admins, siteEditors),
     update: accessOR(admins, siteEditors),
     delete: admins,

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
 import { anyone } from '@/access/anyone';
 import { siteEditors } from '@/access/siteRoleAccess';
+import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { endDate } from '@/fields/endDate';
 import { image } from '@/fields/image';
@@ -21,7 +22,7 @@ export const Cases: CollectionConfig<'cases'> = {
   slug: 'cases',
   access: {
     create: accessOR(admins, siteEditors),
-    read: anyone,
+    read: siteScoped(anyone),
     readVersions: admins,
     update: accessOR(admins, siteEditors),
     delete: admins,
