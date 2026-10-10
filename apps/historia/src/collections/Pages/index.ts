@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
-import { anyone } from '@/access/anyone';
+import { authenticatedOrPublished } from '@/access/authenticatedOrPublished';
 import { siteEditors } from '@/access/siteRoleAccess';
 import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
@@ -27,7 +27,7 @@ export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
     create: accessOR(admins, siteEditors),
-    read: siteScoped(anyone),
+    read: siteScoped(authenticatedOrPublished),
     readVersions: admins,
     update: accessOR(admins, siteEditors),
     delete: admins,

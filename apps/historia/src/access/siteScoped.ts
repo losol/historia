@@ -28,7 +28,7 @@ type SiteField = 'id' | 'tenant';
  * @example
  * access: {
  *   read: siteScoped(anyone),
- *   read: siteScoped(publishedOnly),
+ *   read: siteScoped(authenticatedOrPublished), // drafts for signed-in users
  *   read: siteScoped(anyone, 'id'), // on the websites collection
  * }
  */

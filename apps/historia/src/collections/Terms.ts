@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { admins } from '@/access/admins';
-import { anyone } from '@/access/anyone';
+import { authenticatedOrPublished } from '@/access/authenticatedOrPublished';
 import { siteEditors } from '@/access/siteRoleAccess';
 import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
@@ -53,7 +53,7 @@ export const Terms: CollectionConfig = {
     },
   },
   access: {
-    read: siteScoped(anyone),
+    read: siteScoped(authenticatedOrPublished),
     create: accessOR(admins, siteEditors),
     update: accessOR(admins, siteEditors),
     delete: admins,
