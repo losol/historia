@@ -5,7 +5,7 @@ A small client for reading Historia content from other sites, for example a shop
 ```ts
 import { createHistoriaClient, formatPrice } from '@eventuras/historia-sdk';
 
-const historia = createHistoriaClient({ baseUrl: 'https://butikk.losvik.no' });
+const historia = createHistoriaClient({ baseUrl: 'https://shop.example.com' });
 
 const { items, hasNextPage } = await historia.products.list({ limit: 12, sort: 'title' });
 for (const product of items) {

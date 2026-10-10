@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createHistoriaClient, formatPrice, HistoriaError } from '../index';
 
-const BASE = 'https://butikk.example.no';
+const BASE = 'https://shop.example.com';
 
 const rawProduct = {
   id: 'p1',
@@ -20,7 +20,7 @@ const rawProduct = {
       sizes: {
         thumbnail: { url: '/api/media/file/morgen-400x400.png', width: 400, height: 400 },
         landscape: {
-          url: 'https://cdn.example.no/morgen-1920x1080.png',
+          url: 'https://cdn.example.com/morgen-1920x1080.png',
           width: 1920,
           height: 1080,
         },
@@ -90,14 +90,14 @@ describe('products.list', () => {
     // No original URL: the largest size stands in. Relative URLs become absolute,
     // and sizes without a URL are left out.
     expect(product?.image).toEqual({
-      url: 'https://cdn.example.no/morgen-1920x1080.png',
+      url: 'https://cdn.example.com/morgen-1920x1080.png',
       width: 1920,
       height: 1080,
       alt: 'Morgen på fjorden',
       sizes: {
         thumbnail: { url: `${BASE}/api/media/file/morgen-400x400.png`, width: 400, height: 400 },
         landscape: {
-          url: 'https://cdn.example.no/morgen-1920x1080.png',
+          url: 'https://cdn.example.com/morgen-1920x1080.png',
           width: 1920,
           height: 1080,
         },
@@ -195,7 +195,7 @@ describe('errors', () => {
   });
 
   it('rejects a base URL that is not http(s)', () => {
-    expect(() => createHistoriaClient({ baseUrl: 'butikk.example.no' })).toThrow(TypeError);
+    expect(() => createHistoriaClient({ baseUrl: 'shop.example.com' })).toThrow(TypeError);
   });
 });
 

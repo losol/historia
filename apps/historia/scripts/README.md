@@ -21,9 +21,9 @@ the site says the payment failed.
 
 **Usage:**
 ```bash
-pnpm e2e:vipps --base-url https://staging.example.no
-pnpm e2e:vipps --base-url https://staging.example.no --scenario=abort
-pnpm e2e:vipps --base-url https://staging.example.no --headed --keep
+pnpm e2e:vipps --base-url https://staging.example.com
+pnpm e2e:vipps --base-url https://staging.example.com --scenario=abort
+pnpm e2e:vipps --base-url https://staging.example.com --headed --keep
 ```
 
 **Required Environment Variables** (the same Vipps test merchant as the site):
