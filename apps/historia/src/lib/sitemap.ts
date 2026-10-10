@@ -2,17 +2,12 @@ import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { headers } from 'next/headers';
 import type { ISitemapField } from 'next-sitemap';
-import {
-  type CollectionSlug,
-  getPayload,
-  type Payload,
-  type TypedLocale,
-  type Where,
-} from 'payload';
+import { getPayload, type TypedLocale } from 'payload';
 import {
   getDocUrl,
   type ValidCollection,
 } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
+import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsite } from '@/lib/website';
 import { getRequestHost } from '@/utilities/requestHost';
 
@@ -60,23 +55,6 @@ export async function getSitemapSite(): Promise<SitemapSite | null> {
 }
 
 const siteLocales = (): string[] => process.env.NEXT_PUBLIC_CMS_LOCALES?.split(',') || ['en'];
-
-/**
- * The published documents of one website in a collection, or every document of a
- * collection shared between the sites (persons, organizations), which has no
- * tenant and is served on each of them.
- */
-function siteWhere(payload: Payload, collection: CollectionSlug, websiteId: string): Where {
-  const { flattenedFields, versions } = payload.collections[collection].config;
-  const conditions: Where[] = [];
-  if (flattenedFields.some((field) => field.name === 'tenant')) {
-    conditions.push({ tenant: { equals: websiteId } });
-  }
-  if (versions?.drafts) {
-    conditions.push({ _status: { equals: 'published' } });
-  }
-  return { and: conditions };
-}
 
 /**
  * Sitemap entries for the documents of these collections on one website, in

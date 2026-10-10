@@ -12,7 +12,8 @@ import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { Hero } from '@/heros/Hero';
 import { generateMeta } from '@/lib/seo';
-import { getCurrentWebsite } from '@/lib/website';
+import { siteWhere } from '@/lib/siteWhere';
+import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import type { PagesSelect } from '@/payload-types';
 
 // Read locales and default locale from environment variables, fallback to 'en'
@@ -258,6 +259,9 @@ const queryPage = cache(
       return null;
     }
 
+    const websiteId = await getCurrentWebsiteId();
+    if (!websiteId) return null;
+
     try {
       const result = await payload.find({
         collection: 'pages',
@@ -268,7 +272,7 @@ const queryPage = cache(
         overrideAccess: draft,
         // @ts-expect-error - Payload's locale parameter type doesn't match our string type
         locale,
-        where,
+        where: { and: [where, siteWhere(payload, 'pages', websiteId, { draft })] },
         select: contentSelection,
       });
 
@@ -298,8 +302,11 @@ const queryPageByBreadcrumbsUrl = cache(
   }) => {
     const payload = await getPayload({ config: configPromise });
 
+    const websiteId = await getCurrentWebsiteId();
+    if (!websiteId) return null;
+
     try {
-      // Fetch pages and filter by breadcrumbs URL
+      // Fetch the site's pages and filter by breadcrumbs URL
       // Note: Payload doesn't support querying nested array fields directly,
       // so we fetch pages and filter in memory. For large sites, consider
       // adding a denormalized fullPath field on the page document.
@@ -312,6 +319,7 @@ const queryPageByBreadcrumbsUrl = cache(
         overrideAccess: draft,
         // @ts-expect-error - Payload's locale parameter type doesn't match our string type
         locale,
+        where: siteWhere(payload, 'pages', websiteId, { draft }),
         select: contentSelection,
       });
 

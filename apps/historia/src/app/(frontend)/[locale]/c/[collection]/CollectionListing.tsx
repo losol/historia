@@ -6,6 +6,8 @@ import { type CollectionSlug, getPayload } from 'payload';
 import { CollectionArchive } from '@/components/CollectionArchive';
 import { PageRange } from '@/components/PageRange';
 import { Pagination } from '@/components/Pagination';
+import { siteWhere } from '@/lib/siteWhere';
+import { getCurrentWebsiteId } from '@/lib/website';
 import {
   getOriginalCollectionName,
   isSiteLocale,
@@ -49,6 +51,9 @@ export async function CollectionListing({
     notFound();
   }
 
+  const websiteId = await getCurrentWebsiteId();
+  if (!websiteId) notFound();
+
   try {
     const docsPage = await payload.find({
       collection: originalCollectionName as CollectionSlug,
@@ -68,15 +73,15 @@ export async function CollectionListing({
         resourceId: true,
         image: { media: true },
       },
-      // exclude shipping products if it is a product listings
-      where:
-        originalCollectionName === 'products'
-          ? {
-              productType: {
-                not_equals: 'shipping',
-              },
-            }
-          : undefined,
+      where: {
+        and: [
+          siteWhere(payload, originalCollectionName, websiteId),
+          // Shipping products are priced by Vipps and not listed.
+          ...(originalCollectionName === 'products'
+            ? [{ productType: { not_equals: 'shipping' } }]
+            : []),
+        ],
+      },
     });
 
     if (!docsPage.docs?.length) {
