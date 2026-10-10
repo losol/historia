@@ -5,9 +5,9 @@
 #    nothing below may hold them back.
 # 2. Publish @eventuras/historia-sdk to npm when its version is not there yet,
 #    with npm's trusted publishing (OIDC, no token; the job has `id-token: write`)
-#    and provenance. npm 11.5.1 or newer is needed for that, which the workflow
-#    installs. A failed publish is reported as an error but does not fail the
-#    step, so the tags are still pushed; the next release retries it.
+#    and provenance, both of which pnpm 11 supports. A failed publish is reported
+#    as an error but does not fail the step, so the tags are still pushed; the
+#    next release retries it.
 set -eu
 
 pnpm changeset git-tag
@@ -22,7 +22,7 @@ if [ -n "$(npm view "$name@$version" version 2>/dev/null || true)" ]; then
 fi
 
 pnpm --filter "$name" build
-if (cd "$dir" && npm publish --provenance --access public); then
+if (cd "$dir" && pnpm publish --provenance --access public --no-git-checks); then
   echo "Published $name@$version to npm."
 else
   echo "::error::Publishing $name@$version to npm failed. Is trusted publishing set up for losol/historia's historia.yml on npmjs.com?"

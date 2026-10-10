@@ -66,10 +66,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # Trusted publishing (OIDC) to npm needs npm 11.5.1 or newer.
-      - name: Update npm
-        run: npm install -g npm@11
-
       # `publish` tags every release and publishes @eventuras/historia-sdk to
       # npm (scripts/release-publish.sh). historia's release artifact is still
       # the Docker image, promoted by its tag.
