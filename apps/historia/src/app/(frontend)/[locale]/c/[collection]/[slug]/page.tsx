@@ -16,7 +16,8 @@ import { PayloadRedirects } from '@/components/PayloadRedirects';
 import { ProductActions } from '@/components/ProductActions';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
-import { getCurrentWebsite } from '@/lib/website';
+import { siteWhere } from '@/lib/siteWhere';
+import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
 import type { Product } from '@/payload-types';
 import { getImageProps } from '@/utilities/image';
 import {
@@ -252,6 +253,9 @@ const queryDocumentByResourceId = cache(
     const { isEnabled: draft } = await draftMode();
     const payload = await getPayload({ config: configPromise });
 
+    const websiteId = await getCurrentWebsiteId();
+    if (!websiteId) return null;
+
     const result = await payload.find({
       collection,
       draft,
@@ -261,9 +265,10 @@ const queryDocumentByResourceId = cache(
       overrideAccess: draft,
       pagination: false,
       where: {
-        resourceId: {
-          equals: resourceId,
-        },
+        and: [
+          { resourceId: { equals: resourceId } },
+          siteWhere(payload, collection, websiteId, { draft }),
+        ],
       },
     });
 

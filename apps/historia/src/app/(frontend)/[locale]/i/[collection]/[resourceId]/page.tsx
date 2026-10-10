@@ -13,6 +13,8 @@ import { JsonLd } from '@/components/JsonLd';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
+import { siteWhere } from '@/lib/siteWhere';
+import { getCurrentWebsiteId } from '@/lib/website';
 import type { Quote, Source } from '@/payload-types';
 import { extractPlainText, generateQuoteJsonLd, generateSourceJsonLd } from '@/utilities/json-ld';
 
@@ -101,6 +103,11 @@ export default async function ItemPage({ params: paramsPromise }: Readonly<Args>
 
   const payload = await getPayload({ config: configPromise });
 
+  const websiteId = await getCurrentWebsiteId();
+  if (!websiteId) {
+    return notFound();
+  }
+
   let doc: Quote | Source | null = null;
 
   try {
@@ -110,9 +117,10 @@ export default async function ItemPage({ params: paramsPromise }: Readonly<Args>
       limit: 1,
       overrideAccess: draft,
       where: {
-        resourceId: {
-          equals: resourceId,
-        },
+        and: [
+          { resourceId: { equals: resourceId } },
+          siteWhere(payload, collectionSlug, websiteId, { draft }),
+        ],
       },
       locale: locale as 'en' | 'no' | 'all',
       depth: 2,
@@ -324,14 +332,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   const payload = await getPayload({ config: configPromise });
 
+  const websiteId = await getCurrentWebsiteId();
+  if (!websiteId) {
+    return {};
+  }
+
   const result = await payload.find({
     collection: collectionSlug,
     limit: 1,
     overrideAccess: false,
     where: {
-      resourceId: {
-        equals: resourceId,
-      },
+      and: [{ resourceId: { equals: resourceId } }, siteWhere(payload, collectionSlug, websiteId)],
     },
     locale: locale as 'en' | 'no' | 'all',
   });

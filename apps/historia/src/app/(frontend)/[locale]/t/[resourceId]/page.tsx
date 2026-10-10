@@ -14,6 +14,8 @@ import { JsonLd } from '@/components/JsonLd';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
+import { siteWhere } from '@/lib/siteWhere';
+import { getCurrentWebsiteId } from '@/lib/website';
 import type { Term } from '@/payload-types';
 import { extractPlainText, generateTermJsonLd } from '@/utilities/json-ld';
 
@@ -69,6 +71,11 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
 
   const payload = await getPayload({ config: configPromise });
 
+  const websiteId = await getCurrentWebsiteId();
+  if (!websiteId) {
+    return notFound();
+  }
+
   let term: Term | null = null;
 
   try {
@@ -78,9 +85,10 @@ export default async function TermPage({ params: paramsPromise }: Readonly<Args>
       limit: 1,
       overrideAccess: draft,
       where: {
-        resourceId: {
-          equals: resourceId,
-        },
+        and: [
+          { resourceId: { equals: resourceId } },
+          siteWhere(payload, 'terms', websiteId, { draft }),
+        ],
       },
       locale: locale as 'en' | 'no' | 'all',
       depth: 2,
@@ -263,14 +271,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   const payload = await getPayload({ config: configPromise });
 
+  const websiteId = await getCurrentWebsiteId();
+  if (!websiteId) {
+    return {};
+  }
+
   const result = await payload.find({
     collection: 'terms',
     limit: 1,
     overrideAccess: false,
     where: {
-      resourceId: {
-        equals: resourceId,
-      },
+      and: [{ resourceId: { equals: resourceId } }, siteWhere(payload, 'terms', websiteId)],
     },
     locale: locale as 'en' | 'no' | 'all',
   });
