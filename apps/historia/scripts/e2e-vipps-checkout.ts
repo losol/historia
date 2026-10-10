@@ -16,8 +16,8 @@
  * hand in the Vipps MT test app instead (up to --approve-timeout seconds).
  *
  * Usage:
- *   pnpm e2e:vipps --base-url https://staging.example.no
- *   pnpm e2e:vipps --base-url https://staging.example.no --scenario=abort
+ *   pnpm e2e:vipps --base-url https://staging.example.com
+ *   pnpm e2e:vipps --base-url https://staging.example.com --scenario=abort
  *
  * Options:
  *   --base-url <url>        The site to test (or E2E_BASE_URL). Required.

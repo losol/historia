@@ -4,7 +4,7 @@
  * @example
  * import { createHistoriaClient, formatPrice } from '@eventuras/historia-sdk';
  *
- * const historia = createHistoriaClient({ baseUrl: 'https://butikk.losvik.no' });
+ * const historia = createHistoriaClient({ baseUrl: 'https://shop.example.com' });
  * const { items } = await historia.products.list({ limit: 6 });
  * for (const product of items) {
  *   console.log(product.title, product.price && formatPrice(product.price.amountIncVat, product.price.currency));

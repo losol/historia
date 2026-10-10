@@ -3,7 +3,7 @@ import { createProductsApi, type ProductsApi } from './products';
 
 export interface HistoriaClientOptions {
   /**
-   * The address of the Historia website to read from, e.g. `https://butikk.losvik.no`.
+   * The address of the Historia website to read from, e.g. `https://shop.example.com`.
    * Historia answers each domain with that website's content only, so this must be
    * one of the website's own domains, not the CMS admin's.
    */
