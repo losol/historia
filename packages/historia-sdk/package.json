@@ -1,0 +1,31 @@
+{
+  "name": "@eventuras/historia-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Small client for reading Historia content, such as products, from other sites",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.typecheck.json"
+  },
+  "devDependencies": {
+    "@eventuras/typescript-config": "^1.1.0",
+    "@eventuras/vite-config": "^0.4.0",
+    "@typescript/typescript6": "^6.0.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  }
+}
