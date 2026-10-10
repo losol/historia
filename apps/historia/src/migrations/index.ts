@@ -24,6 +24,7 @@ import * as migration_20260927_132137_website_appearance from './20260927_132137
 import * as migration_20260927_181158_media_object_key from './20260927_181158_media_object_key';
 import * as migration_20260927_194530_cart_amount from './20260927_194530_cart_amount';
 import * as migration_20260927_201404_order_payment_reference from './20260927_201404_order_payment_reference';
+import * as migration_20261010_205840_search_tenant from './20261010_205840_search_tenant';
 
 export const migrations = [
   {
@@ -155,5 +156,10 @@ export const migrations = [
     up: migration_20260927_201404_order_payment_reference.up,
     down: migration_20260927_201404_order_payment_reference.down,
     name: '20260927_201404_order_payment_reference',
+  },
+  {
+    up: migration_20261010_205840_search_tenant.up,
+    down: migration_20261010_205840_search_tenant.down,
+    name: '20261010_205840_search_tenant'
   },
 ];

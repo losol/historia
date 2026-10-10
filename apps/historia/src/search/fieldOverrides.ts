@@ -2,6 +2,16 @@ import type { Field } from 'payload';
 
 export const searchFields: Field[] = [
   {
+    // The website of the indexed document, so a site only searches its own.
+    name: 'tenant',
+    type: 'relationship',
+    relationTo: 'websites',
+    index: true,
+    admin: {
+      readOnly: true,
+    },
+  },
+  {
     name: 'slug',
     type: 'text',
     index: true,
