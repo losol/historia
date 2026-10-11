@@ -40,24 +40,33 @@ export interface ProductsApi {
   getById(id: string, options?: RequestOptions): Promise<HistoriaProduct | null>;
 }
 
-// What Historia's REST API returns for the fields the SDK asks for.
-interface RawSize {
+// What Historia's REST API returns for the fields the SDK asks for. Exported for the
+// check in Historia (apps/historia/src/collections/Products/sdk-contract.ts) that
+// these still match its schema; not part of the public API.
+export interface RawSize {
   url?: string | null;
   width?: number | null;
   height?: number | null;
 }
-interface RawMedia extends RawSize {
+export interface RawMedia extends RawSize {
   title?: string | null;
   sizes?: Record<string, RawSize | null> | null;
 }
-interface RawProduct {
+export interface RawPrice {
+  amountExVat?: number | null;
+  vatAmount?: number | null;
+  amountIncVat?: number | null;
+  vatRate?: number | null;
+  currency?: string | null;
+}
+export interface RawProduct {
   id: string;
   resourceId?: string | null;
   slug?: string | null;
   title?: string | null;
   lead?: string | null;
   productType?: string | null;
-  price?: Partial<HistoriaPrice> | null;
+  price?: RawPrice | null;
   image?: { media?: RawMedia | string | null } | null;
   inventory?: number | null;
   sku?: string | null;
@@ -73,7 +82,7 @@ interface RawPage {
 
 // Only what the SDK returns, so the answer stays small: without a select, Historia
 // also returns the story, the gallery and the whole website the product belongs to.
-const SELECT = {
+export const SELECT = {
   title: true,
   lead: true,
   productType: true,
@@ -85,7 +94,7 @@ const SELECT = {
   resourceId: true,
   updatedAt: true,
 };
-const POPULATE = {
+export const POPULATE = {
   media: { url: true, title: true, width: true, height: true, sizes: true },
 };
 
@@ -201,7 +210,7 @@ function mapImage(media: RawMedia | string | null | undefined, baseUrl: string) 
   return image;
 }
 
-function mapPrice(price: Partial<HistoriaPrice> | null | undefined): HistoriaPrice | null {
+function mapPrice(price: RawPrice | null | undefined): HistoriaPrice | null {
   if (!price || typeof price.amountExVat !== 'number') return null;
   return {
     amountExVat: price.amountExVat,
