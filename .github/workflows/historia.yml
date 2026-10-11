@@ -46,6 +46,8 @@ jobs:
     needs: [ci, docker]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # Matches the environment in the SDK's trusted publisher on npmjs.com.
+    environment: npm
     permissions:
       contents: write
       pull-requests: write
