@@ -1,5 +1,11 @@
 # @eventuras/historia
 
+## 0.29.2
+
+### Patch Changes
+
+- 99598b8: Share images (og:image, twitter:image) use the website's own domain, like the canonical URL, instead of NEXT_PUBLIC_CMS_URL, which fell back to localhost where it was not set.
+
 ## 0.29.1
 
 ### Patch Changes
