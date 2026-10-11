@@ -28,7 +28,7 @@ export interface GenerateMetaOptions {
   path?: string;
 
   /**
-   * Optional base URL override (defaults to getServerSideURL())
+   * Optional base URL for images (defaults to the website's first domain, then getServerSideURL())
    */
   baseUrl?: string;
 }
@@ -62,7 +62,16 @@ export interface GenerateMetaOptions {
 export async function generateMeta(options: GenerateMetaOptions): Promise<Metadata> {
   const { doc, website, path, baseUrl } = options;
 
-  const serverUrl = baseUrl || getServerSideURL();
+  // The site's first domain is its canonical one; https except in development.
+  const domain = website?.domains?.[0];
+  const siteUrl = domain
+    ? `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${domain}`
+    : undefined;
+
+  // Images are served from the same domain as the page. NEXT_PUBLIC_CMS_URL is not
+  // set in every deployment, and its fallback (localhost) gave share images that
+  // Facebook and others could not fetch.
+  const serverUrl = baseUrl || siteUrl || getServerSideURL();
 
   // Title fallback chain
   const title =
@@ -88,12 +97,7 @@ export async function generateMeta(options: GenerateMetaOptions): Promise<Metada
   const image = docImage || websiteImage;
   const imageData = image ? getImageURL(image, serverUrl) : null;
 
-  // The site's first domain is its canonical one; https except in development.
-  const domain = website?.domains?.[0];
-  const canonical =
-    path && domain
-      ? `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${domain}${path}`
-      : undefined;
+  const canonical = path && siteUrl ? `${siteUrl}${path}` : undefined;
 
   return {
     title,
