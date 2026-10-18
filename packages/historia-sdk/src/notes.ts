@@ -32,6 +32,11 @@ export interface NotesApi {
   get(slug: string, options?: RequestOptions): Promise<HistoriaNote | null>;
   /** One note by id, or null when there is none. */
   getById(id: string, options?: RequestOptions): Promise<HistoriaNote | null>;
+  /**
+   * One note by its short id, the one in its URL after the slug (`…--x7k2p9a`), or null. It
+   * never changes, so a link made with it holds when the slug does.
+   */
+  getByResourceId(resourceId: string, options?: RequestOptions): Promise<HistoriaNote | null>;
 }
 
 // What Historia's REST API returns for the fields the SDK asks for. Exported for the
@@ -139,6 +144,10 @@ export function createNotesApi(context: {
 
     getById(id, options) {
       return findOne({ id: { equals: id } }, options);
+    },
+
+    getByResourceId(resourceId, options) {
+      return findOne({ resourceId: { equals: resourceId } }, options);
     },
   };
 }

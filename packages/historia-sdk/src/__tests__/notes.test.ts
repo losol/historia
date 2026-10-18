@@ -172,3 +172,18 @@ describe('notes.get', () => {
     expect(await none.notes.getById('nope')).toBeNull();
   });
 });
+
+describe('notes.getByResourceId', () => {
+  it('finds one note by its short id, whatever its slug is now, or null', async () => {
+    const fetch = fakeFetch(page([rawNote]));
+    const historia = createHistoriaClient({ baseUrl: BASE, fetch });
+
+    expect((await historia.notes.getByResourceId('x7k2p'))?.slug).toBe('dugnad-pa-kaia');
+    const q = new URL(String(fetch.mock.calls[0]?.[0])).searchParams;
+    expect(q.get('where[resourceId][equals]')).toBe('x7k2p');
+    expect(q.get('limit')).toBe('1');
+
+    const none = createHistoriaClient({ baseUrl: BASE, fetch: fakeFetch(page([])) });
+    expect(await none.notes.getByResourceId('nope')).toBeNull();
+  });
+});
