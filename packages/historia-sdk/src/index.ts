@@ -2,7 +2,7 @@
  * @eventuras/historia-sdk: read Historia content from other sites.
  *
  * @example
- * import { createHistoriaClient, formatPrice } from '@eventuras/historia-sdk';
+ * import { createHistoriaClient, formatPrice, toPlainText } from '@eventuras/historia-sdk';
  *
  * const historia = createHistoriaClient({ baseUrl: 'https://shop.example.com' });
  * const { items } = await historia.products.list({ limit: 6 });
