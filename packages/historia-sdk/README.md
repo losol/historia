@@ -1,6 +1,6 @@
 # @eventuras/historia-sdk
 
-A small client for reading Historia content from other sites, for example a shop's products on a municipality's website. It is plain TypeScript with no runtime dependencies. It runs in browsers, Node 18+ and edge runtimes.
+A small client for reading Historia content from other sites, for example a shop's products or a notice board's notes on a municipality's website. It is plain TypeScript with no runtime dependencies. It runs in browsers, Node 18+ and edge runtimes.
 
 ```sh
 npm install @eventuras/historia-sdk
@@ -60,6 +60,48 @@ A product has:
 - **`sku`, `url` (the product page in the shop) and `updatedAt`.**
 
 The types are the SDK's own, not Historia's internal ones, so the CMS can change without breaking sites that use them.
+
+## Notes
+
+```ts
+import { createHistoriaClient, toPlainText } from '@eventuras/historia-sdk';
+
+const historia = createHistoriaClient({ baseUrl: 'https://www.example.com' });
+
+const { items } = await historia.notes.list({ limit: 10 }); // the newest first
+for (const note of items) {
+  console.log(note.title, note.publishedAt, toPlainText(note.content).slice(0, 140));
+}
+
+const note = await historia.notes.get('dugnad-pa-kaia'); // by slug, or null
+```
+
+- `notes.list({ limit, page, sort, topics, ids, signal })`
+  - Returns one page, as for products.
+  - `sort` is one of `publishedAt`, `title` or `updatedAt`, with a leading `-` for descending. The default is `-publishedAt`.
+  - `topics` keeps the notes about one of the given topics, by the topic's slug.
+  - Every note the website has is returned, a `publishedAt` in the future too, as on Historia's own pages.
+- `notes.get(slug)`: one note by its slug in the client's locale, or `null`.
+- `notes.getById(id)`: one note by id, or `null`.
+
+A note has:
+- **`id`, `resourceId`, `slug`, `title`, `publishedAt` and `updatedAt`.**
+- **`image`:** as a product's, or `null`. **`imageCaption`** is its caption as plain text.
+- **`content`:** its text, as rich text (below). Empty when it has none.
+- **`topics`:** `{ id, title, slug }` each.
+- **`url`:** the note's page on the Historia website.
+
+## Rich text
+
+Historia keeps rich text in its editor's own format. The SDK hands it on as a small tree of its own instead, so a site draws it with its own components and never depends on the editor:
+
+- **Blocks:** `paragraph`, `heading` (with its `level`), `quote` and `list` (`ordered`, and its `items`). A list inside a list is flattened into it.
+- **Inside a block:** `text` with its `marks` (`bold`, `italic`, `underline`, `strikethrough`, `code`), `linebreak` and `link`.
+- **A link** has an absolute `url` and `newTab`. A link to another document in Historia goes to that document's page on the website, and says which it is in `document` (`{ collection, slug, resourceId }`), so a site can show it itself.
+- **Safe to draw.** A link goes only to http(s), mailto or tel. A link to anything else, or to nothing, is left as its text.
+- **Nothing is lost.** Whatever the SDK doesn't know is kept as its text.
+
+`toPlainText(content)` gives the text alone, blocks apart by a blank line, for a summary or alt text.
 
 ## Errors
 

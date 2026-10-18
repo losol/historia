@@ -1,12 +1,9 @@
 import type { Requester, RequestOptions } from './client';
-import type {
-  HistoriaImage,
-  HistoriaImageSize,
-  HistoriaPage,
-  HistoriaPrice,
-  HistoriaProduct,
-  HistoriaProductType,
-} from './types';
+import { MEDIA_POPULATE, mapImage, type RawMedia } from './media';
+import { collectionSegment } from './paths';
+import type { HistoriaPage, HistoriaPrice, HistoriaProduct, HistoriaProductType } from './types';
+
+export type { RawMedia, RawSize } from './media';
 
 export type ProductSort =
   | 'title'
@@ -43,15 +40,6 @@ export interface ProductsApi {
 // What Historia's REST API returns for the fields the SDK asks for. Exported for the
 // check in Historia (apps/historia/src/collections/Products/sdk-contract.ts) that
 // these still match its schema; not part of the public API.
-export interface RawSize {
-  url?: string | null;
-  width?: number | null;
-  height?: number | null;
-}
-export interface RawMedia extends RawSize {
-  title?: string | null;
-  sizes?: Record<string, RawSize | null> | null;
-}
 export interface RawPrice {
   amountExVat?: number | null;
   vatAmount?: number | null;
@@ -94,13 +82,7 @@ export const SELECT = {
   resourceId: true,
   updatedAt: true,
 };
-export const POPULATE = {
-  media: { url: true, title: true, width: true, height: true, sizes: true },
-};
-
-// The shop's product pages live under a localised segment (see Historia's
-// pageCollections): /no/c/produkter/..., /en/c/products/...
-const PRODUCT_SEGMENT: Record<string, string> = { no: 'produkter', en: 'products' };
+export const POPULATE = { media: MEDIA_POPULATE };
 
 const SORT_FIELD: Record<ProductSort, string> = {
   title: 'title',
@@ -178,38 +160,6 @@ export function createProductsApi(context: {
   };
 }
 
-function absolute(url: string | null | undefined, baseUrl: string): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url, `${baseUrl}/`).toString();
-  } catch {
-    return null;
-  }
-}
-
-function mapImage(media: RawMedia | string | null | undefined, baseUrl: string) {
-  // An id instead of a document means the media was not populated or not readable.
-  if (!media || typeof media === 'string') return null;
-
-  const sizes: Record<string, HistoriaImageSize> = {};
-  for (const [name, size] of Object.entries(media.sizes ?? {})) {
-    const url = absolute(size?.url, baseUrl);
-    if (url) sizes[name] = { url, width: size?.width ?? null, height: size?.height ?? null };
-  }
-  const largest = Object.values(sizes).sort((a, b) => (b.width ?? 0) - (a.width ?? 0))[0];
-  const url = absolute(media.url, baseUrl) ?? largest?.url;
-  if (!url) return null;
-
-  const image: HistoriaImage = {
-    url,
-    width: media.url ? (media.width ?? null) : (largest?.width ?? null),
-    height: media.url ? (media.height ?? null) : (largest?.height ?? null),
-    alt: media.title ?? null,
-    sizes,
-  };
-  return image;
-}
-
 function mapPrice(price: RawPrice | null | undefined): HistoriaPrice | null {
   if (!price || typeof price.amountExVat !== 'number') return null;
   return {
@@ -226,7 +176,8 @@ export function productUrl(
   baseUrl: string,
   locale: string,
 ): string {
-  const segment = PRODUCT_SEGMENT[locale] ?? 'products';
+  // The shop's product pages: /no/c/produkter/..., /en/c/products/...
+  const segment = collectionSegment('products', locale) ?? 'products';
   return `${baseUrl}/${locale}/c/${segment}/${product.slug}--${product.resourceId}`;
 }
 

@@ -1,4 +1,5 @@
 import { HistoriaError } from './errors';
+import { createNotesApi, type NotesApi } from './notes';
 import { createProductsApi, type ProductsApi } from './products';
 
 export interface HistoriaClientOptions {
@@ -27,6 +28,7 @@ export interface HistoriaClient {
   readonly baseUrl: string;
   readonly locale: string;
   readonly products: ProductsApi;
+  readonly notes: NotesApi;
 }
 
 type QueryValue = string | number | boolean | null | undefined | QueryObject | QueryValue[];
@@ -106,6 +108,7 @@ export function createHistoriaClient(options: HistoriaClientOptions): HistoriaCl
     baseUrl,
     locale,
     products: createProductsApi({ request, baseUrl, locale }),
+    notes: createNotesApi({ request, baseUrl, locale }),
   };
 }
 
