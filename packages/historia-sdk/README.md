@@ -51,6 +51,7 @@ Every call also takes a `signal` to cancel it.
   - Shipping lines are never included.
 - `products.get(slug)`: one product by its slug in the client's locale, or `null`.
 - `products.getById(id)`: one product by id, or `null`.
+- `products.getByResourceId(resourceId)`: one product by its short id, the one in its URL after the slug (`…--n5rnun9`), or `null`. It never changes, so a link made with it holds when the slug does.
 
 A product has:
 - **`id`, `resourceId`, `slug`, `title`, `lead`, `productType`.**
@@ -83,6 +84,7 @@ const note = await historia.notes.get('dugnad-pa-kaia'); // by slug, or null
   - Every note the website has is returned, a `publishedAt` in the future too, as on Historia's own pages.
 - `notes.get(slug)`: one note by its slug in the client's locale, or `null`.
 - `notes.getById(id)`: one note by id, or `null`.
+- `notes.getByResourceId(resourceId)`: one note by its short id, as for products.
 
 A note has:
 - **`id`, `resourceId`, `slug`, `title`, `publishedAt` and `updatedAt`.**

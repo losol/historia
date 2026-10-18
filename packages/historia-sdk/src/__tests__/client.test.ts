@@ -140,6 +140,17 @@ describe('products.get', () => {
     const historia = createHistoriaClient({ baseUrl: BASE, fetch: fakeFetch(page([])) });
     expect(await historia.products.get('missing')).toBeNull();
   });
+  it('finds a product by its short id, whatever its slug is now', async () => {
+    const fetch = fakeFetch(page([rawProduct]));
+    const historia = createHistoriaClient({ baseUrl: BASE, fetch });
+
+    const product = await historia.products.getByResourceId('n5rnun9');
+
+    const q = new URL(String(fetch.mock.calls[0]?.[0])).searchParams;
+    expect(q.get('where[and][1][resourceId][equals]')).toBe('n5rnun9');
+    expect(q.get('limit')).toBe('1');
+    expect(product?.slug).toBe('bok-losene');
+  });
 });
 
 describe('errors', () => {
