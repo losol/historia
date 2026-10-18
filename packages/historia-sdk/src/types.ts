@@ -60,3 +60,73 @@ export interface HistoriaPage<T> {
   totalItems: number;
   hasNextPage: boolean;
 }
+
+/**
+ * Rich text as the SDK hands it on: a few kinds of block, each with its text, and
+ * nothing of the editor Historia stores it from. A site draws it however it likes.
+ * What the SDK doesn't know is kept as its text, never dropped.
+ */
+export type HistoriaRichText = HistoriaBlock[];
+
+export type HistoriaBlock =
+  | { type: 'paragraph'; children: HistoriaInline[] }
+  | { type: 'heading'; level: 1 | 2 | 3 | 4 | 5 | 6; children: HistoriaInline[] }
+  | { type: 'quote'; children: HistoriaInline[] }
+  /** Each item its text. A list in a list is flattened into it. */
+  | { type: 'list'; ordered: boolean; items: HistoriaInline[][] };
+
+export type HistoriaInline = HistoriaText | HistoriaLink | HistoriaLineBreak;
+
+export type HistoriaMark = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code';
+
+export interface HistoriaText {
+  type: 'text';
+  text: string;
+  marks: HistoriaMark[];
+}
+
+export interface HistoriaLineBreak {
+  type: 'linebreak';
+}
+
+export interface HistoriaLink {
+  type: 'link';
+  /** Absolute, and only http(s), mailto or tel: a link to anything else is left as its text. */
+  url: string;
+  newTab: boolean;
+  /** For a link to another document in Historia: which, so a site can show it itself. */
+  document: HistoriaDocumentRef | null;
+  children: (HistoriaText | HistoriaLineBreak)[];
+}
+
+export interface HistoriaDocumentRef {
+  /** Historia's collection, e.g. `notes`, `articles`, `pages`. */
+  collection: string;
+  slug: string;
+  resourceId: string | null;
+}
+
+export interface HistoriaTopic {
+  id: string;
+  title: string;
+  slug: string;
+}
+
+export interface HistoriaNote {
+  id: string;
+  /** Short, stable id used in the note's URL. */
+  resourceId: string;
+  slug: string;
+  title: string;
+  image: HistoriaImage | null;
+  /** The picture's caption, as plain text. */
+  imageCaption: string | null;
+  /** Empty when the note has no text. */
+  content: HistoriaRichText;
+  topics: HistoriaTopic[];
+  /** ISO date; null when not set. */
+  publishedAt: string | null;
+  /** The note's page on the Historia website. */
+  url: string;
+  updatedAt: string;
+}

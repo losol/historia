@@ -1,12 +1,13 @@
 {
   "name": "@eventuras/historia-sdk",
   "version": "0.1.0",
-  "description": "Small client for reading Historia content, such as products, from other sites",
+  "description": "Small client for reading Historia content, such as products and notes, from other sites",
   "keywords": [
     "historia",
     "cms",
     "sdk",
-    "products"
+    "products",
+    "notes"
   ],
   "license": "MIT",
   "repository": {
