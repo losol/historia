@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+# A new push to a pull request cancels its older run. On main every run finishes,
+# so each merge gets its image and its release step; a newer push waits instead.
 concurrency:
   group: historia-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ci:
@@ -39,18 +41,72 @@ jobs:
   # then tags the new version, and the tag triggers the retag job in
   # historia-docker.yml, which promotes the image to `vX.Y.Z` and `latest`.
   #
+  # The two steps are separate jobs so the version PR does not wait for the
+  # Docker build: while changesets are pending, `version` opens or updates the
+  # PR right away. Once they are released (the version PR is merged), `release`
+  # tags and publishes, after CI and Docker.
+  changesets:
+    name: Pending changesets
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      pending: ${{ steps.check.outputs.pending }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .changeset
+
+      - name: Look for changesets
+        id: check
+        run: |
+          if find .changeset -name '*.md' ! -name 'README.md' | grep -q .; then
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  version:
+    name: Version PR
+    needs: changesets
+    if: needs.changesets.outputs.pending == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # No publish-script: this job only opens or updates the version PR, and can
+      # never tag or publish.
+      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version-script: pnpm changeset:version
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
+
   # `needs: docker` matters: the tag must not exist before the image it points
   # at has been pushed, or the retag has nothing to promote.
   release:
     name: Release
-    needs: [ci, docker]
-    if: github.event_name == 'push'
+    needs: [changesets, ci, docker]
+    if: needs.changesets.outputs.pending == 'false'
     runs-on: ubuntu-latest
     # Matches the environment in the SDK's trusted publisher on npmjs.com.
     environment: npm
     permissions:
       contents: write
-      pull-requests: write
       # npm provenance: the published SDK is signed as built by this workflow.
       id-token: write
     steps:
@@ -73,7 +129,4 @@ jobs:
       # the Docker image, promoted by its tag.
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          version-script: pnpm changeset:version
           publish-script: pnpm changeset:publish
-          commit-message: 'chore: version packages'
-          pr-title: 'chore: version packages'
