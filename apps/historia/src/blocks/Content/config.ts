@@ -1,8 +1,12 @@
 import {
+  BlockquoteFeature,
   BlocksFeature,
   HeadingFeature,
+  HorizontalRuleFeature,
   InlineToolbarFeature,
   lexicalEditor,
+  OrderedListFeature,
+  UnorderedListFeature,
 } from '@payloadcms/richtext-lexical';
 import type { Block } from 'payload';
 import { Image } from '@/blocks/Image/config';
@@ -20,6 +24,10 @@ export const Content: Block = {
           return [
             ...rootFeatures,
             HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+            UnorderedListFeature(),
+            OrderedListFeature(),
+            BlockquoteFeature(),
+            HorizontalRuleFeature(),
             InlineToolbarFeature(),
             BlocksFeature({ blocks: [Image] }),
           ];
