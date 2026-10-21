@@ -1,0 +1,11 @@
+{
+  "extends": "@eventuras/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"],
+  // Tests stay out of dist; the typecheck config covers them.
+  "exclude": ["node_modules", "dist", "**/__tests__"]
+}

@@ -1,4 +1,4 @@
-import { createVippsAuthStrategy } from '@eventuras/payload-vipps-auth';
+import { identitiesField } from '@eventuras/payload-oidc-auth';
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields';
 import type { CollectionConfig } from 'payload';
 import { adminsFieldLevel } from '../../access/admins';
@@ -51,7 +51,7 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: {
-    strategies: [createVippsAuthStrategy()],
+    // The identity providers' strategies are added by oidcAuthPlugin (see plugins.ts).
     tokenExpiration: 60 * 60 * 24 * 7, // 7 days
     useSessions: true,
     useAPIKey: true,
@@ -192,6 +192,10 @@ export const Users: CollectionConfig = {
         ...addressFields(),
       ],
     },
+    // The logins at identity providers (Vipps, ...) that belong to this user.
+    // oidcAuthPlugin adds it when missing, but it is declared here so the
+    // schema is the same whether or not a provider is enabled.
+    identitiesField,
     {
       name: 'roles',
       type: 'select',

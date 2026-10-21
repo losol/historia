@@ -1,15 +1,21 @@
 /**
- * Vipps Login Authentication Plugin for Payload CMS
+ * Vipps Login for Payload CMS, as a provider for `@eventuras/payload-oidc-auth`.
  *
- * Provides Vipps Login (OpenID Connect) authentication for Payload CMS applications.
+ * @example
+ * ```typescript
+ * import { oidcAuthPlugin } from '@eventuras/payload-oidc-auth';
+ * import { vippsProvider } from '@eventuras/payload-vipps-auth';
  *
- * @see https://payloadcms.com/docs/authentication/overview
+ * plugins: [
+ *   oidcAuthPlugin({
+ *     providers: [vippsProvider({ clientId, clientSecret, apiUrl })],
+ *   }),
+ * ]
+ * ```
+ *
  * @see https://developer.vippsmobilepay.com/docs/APIs/login-api/
  */
 
 export * from './components';
-export * from './config';
-export * from './handlers';
-export * from './plugin';
-export * from './strategy';
+export * from './provider';
 export * from './types';

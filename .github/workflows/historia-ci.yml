@@ -48,6 +48,12 @@ jobs:
           pnpm --filter @eventuras/historia-sdk typecheck
           pnpm --filter @eventuras/historia-sdk test
 
+      - name: Typecheck & test (payload-oidc-auth, payload-vipps-auth)
+        run: |
+          pnpm --filter @eventuras/payload-oidc-auth typecheck
+          pnpm --filter @eventuras/payload-oidc-auth test
+          pnpm --filter @eventuras/payload-vipps-auth typecheck
+
   # The gate that matters for a release: the app has to type-check, its schema
   # has to match its collections, and it has to boot against a real Postgres.
   # `biome ci` and the Docker build cannot show any of that — the image is built
