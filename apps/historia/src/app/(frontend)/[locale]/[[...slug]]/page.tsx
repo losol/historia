@@ -10,6 +10,7 @@ import { notFound } from 'next/navigation';
 import { getPayload, type Where } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
+import { PayloadRedirects } from '@/components/PayloadRedirects';
 import { Hero } from '@/heros/Hero';
 import { generateMeta } from '@/lib/seo';
 import { siteWhere } from '@/lib/siteWhere';
@@ -146,7 +147,8 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     const userAgent = headersData.get('user-agent') || 'unknown';
 
     logger.info({ locale, ip, userAgent }, 'Invalid locale access attempt');
-    notFound();
+    // Not a locale, so maybe an old URL (/nyheter/<slug>) with a redirect
+    return <PayloadRedirects permanent url={`/${[locale, ...(slug ?? [])].join('/')}`} />;
   }
 
   // Build the full path from slug segments (this is the breadcrumbs URL)
@@ -171,7 +173,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
   }
 
   if (!page) {
-    notFound();
+    return <PayloadRedirects permanent url={`/${locale}${fullPath ?? ''}`} />;
   }
 
   const { title, image, breadcrumbs, story } = page;
