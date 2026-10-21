@@ -1,23 +1,26 @@
 import type React from 'react';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import type { Article, Page } from '@/payload-types';
 import { getCachedDocument } from '@/utilities/getDocument';
 import { getCachedRedirects } from '@/utilities/getRedirects';
 
 interface Props {
   disableNotFound?: boolean;
+  /** 308 instead of 307, for URLs that moved for good (e.g. a migrated site). */
+  permanent?: boolean;
   url: string;
 }
 
 /* This component helps us with SSR based dynamic redirects */
-export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }) => {
+export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, permanent, url }) => {
+  const goTo = permanent ? permanentRedirect : redirect;
   const redirects = await getCachedRedirects()();
 
   const redirectItem = redirects.find((redirect) => redirect.from === url);
 
   if (redirectItem) {
     if (redirectItem.to?.url) {
-      redirect(redirectItem.to.url);
+      goTo(redirectItem.to.url);
     }
 
     let redirectUrl: string;
@@ -44,7 +47,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
       }`;
     }
 
-    if (redirectUrl) redirect(redirectUrl);
+    if (redirectUrl) goTo(redirectUrl);
   }
 
   if (disableNotFound) return null;
