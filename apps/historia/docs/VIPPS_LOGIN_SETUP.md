@@ -72,16 +72,23 @@ pnpm dev
 
 ## How users are created and matched
 
-Users are matched on **email**:
+Users are matched on their **Vipps identity** first, then on **email**:
 
-- **Existing user with that email:** they are logged in, and their profile is updated
-  from Vipps (see `mapVippsUser` in `src/plugins.ts`). Of their addresses, only the one
-  labelled "Vipps" is updated (or added if missing); any others are left alone.
-- **No user with that email:** a new user is created from the Vipps profile.
+- **Logged in with Vipps before:** the user is found by their Vipps subject (the
+  `identities` field on the user, shown in the sidebar), whatever their email is now.
+  Their profile is updated from Vipps (see `mapVippsUser` in `src/plugins.ts`). Of their
+  addresses, only the one labelled "Vipps" is updated (or added if missing); any others
+  are left alone.
+- **Existing user with that email:** they are logged in and the Vipps identity is
+  linked to them, provided Vipps reports the email as verified. An unverified email is
+  refused (`?error=email_not_verified`), so nobody can take over an account by
+  registering its email with Vipps.
+- **No user with that email:** a new user is created from the Vipps profile, with a
+  random password nobody knows (they can reset it to use email login too).
 - **Vipps account without an email:** the login is refused (`?error=no_email`).
 
-If someone changes their email in Vipps, they will not match their old account and a
-new user is created.
+The login routes are served by `@eventuras/payload-oidc-auth`, the plugin that handles
+every identity provider; Vipps is one provider in it (`src/plugins.ts`).
 
 ### Access for new users
 
@@ -180,12 +187,11 @@ The PKCE cookies live for 10 minutes. Start the login again.
 on every login. Keep it to profile data. Do not grant roles or tenant access from
 Vipps data, as anything that controls access should be assigned by an admin.
 
-### Disable email/password login
+### Email/password login stays on
 
-To allow Vipps login only, pass `disableLocalStrategy: true` to `vippsAuthPlugin()` in
-`src/plugins.ts`. It is not wired to an environment variable.
-
-⚠️ Make sure a system admin can log in with Vipps before you do this.
+Payload only registers the JWT strategy, the one that reads the login cookie, while
+the users collection keeps its local (email and password) strategy. Turning that off
+would log everyone out after a Vipps login too, so there is no option for it.
 
 ## Further reading
 

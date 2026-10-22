@@ -1,35 +1,29 @@
 /**
- * Type definitions for Payload Vipps Auth Plugin
+ * Types for the Vipps Login provider.
  */
 
 import type { VippsUserInfo } from '@eventuras/fides-auth/providers/vipps';
+import type { OidcProvider, UserMapper } from '@eventuras/payload-oidc-auth';
+
+export type { VippsUserInfo };
 
 /** Maps Vipps profile data to the user fields to create or update. */
-export type VippsUserMapper = (
-  vippsUser: VippsUserInfo,
-  existingUser?: Record<string, unknown>,
-) => Record<string, unknown>;
+export type VippsUserMapper = UserMapper<VippsUserInfo>;
 
 /**
- * Configuration options for Vipps authentication plugin
+ * What `vippsProvider` takes. It becomes an `OidcProvider` named `vipps` for
+ * `oidcAuthPlugin`.
  */
-export interface VippsAuthPluginConfig {
-  /**
-   * Vipps OAuth Client ID (required)
-   */
+export interface VippsProviderConfig
+  extends Pick<
+    OidcProvider<VippsUserInfo>,
+    'redirectUri' | 'basePath' | 'allowSignup' | 'requireVerifiedEmail'
+  > {
+  /** Vipps OAuth Client ID (required) */
   clientId: string;
 
-  /**
-   * Vipps OAuth Client Secret (required)
-   */
+  /** Vipps OAuth Client Secret (required) */
   clientSecret: string;
-
-  /**
-   * OAuth redirect URI / callback URL
-   * Optional: If not provided, will be computed from request origin
-   * Format: {origin}/api/auth/vipps/callback
-   */
-  redirectUri?: string;
 
   /**
    * Vipps API base URL, the same value the payments client uses
@@ -43,46 +37,21 @@ export interface VippsAuthPluginConfig {
 
   /**
    * OpenID Connect scopes
-   * Default: 'openid name phoneNumber address email'
+   * @default 'openid name phoneNumber address email'
    */
   scope?: string;
 
-  /**
-   * Vipps subscription key (Ocp-Apim-Subscription-Key)
-   * Required for userinfo endpoint
-   */
+  /** Vipps subscription key (Ocp-Apim-Subscription-Key), required for the userinfo endpoint */
   subscriptionKey?: string;
 
-  /**
-   * Merchant serial number
-   * Required for userinfo endpoint
-   */
+  /** Merchant serial number, required for the userinfo endpoint */
   merchantSerialNumber?: string;
 
   /**
-   * Whether to disable local (email/password) authentication strategy
-   * Default: false
-   */
-  disableLocalStrategy?: boolean;
-
-  /**
-   * Whether the plugin is enabled
-   * Default: true
-   * Useful for conditionally enabling Vipps auth based on environment
-   */
-  enabled?: boolean;
-
-  /**
-   * Custom mapping function to transform Vipps user data to Payload user fields
-   * Allows customization of how Vipps profile data is stored in Payload
+   * Custom mapping from Vipps profile data to user fields.
    *
    * The result is written with a plain update, so array fields such as
    * addresses replace what the user had. Use `existingUser` to merge instead.
-   *
-   * @param vippsUser - User information from Vipps
-   * @param existingUser - The user being logged in, or undefined when a new user
-   *   is about to be created
-   * @returns Partial user object to create/update in Payload
    *
    * @example
    * ```typescript
@@ -93,26 +62,4 @@ export interface VippsAuthPluginConfig {
    * ```
    */
   mapVippsUser?: VippsUserMapper;
-}
-
-/**
- * Resolved configuration with defaults applied
- */
-export interface ResolvedVippsAuthConfig
-  extends Required<
-    Omit<
-      VippsAuthPluginConfig,
-      | 'mapVippsUser'
-      | 'subscriptionKey'
-      | 'merchantSerialNumber'
-      | 'redirectUri'
-      | 'enabled'
-      | 'apiUrl'
-    >
-  > {
-  apiUrl: string;
-  redirectUri?: string;
-  mapVippsUser?: VippsUserMapper;
-  subscriptionKey?: string;
-  merchantSerialNumber?: string;
 }

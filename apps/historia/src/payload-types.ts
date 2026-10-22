@@ -1103,6 +1103,16 @@ export interface User {
       }[]
     | null;
   /**
+   * Logins at identity providers that belong to this user.
+   */
+  identities?:
+    | {
+        provider: string;
+        subject: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Global system administrator role. Only system admins can assign this role.
    */
   roles?: 'system-admin'[] | null;
@@ -3686,6 +3696,13 @@ export interface UsersSelect<T extends boolean = true> {
         postalCode?: T;
         city?: T;
         country?: T;
+        id?: T;
+      };
+  identities?:
+    | T
+    | {
+        provider?: T;
+        subject?: T;
         id?: T;
       };
   roles?: T;
