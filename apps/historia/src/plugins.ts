@@ -4,7 +4,7 @@
  * Centralized configuration for all Payload plugins used in Historia.
  */
 
-import { oidcAuthPlugin } from '@eventuras/payload-oidc-auth';
+import { type OidcProvider, oidcAuthPlugin } from '@eventuras/payload-oidc-auth';
 import { vippsProvider } from '@eventuras/payload-vipps-auth';
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder';
 import { importExportPlugin } from '@payloadcms/plugin-import-export';
@@ -22,6 +22,7 @@ import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { siteScoped } from '@/access/siteScoped';
 import { allowedOrigins, getAllowedDomainsFromAllowedOrigins } from '@/config/allowed-origins';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
+import { getOidcLoginEnv } from '@/lib/oidc/login-config';
 import { mergeVippsAddress } from '@/lib/vipps/login-address';
 import { getVippsLoginEnv } from '@/lib/vipps/login-config';
 import type { Config, User } from '@/payload-types';
@@ -42,6 +43,63 @@ type UserAddress = NonNullable<User['addresses']>[number];
 const areAllS3VarsPresent = requiredS3MediaVars.every((varName) => process.env[varName]);
 
 const vippsLogin = getVippsLoginEnv();
+const oidcLogin = getOidcLoginEnv();
+
+// The identity providers that are turned on. Vipps has its own package, for the
+// headers its userinfo endpoint wants; any plain OIDC provider, such as Keycloak
+// (Tessera), goes through the generic one with its settings from the environment.
+// biome-ignore lint/suspicious/noExplicitAny: each provider carries its own user-info type
+const identityProviders: OidcProvider<any>[] = [];
+
+if (oidcLogin.enabled) {
+  identityProviders.push({
+    name: 'oidc',
+    label: oidcLogin.label,
+    issuer: oidcLogin.issuer,
+    clientId: oidcLogin.clientId,
+    clientSecret: oidcLogin.clientSecret,
+    allowSignup: oidcLogin.allowSignup,
+    mapUser: (user) => ({
+      email: user.email,
+      email_verified: user.email_verified,
+      given_name: user.given_name,
+      family_name: user.family_name,
+    }),
+  });
+}
+
+if (vippsLogin.enabled) {
+  identityProviders.push(
+    vippsProvider({
+      apiUrl: vippsLogin.apiUrl,
+      clientId: vippsLogin.clientId,
+      clientSecret: vippsLogin.clientSecret,
+
+      mapVippsUser: (vippsUser, existingUser) => {
+        // Only the address labelled "Vipps" is kept in sync; any others the user
+        // added are left alone. See mergeVippsAddress.
+        const addresses = mergeVippsAddress(
+          existingUser && Array.isArray(existingUser.addresses)
+            ? (existingUser.addresses as UserAddress[])
+            : undefined,
+          vippsUser.addresses,
+        );
+
+        return {
+          email: vippsUser.email,
+          email_verified: vippsUser.email_verified,
+          given_name: vippsUser.given_name,
+          middle_name: null, // Vipps doesn't provide middle_name as separate field
+          family_name: vippsUser.family_name,
+          name_verified: true,
+          phone_number: vippsUser.phone_number,
+          phone_number_verified: vippsUser.phone_number_verified,
+          ...(addresses && { addresses }),
+        };
+      },
+    }),
+  );
+}
 
 export const plugins: Plugin[] = [
   importExportPlugin({
@@ -218,41 +276,10 @@ export const plugins: Plugin[] = [
   seoPlugin({}),
   // Every identity provider goes through one plugin, which serves the login
   // routes under /api/auth/{provider} and matches users by the provider's
-  // subject (the `identities` field). Vipps is the first; others are added to
-  // `providers`.
+  // subject (the `identities` field). With no provider on, it does nothing.
   oidcAuthPlugin({
-    enabled: vippsLogin.enabled,
     // The domains Historia serves, so the login returns to the one the person is on.
     allowedDomains: () => getAllowedDomainsFromAllowedOrigins(allowedOrigins),
-    providers: [
-      vippsProvider({
-        apiUrl: vippsLogin.apiUrl,
-        clientId: vippsLogin.clientId,
-        clientSecret: vippsLogin.clientSecret,
-
-        mapVippsUser: (vippsUser, existingUser) => {
-          // Only the address labelled "Vipps" is kept in sync; any others the user
-          // added are left alone. See mergeVippsAddress.
-          const addresses = mergeVippsAddress(
-            existingUser && Array.isArray(existingUser.addresses)
-              ? (existingUser.addresses as UserAddress[])
-              : undefined,
-            vippsUser.addresses,
-          );
-
-          return {
-            email: vippsUser.email,
-            email_verified: vippsUser.email_verified,
-            given_name: vippsUser.given_name,
-            middle_name: null, // Vipps doesn't provide middle_name as separate field
-            family_name: vippsUser.family_name,
-            name_verified: true,
-            phone_number: vippsUser.phone_number,
-            phone_number_verified: vippsUser.phone_number_verified,
-            ...(addresses && { addresses }),
-          };
-        },
-      }),
-    ],
+    providers: identityProviders,
   }),
 ];
