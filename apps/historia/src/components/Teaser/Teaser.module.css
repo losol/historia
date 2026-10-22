@@ -12,7 +12,8 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--color-neutral-200);
+  /* A theme-aware placeholder while the picture loads. */
+  background: var(--border-1);
   aspect-ratio: 3 / 2;
 }
 
