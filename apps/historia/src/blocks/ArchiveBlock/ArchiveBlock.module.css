@@ -1,0 +1,23 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 2rem;
+}
+
+.featured {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 56rem) {
+  .featured {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border-1);
+}

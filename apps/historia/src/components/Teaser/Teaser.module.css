@@ -1,0 +1,124 @@
+/* A teaser is one link: image, eyebrow, title and lead, in the magazine look. */
+
+.teaser {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-neutral-200);
+  aspect-ratio: 3 / 2;
+}
+
+.frame picture {
+  display: contents;
+}
+
+/* Fills the frame whatever the picture's own proportions. */
+.frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 0;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.375rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
+  text-wrap: balance;
+  transition: color 0.15s;
+}
+
+.lead {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* lg: the lead story */
+.lg {
+  gap: 1.25rem;
+}
+
+.lg .frame {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl, 1rem);
+}
+
+.lg .eyebrow {
+  color: var(--primary);
+}
+
+.lg .title {
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+}
+
+.lg .lead {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+/* row: text left, a small picture right, in a divided list */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.875rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.row .frame {
+  order: 2;
+  width: 6rem;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm, 0.25rem);
+}
+
+.row .title {
+  font-size: 1.125rem;
+  line-height: 1.22;
+}
+
+.row .lead {
+  display: none;
+}
+
+/* Last, so it wins over the variants' title rules. */
+.teaser:hover .title {
+  color: var(--primary);
+}

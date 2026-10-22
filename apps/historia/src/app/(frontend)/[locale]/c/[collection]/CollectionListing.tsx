@@ -100,6 +100,7 @@ export async function CollectionListing({
           docs={docsPage.docs}
           // @ts-expect-error
           relationTo={originalCollectionName}
+          locale={locale}
         />
 
         {docsPage.totalPages > 1 && (

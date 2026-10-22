@@ -11,6 +11,15 @@ export const Archive: Block = {
   interfaceName: 'ArchiveBlock',
   fields: [
     {
+      name: 'title',
+      type: 'text',
+      localized: true,
+      label: 'Heading',
+      admin: {
+        description: 'Shown above the list, e.g. "Siste nytt". Leave empty for none.',
+      },
+    },
+    {
       name: 'description',
       type: 'richText',
       editor: lexicalEditor({
@@ -58,10 +67,32 @@ export const Archive: Block = {
       relationTo: 'topics',
     },
     {
-      name: 'showImages',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Show Images',
+      name: 'layout',
+      type: 'select',
+      defaultValue: 'grid',
+      label: 'Layout',
+      options: [
+        { label: 'Grid of cards', value: 'grid' },
+        { label: 'Featured: the first story large, the rest beside it', value: 'featured' },
+        { label: 'List of compact rows', value: 'list' },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'showImages',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Show Images',
+        },
+        {
+          name: 'showAllLink',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Link to the full list',
+        },
+      ],
     },
     {
       name: 'limit',

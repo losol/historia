@@ -7,5 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function Header() {
   const website = await getCurrentWebsite();
   const websiteTitle = website?.title || 'Historia';
-  return <HeaderClient title={websiteTitle} />;
+  return (
+    <HeaderClient title={websiteTitle} navigation={website?.siteSettings?.header?.navigation} />
+  );
 }

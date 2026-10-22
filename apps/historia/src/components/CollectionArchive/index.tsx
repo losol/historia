@@ -1,25 +1,33 @@
-import { Grid } from '@eventuras/ratio-ui/layout/Grid';
-import { Card } from '@/components/Card';
-import type { Article, Case, Happening, Note, Page } from '@/payload-types';
+import { DocTeaser, type TeaserCollection, type TeaserDocument } from '@/components/Teaser';
+import styles from './CollectionArchive.module.css';
 
-export type ArchiveDocument = Article | Happening | Page | Case | Note;
+export type ArchiveDocument = TeaserDocument;
 
 type CollectionArchiveProps = {
   docs: ArchiveDocument[];
-  relationTo: 'articles' | 'happenings' | 'notes' | 'cases';
+  relationTo: TeaserCollection;
+  locale: string;
   showImages?: boolean;
 };
 
+/** A grid of teasers, one per document. */
 export const CollectionArchive = ({
   docs,
   relationTo,
+  locale,
   showImages = true,
 }: CollectionArchiveProps) => {
   return (
-    <Grid cols={{ sm: 1, md: 2, lg: 3 }} paddingClassName="gap-4 lg:gap-8">
+    <div className={styles.grid}>
       {docs?.map((doc) => (
-        <Card key={doc.resourceId} doc={doc} relationTo={relationTo} showImages={showImages} />
+        <DocTeaser
+          key={doc.id}
+          doc={doc}
+          relationTo={relationTo}
+          locale={locale}
+          showImage={showImages}
+        />
       ))}
-    </Grid>
+    </div>
   );
 };

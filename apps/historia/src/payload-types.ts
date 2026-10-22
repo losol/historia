@@ -333,6 +333,12 @@ export interface Website {
        */
       colorScheme?: ('light' | 'dark' | 'both') | null;
     };
+    header?: {
+      /**
+       * The links in the top bar, in order. Section titles are not shown.
+       */
+      navigation?: NavBlock[] | null;
+    };
     footer?: {
       /**
        * Navigation for the footer
@@ -901,6 +907,10 @@ export interface Organization {
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
+  /**
+   * Shown above the list, e.g. "Siste nytt". Leave empty for none.
+   */
+  title?: string | null;
   description?: {
     root: {
       type: string;
@@ -918,7 +928,9 @@ export interface ArchiveBlock {
   } | null;
   relationTo?: ('articles' | 'happenings' | 'notes' | 'cases') | null;
   topics?: (string | Topic)[] | null;
+  layout?: ('grid' | 'featured' | 'list') | null;
   showImages?: boolean | null;
+  showAllLink?: boolean | null;
   limit?: number | null;
   id?: string | null;
   blockName?: string | null;
@@ -3356,10 +3368,13 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "ArchiveBlock_select".
  */
 export interface ArchiveBlockSelect<T extends boolean = true> {
+  title?: T;
   description?: T;
   relationTo?: T;
   topics?: T;
+  layout?: T;
   showImages?: T;
+  showAllLink?: T;
   limit?: T;
   id?: T;
   blockName?: T;
@@ -3761,6 +3776,15 @@ export interface WebsitesSelect<T extends boolean = true> {
           | {
               theme?: T;
               colorScheme?: T;
+            };
+        header?:
+          | T
+          | {
+              navigation?:
+                | T
+                | {
+                    nav?: T | NavBlockSelect<T>;
+                  };
             };
         footer?:
           | T
