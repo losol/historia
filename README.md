@@ -66,12 +66,18 @@ The database runs on migrations, as production does, rather than schema push.
 So after changing a collection, create a migration and run the migrations step
 again. `migrate:create` compares the config with the last migration and does
 not connect; the Postgres URL is what makes it write Postgres SQL rather than
-SQLite, and the locales must match or it will try to change the locale enum:
+SQLite, and the locales must match or it will try to change the locale enum.
+The S3 variables must be set too, with any non-empty values: the S3 plugin is
+enabled only when they all are, and it adds a column to `media`, so without
+them the migration drops `media._objectkey`:
 
 ```sh
 cd apps/historia
 CMS_DATABASE_URL=postgres://postgres:historia@localhost:3103/cms \
 NEXT_PUBLIC_CMS_LOCALES=no,en NEXT_PUBLIC_CMS_DEFAULT_LOCALE=no \
+CMS_MEDIA_S3_ACCESS_KEY_ID=x CMS_MEDIA_S3_SECRET_ACCESS_KEY=x \
+CMS_MEDIA_S3_ENDPOINT=https://s3.example.com CMS_MEDIA_S3_REGION=auto \
+CMS_MEDIA_S3_BUCKET=not-used \
   pnpm payload migrate:create <name>
 aspire resource migrations start
 ```
