@@ -15,14 +15,22 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 # Install sharp dependencies for Next.js / Payload image processing
 # Prefer runtime packages over -dev to keep the image slimmer.
+#
+# jemalloc: glibc's allocator fragments under sharp's many short-lived, large
+# buffers and never hands the memory back, so the process grows with every
+# upload until it is OOM-killed (staging died after ~70 ordinary images at 1Gi
+# during the WordPress import). sharp recommends jemalloc on glibc. The symlink
+# gives LD_PRELOAD one path on every architecture.
 # https://sharp.pixelplumbing.com/install#linux-memory-allocator
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
     libstdc++6 \
     libvips \
+    libjemalloc2 \
     ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/lib/*-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so.2 \
     && corepack enable \
     && corepack prepare pnpm@11.8.0 --activate \
     && pnpm config set store-dir /pnpm/store
@@ -98,6 +106,13 @@ RUN --mount=type=cache,id=next-cache,target=/app/apps/historia/.next/cache \
 FROM base AS runtime
 
 WORKDIR /app
+
+# Every process in the image, node and the healthcheck included, allocates
+# through jemalloc. See the note in the base stage.
+ENV LD_PRELOAD=/usr/local/lib/libjemalloc.so.2
+# A wrong path would only print a warning and silently fall back to glibc, so
+# the build checks that node really maps jemalloc.
+RUN node -e "process.exit(require('fs').readFileSync('/proc/self/maps', 'utf8').includes('libjemalloc') ? 0 : 1)"
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
