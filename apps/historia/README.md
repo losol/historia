@@ -78,10 +78,15 @@ The migrations are Postgres SQL. That means you must create them with a Postgres
 ```bash
 CMS_DATABASE_URL=postgres://postgres:historia@localhost:3103/cms \
 NEXT_PUBLIC_CMS_LOCALES=no,en NEXT_PUBLIC_CMS_DEFAULT_LOCALE=no \
+CMS_MEDIA_S3_ACCESS_KEY_ID=x CMS_MEDIA_S3_SECRET_ACCESS_KEY=x \
+CMS_MEDIA_S3_ENDPOINT=https://s3.example.com CMS_MEDIA_S3_REGION=auto \
+CMS_MEDIA_S3_BUCKET=not-used \
   pnpm payload migrate:create <name>
 ```
 
-`migrate:create` does not connect to the database; the URL only selects the dialect. The locales must match the ones the existing migrations were made with, or it will try to change the locale enum. CI fails a pull request that changes a collection without a matching migration.
+`migrate:create` does not connect to the database; the URL only selects the dialect. The locales must match the ones the existing migrations were made with, or it will try to change the locale enum.
+
+The S3 variables must be set, with any non-empty values. The S3 plugin is enabled only when all of them are present, and it is what adds the `_objectkey` column to `media`. Run without them, the plugin is inert and the migration drops that column. Nothing contacts S3: the plugin builds its client lazily. Read the generated SQL before committing it; a line about `media` in a migration that did not touch media is this mistake. CI runs the same command with the variables set and fails a pull request whose migrations do not match the collections.
 
 To apply and inspect migrations against a Postgres database, for example the one `aspire run` starts (see the [repository README](../../README.md#with-aspire)):
 
