@@ -20,11 +20,12 @@ import type { ResolvedOidcProvider } from './types';
 type StoredSession = { id: string; createdAt?: string | null; expiresAt: string };
 
 export function createOidcAuthStrategy(
-  provider: Pick<ResolvedOidcProvider, 'name'>,
+  provider: Pick<ResolvedOidcProvider, 'name' | 'basePath'>,
   collection = 'users',
 ): AuthStrategy {
   const name = strategyName(provider);
-  const cookieName = pendingSessionCookie(provider.name);
+  const cookie = pendingSessionCookie(provider);
+  const cookieName = cookie.name;
   const log = createLogger('OidcAuthStrategy', provider.name);
 
   return {
@@ -47,6 +48,10 @@ export function createOidcAuthStrategy(
       }
 
       if (pending.provider !== provider.name || !pending.user?.id) {
+        return { user: null };
+      }
+      if (typeof pending.expiresAt !== 'number' || pending.expiresAt < Date.now()) {
+        log.warn({ userId: pending.user.id }, 'The pending session has expired');
         return { user: null };
       }
 
@@ -84,7 +89,7 @@ export function createOidcAuthStrategy(
 
       // The cookie has done its job; clear it with the answer.
       const responseHeaders = new Headers();
-      responseHeaders.append('Set-Cookie', clearCookieHeader(cookieName, false));
+      responseHeaders.append('Set-Cookie', clearCookieHeader(cookieName, false, cookie.path));
 
       return {
         user: {

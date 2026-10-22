@@ -10,6 +10,7 @@ import {
   clearCookieHeader,
   getCookie,
   handshakeCookies,
+  isValidState,
   pendingSessionCookie,
   redirect,
   setCookieHeader,
@@ -34,6 +35,8 @@ export interface CallbackOptions {
 export interface PendingSession {
   provider: string;
   user: { id: string | number; email?: string };
+  /** Epoch milliseconds. The cookie's Max-Age is only honoured by browsers. */
+  expiresAt: number;
 }
 
 export function errorRedirect(errorPath: string, origin: string, error: OidcLoginError): Response {
@@ -52,7 +55,8 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
   const secure = url.protocol === 'https:' || origin.startsWith('https:');
   const fail = (error: OidcLoginError) => errorRedirect(options.errorPath, origin, error);
 
-  const state = url.searchParams.get('state');
+  const rawState = url.searchParams.get('state');
+  const state = isValidState(rawState) ? rawState : undefined;
   const cookies = state ? handshakeCookies(provider.name, state) : undefined;
   const clearHandshake = cookies
     ? [clearCookieHeader(cookies.verifier, secure), clearCookieHeader(cookies.redirectUri, secure)]
@@ -74,8 +78,8 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
       return withClearedHandshake(fail('oauth_failed'));
     }
     if (!code || !state || !cookies) {
-      log.error('The callback has no code or state');
-      return fail('invalid_callback');
+      log.error({ hasCode: !!code, hasState: !!rawState }, 'The callback has no code or state');
+      return withClearedHandshake(fail('invalid_callback'));
     }
 
     const codeVerifier = getCookie(request, cookies.verifier);
@@ -108,15 +112,17 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
     const pending: PendingSession = {
       provider: provider.name,
       user: { id: user.id, email: user.email },
+      expiresAt: Date.now() + PENDING_SESSION_MAX_AGE * 1000,
     };
     const sessionToken = await createEncryptedJWT(pending, getSessionSecret());
 
     log.info({ userId: user.id }, 'Login succeeded, handing over to the session route');
     return withClearedHandshake(
       redirect(new URL(`${provider.basePath}/session`, new URL(redirectUri).origin), [
-        setCookieHeader(pendingSessionCookie(provider.name), sessionToken, {
+        setCookieHeader(pendingSessionCookie(provider).name, sessionToken, {
           maxAge: PENDING_SESSION_MAX_AGE,
           secure,
+          path: pendingSessionCookie(provider).path,
         }),
       ]),
     );

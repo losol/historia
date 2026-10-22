@@ -61,7 +61,6 @@ export function resolveConfig(config: OidcAuthPluginConfig): ResolvedOidcAuthPlu
   return {
     providers,
     usersCollection: config.usersCollection ?? 'users',
-    disableLocalStrategy: config.disableLocalStrategy ?? false,
     allowedDomains: config.allowedDomains,
     successPath: config.successPath ?? '/admin',
     errorPath: config.errorPath ?? '/admin/login?error={error}',

@@ -104,13 +104,4 @@ describe('oidcAuthPlugin', () => {
     expect(config.endpoints).toBeUndefined();
     expect(config.collections?.[0]?.auth).toBe(true);
   });
-
-  it('turns local login off when asked', () => {
-    const config = oidcAuthPlugin({ providers: [provider], disableLocalStrategy: true })({
-      collections: [users()],
-    } as Config);
-
-    const auth = config.collections?.[0]?.auth;
-    expect(auth && auth !== true && auth.disableLocalStrategy).toBe(true);
-  });
 });

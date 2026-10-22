@@ -59,6 +59,12 @@ function defaultMapUser(user: OidcUserInfo): Record<string, unknown> {
   };
 }
 
+/** Payload stores emails lowercased and trimmed; compare and write them the same way. */
+function normalizeEmail(email: string | undefined): string | undefined {
+  const normalized = email?.trim().toLowerCase();
+  return normalized || undefined;
+}
+
 function identitiesOf(user: UserDoc): Identity[] {
   const rows = user[IDENTITIES_FIELD];
   return Array.isArray(rows) ? (rows as Identity[]) : [];
@@ -117,9 +123,23 @@ export async function findOrCreateUser<TUser extends OidcUserInfo>(options: {
   userInfo: TUser;
 }): Promise<UserDoc> {
   const { payload, collection, provider, userInfo } = options;
-  const mapUser = provider.mapUser ?? defaultMapUser;
   const identity: Identity = { provider: provider.name, subject: userInfo.sub };
   const log = createLogger('Users', provider.name);
+  const email = normalizeEmail(userInfo.email);
+  const emailTrusted = !provider.requireVerifiedEmail || userInfo.email_verified === true;
+
+  // What the provider's claims become on the user. An email the provider has not
+  // verified is never written: on a known user it would let anyone change their
+  // provider email to another person's and claim it here.
+  const mapUser = (existing?: UserDoc): Record<string, unknown> => {
+    const data = (provider.mapUser ?? defaultMapUser)(userInfo, existing);
+    if (typeof data.email === 'string') data.email = normalizeEmail(data.email);
+    if (!emailTrusted) {
+      delete data.email;
+      delete data.email_verified;
+    }
+    return data;
+  };
 
   if (!identity.subject) {
     throw new OidcLoginFailure('callback_failed', 'The provider returned no subject');
@@ -128,27 +148,27 @@ export async function findOrCreateUser<TUser extends OidcUserInfo>(options: {
   const byIdentity = await findByIdentity(payload, collection, identity);
   if (byIdentity) {
     log.info({ userId: byIdentity.id, sub: identity.subject }, 'Found user by identity');
-    return update(byIdentity, mapUser(userInfo, byIdentity));
+    return update(byIdentity, mapUser(byIdentity));
   }
 
-  if (!userInfo.email) {
+  if (!email) {
     throw new OidcLoginFailure('no_email', 'The provider returned no email');
   }
-  if (provider.requireVerifiedEmail && userInfo.email_verified !== true) {
+  if (!emailTrusted) {
     throw new OidcLoginFailure(
       'email_not_verified',
       'The provider has not verified the email, so it cannot identify a user',
     );
   }
 
-  const byEmail = await findByEmail(payload, collection, userInfo.email);
+  const byEmail = await findByEmail(payload, collection, email);
   if (byEmail) {
     log.info(
       { userId: byEmail.id, sub: identity.subject },
       'Found user by verified email, linking identity',
     );
     return update(byEmail, {
-      ...mapUser(userInfo, byEmail),
+      ...mapUser(byEmail),
       [IDENTITIES_FIELD]: [...identitiesOf(byEmail), identity],
     });
   }
@@ -160,11 +180,11 @@ export async function findOrCreateUser<TUser extends OidcUserInfo>(options: {
   const created = (await payload.create({
     collection,
     data: {
-      email: userInfo.email,
+      email,
       // Payload's local strategy insists on a password. This one is never told
       // to anyone; a person who wants email login resets it.
       password: randomBytes(32).toString('base64url'),
-      ...mapUser(userInfo),
+      ...mapUser(),
       [IDENTITIES_FIELD]: [identity],
     },
   })) as UserDoc;

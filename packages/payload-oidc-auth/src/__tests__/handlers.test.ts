@@ -134,6 +134,29 @@ describe('handleOidcCallback', () => {
     expect(set.get('__idp_session_pending')).toBeTruthy();
     expect(set.get(cookies.verifier)).toBe('');
     expect(set.get(cookies.redirectUri)).toBe('');
+
+    // Only the session route gets the pending cookie, so no other request can use it up.
+    const pendingHeader = response.headers
+      .getSetCookie()
+      .find((c) => c.startsWith('__idp_session_pending='));
+    expect(pendingHeader).toContain('; Path=/api/auth/idp/session;');
+  });
+
+  it('rejects a state that is not one of ours, so it never reaches a cookie header', async () => {
+    const response = await callback(
+      fakeClient(),
+      `code=c0de&state=${encodeURIComponent('x; Domain=evil.example; Path=/admin')}`,
+    ).response;
+
+    expect(response.headers.get('location')).toContain('error=invalid_callback');
+    expect(response.headers.getSetCookie()).toEqual([]);
+  });
+
+  it('clears the handshake when the callback has a state but no code', async () => {
+    const response = await callback(fakeClient(), 'state=st4te').response;
+
+    expect(response.headers.get('location')).toContain('error=invalid_callback');
+    expect(setCookies(response)).toEqual([`${cookies.verifier}=`, `${cookies.redirectUri}=`]);
   });
 
   it('fails with the provider error', async () => {

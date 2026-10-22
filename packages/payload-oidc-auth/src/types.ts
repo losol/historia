@@ -132,12 +132,6 @@ export interface OidcAuthPluginConfig {
   usersCollection?: string;
 
   /**
-   * Turn off email and password login on the users collection.
-   * @default false
-   */
-  disableLocalStrategy?: boolean;
-
-  /**
    * The hosts the deployment answers on. With a list, `X-Forwarded-Host` is
    * trusted when it names one of them, so the redirect URI matches the domain the
    * person is on. Without one, only the request's own host is used.
@@ -157,7 +151,6 @@ export interface OidcAuthPluginConfig {
 export interface ResolvedOidcAuthPluginConfig {
   providers: ResolvedOidcProvider[];
   usersCollection: string;
-  disableLocalStrategy: boolean;
   allowedDomains?: string[] | (() => string[] | undefined);
   successPath: string;
   errorPath: string;

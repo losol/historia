@@ -61,6 +61,37 @@ describe('findOrCreateUser', () => {
     expect(calls.filter((c) => c.method === 'create')).toHaveLength(0);
   });
 
+  it('never writes an unverified email onto a user found by identity', async () => {
+    const { payload } = fakePayload([
+      {
+        id: 'u1',
+        email: 'kari@example.com',
+        email_verified: true,
+        identities: [{ provider: 'idp', subject: 'abc' }],
+      },
+    ]);
+    const user = await login(payload, {
+      ...userInfo,
+      email: 'victim@example.com',
+      email_verified: false,
+      given_name: 'K',
+    });
+
+    expect(user.id).toBe('u1');
+    expect(user.email).toBe('kari@example.com');
+    expect(user.email_verified).toBe(true);
+    expect(user.given_name).toBe('K');
+  });
+
+  it('matches and stores the email the way Payload does: lowercased and trimmed', async () => {
+    const { payload, docs } = fakePayload([{ id: 'u1', email: 'kari@example.com' }]);
+    const user = await login(payload, { ...userInfo, email: ' Kari@Example.com ' });
+
+    expect(user.id).toBe('u1');
+    expect(user.email).toBe('kari@example.com');
+    expect(docs.size).toBe(1);
+  });
+
   it('does not match the same subject at another provider', async () => {
     const { payload } = fakePayload([
       { id: 'u1', email: 'other@example.com', identities: [{ provider: 'vipps', subject: 'abc' }] },

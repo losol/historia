@@ -187,12 +187,11 @@ The PKCE cookies live for 10 minutes. Start the login again.
 on every login. Keep it to profile data. Do not grant roles or tenant access from
 Vipps data, as anything that controls access should be assigned by an admin.
 
-### Disable email/password login
+### Email/password login stays on
 
-To allow Vipps login only, pass `disableLocalStrategy: true` to `oidcAuthPlugin()` in
-`src/plugins.ts`. It is not wired to an environment variable.
-
-⚠️ Make sure a system admin can log in with Vipps before you do this.
+Payload only registers the JWT strategy, the one that reads the login cookie, while
+the users collection keeps its local (email and password) strategy. Turning that off
+would log everyone out after a Vipps login too, so there is no option for it.
 
 ## Further reading
 

@@ -4,8 +4,7 @@
  * cookie Payload's own login would set are made here.
  */
 
-import crypto from 'node:crypto';
-import type { Payload } from 'payload';
+import type { Payload, TypedUser } from 'payload';
 import { generatePayloadCookie, jwtSign } from 'payload';
 import { redirect } from '../cookies';
 import { getPublicRequestOrigin } from '../origin';
@@ -17,6 +16,12 @@ export interface SessionOptions {
   allowedDomains?: string[];
   successPath: string;
   errorPath: string;
+  /**
+   * The user Payload already authenticated for this request (`req.user` in an
+   * endpoint). Given, the strategies are not run a second time, which would
+   * open a second session for the same login.
+   */
+  user?: TypedUser | null;
 }
 
 export async function handleOidcSession(
@@ -26,7 +31,7 @@ export async function handleOidcSession(
 ): Promise<Response> {
   const origin = getPublicRequestOrigin(request, options.allowedDomains);
 
-  const { user } = await payload.auth({ headers: request.headers });
+  const user = options.user ?? (await payload.auth({ headers: request.headers })).user;
   if (!user) {
     return errorRedirect(options.errorPath, origin, 'auth_failed');
   }
@@ -37,13 +42,6 @@ export async function handleOidcSession(
   }
   const authConfig = collection.config.auth;
 
-  // The same key Payload signs its own tokens with.
-  const secret = crypto
-    .createHash('sha256')
-    .update(payload.config.secret)
-    .digest('hex')
-    .slice(0, 32);
-
   const { token } = await jwtSign({
     fieldsToSign: {
       _strategy: user._strategy ?? undefined,
@@ -52,7 +50,8 @@ export async function handleOidcSession(
       id: user.id,
       sid: user._sid ?? undefined,
     },
-    secret,
+    // The key Payload's own JWT strategy verifies with.
+    secret: payload.secret,
     tokenExpiration: authConfig.tokenExpiration,
   });
 

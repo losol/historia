@@ -56,7 +56,6 @@ Declare `identitiesField` on the collection yourself when the plugin can be off 
 | `providers` | required | See below |
 | `enabled` | `true` | |
 | `usersCollection` | `'users'` | The auth-enabled collection |
-| `disableLocalStrategy` | `false` | Turn off email and password login |
 | `allowedDomains` | none | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
 | `successPath` | `'/admin'` | |
 | `errorPath` | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, … |
@@ -75,6 +74,12 @@ A provider:
 | `requireVerifiedEmail` | `true` | |
 | `mapUser` | standard claims | |
 | `createClient` | plain OIDC | For a provider that needs its own client, e.g. extra headers on userinfo |
+
+## Notes
+
+- **Email and password login stays on.** Payload registers its JWT strategy, the one that reads the session cookie, only while some auth collection keeps the local strategy. With `disableLocalStrategy` on the users collection, nobody could stay logged in after an OIDC login either.
+- **Custom paths.** `OidcLoginButton` defaults to `/api/auth/{name}/login`; pass `loginPath` when a provider has its own `basePath` or Payload's API route is not `/api`.
+- **The handoff cookie** is scoped to `/api/auth/{name}/session`, carries its own expiry (60 s) and is cleared once used.
 
 ## Environment
 

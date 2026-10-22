@@ -28,29 +28,35 @@ export function oidcEndpoints(config: ResolvedOidcAuthPluginConfig, apiRoute = '
       );
     }
     const path = provider.basePath.slice(apiRoute.length);
-    const common = {
+    // Read per request, so a function can answer with what is allowed right now.
+    const common = () => ({
       collection: config.usersCollection,
       allowedDomains: allowedDomainsOf(config),
       errorPath: config.errorPath,
-    };
+    });
 
     return [
       {
         method: 'get',
         path: `${path}/login`,
         handler: (req: PayloadRequest) =>
-          handleOidcLogin(req, provider, { allowedDomains: common.allowedDomains }),
+          handleOidcLogin(req, provider, { allowedDomains: common().allowedDomains }),
       },
       {
         method: 'get',
         path: `${path}/callback`,
-        handler: (req: PayloadRequest) => handleOidcCallback(req, provider, req.payload, common),
+        handler: (req: PayloadRequest) => handleOidcCallback(req, provider, req.payload, common()),
       },
       {
         method: 'get',
         path: `${path}/session`,
+        // Payload ran the strategies before the handler, so req.user is the login.
         handler: (req: PayloadRequest) =>
-          handleOidcSession(req, req.payload, { ...common, successPath: config.successPath }),
+          handleOidcSession(req, req.payload, {
+            ...common(),
+            successPath: config.successPath,
+            user: req.user,
+          }),
       },
     ];
   });
@@ -80,9 +86,6 @@ export function oidcAuthPlugin(pluginConfig: OidcAuthPluginConfig) {
         createOidcAuthStrategy(provider, config.usersCollection),
       ),
     ];
-    if (config.disableLocalStrategy) {
-      auth.disableLocalStrategy = true;
-    }
 
     if (!users.fields.some((field) => 'name' in field && field.name === IDENTITIES_FIELD)) {
       users.fields = [...users.fields, identitiesField];

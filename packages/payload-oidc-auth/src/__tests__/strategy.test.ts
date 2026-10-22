@@ -11,11 +11,11 @@ beforeAll(() => {
 
 const headersWith = (cookie: string) => new Headers({ cookie });
 
-const pendingCookie = async (provider: string, userId: string) =>
-  `__${provider}_session_pending=${await createEncryptedJWT({ provider, user: { id: userId } }, SECRET)}`;
+const pendingCookie = async (provider: string, userId: string, expiresAt = Date.now() + 60_000) =>
+  `__${provider}_session_pending=${await createEncryptedJWT({ provider, user: { id: userId }, expiresAt }, SECRET)}`;
 
 describe('createOidcAuthStrategy', () => {
-  const strategy = createOidcAuthStrategy({ name: 'idp' });
+  const strategy = createOidcAuthStrategy({ name: 'idp', basePath: '/api/auth/idp' });
 
   it('is named after the provider', () => {
     expect(strategy.name).toBe('oidc-idp');
@@ -39,7 +39,20 @@ describe('createOidcAuthStrategy', () => {
     expect(result.user).toMatchObject({ id: 'u1', collection: 'users', _strategy: 'oidc-idp' });
     expect(result.user?._sid).toBeTruthy();
     expect(docs.get('u1')?.sessions).toHaveLength(1);
-    expect(result.responseHeaders?.get('set-cookie')).toContain('__idp_session_pending=;');
+    expect(result.responseHeaders?.get('set-cookie')).toContain(
+      '__idp_session_pending=; Path=/api/auth/idp/session;',
+    );
+  });
+
+  it('rejects a pending session past its expiry, whatever the cookie says', async () => {
+    const { payload, docs } = fakePayload([{ id: 'u1', email: 'kari@example.com' }]);
+    const result = await strategy.authenticate({
+      payload,
+      headers: headersWith(await pendingCookie('idp', 'u1', Date.now() - 1)),
+    } as never);
+
+    expect(result.user).toBeNull();
+    expect(docs.get('u1')?.sessions).toBeUndefined();
   });
 
   it('ignores a cookie made for another provider', async () => {

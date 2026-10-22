@@ -27,13 +27,22 @@ export function getCookie(request: IncomingRequest, name: string): string | unde
 export function setCookieHeader(
   name: string,
   value: string,
-  options: { maxAge: number; secure: boolean },
+  options: { maxAge: number; secure: boolean; path?: string },
 ): string {
-  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${options.maxAge}${options.secure ? '; Secure' : ''}`;
+  return `${name}=${encodeURIComponent(value)}; Path=${options.path ?? '/'}; HttpOnly; SameSite=Lax; Max-Age=${options.maxAge}${options.secure ? '; Secure' : ''}`;
 }
 
-export function clearCookieHeader(name: string, secure: boolean): string {
-  return `${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`;
+/** Clears a cookie; the path must be the one it was set with. */
+export function clearCookieHeader(name: string, secure: boolean, path = '/'): string {
+  return `${name}=; Path=${path}; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`;
+}
+
+/**
+ * The `state` of a login, as the provider sent it back. Only openid-client's own
+ * format (base64url) is accepted, because the value becomes part of cookie names.
+ */
+export function isValidState(state: string | null): state is string {
+  return !!state && /^[A-Za-z0-9_-]{1,256}$/.test(state);
 }
 
 /** A redirect built by hand: `Response.redirect()` returns immutable headers. */
@@ -51,7 +60,11 @@ export function handshakeCookies(providerName: string, state: string) {
   };
 }
 
-/** The cookie that carries a finished login from the callback to the strategy. */
-export function pendingSessionCookie(providerName: string): string {
-  return `__${providerName}_session_pending`;
+/**
+ * The cookie that carries a finished login from the callback to the strategy. It
+ * is scoped to the session route, so no other request in the handoff window can
+ * consume it.
+ */
+export function pendingSessionCookie(provider: { name: string; basePath: string }) {
+  return { name: `__${provider.name}_session_pending`, path: `${provider.basePath}/session` };
 }
