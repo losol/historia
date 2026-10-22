@@ -30,15 +30,12 @@ export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc 
   if (topics && Array.isArray(topics) && topics.length > 0) {
     // get full topics and keep a flattened copy of their most important properties
     try {
-      const mappedTopics = topics.map((topic) => {
-        const { id, title } = topic;
-
-        return {
-          relationTo: 'topics',
-          id,
-          title,
-        };
-      });
+      // No `id`: it's the array row's primary key, so a topic shared by two
+      // documents collided and the save was rolled back without an error
+      const mappedTopics = topics.map((topic) => ({
+        relationTo: 'topics',
+        title: topic.title,
+      }));
 
       modifiedDoc.topics = mappedTopics;
     } catch (err) {
