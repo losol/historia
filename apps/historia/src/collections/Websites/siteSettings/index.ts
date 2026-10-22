@@ -1,6 +1,7 @@
 import type { Field } from 'payload';
 import { appearance } from './appearance';
 import { footer } from './footer';
+import { header } from './header';
 
 /**
  * Settings for how the site looks and behaves, one group per area. A new area is
@@ -11,5 +12,5 @@ export const siteSettings: Field = {
   name: 'siteSettings',
   label: 'Site Settings',
   type: 'group',
-  fields: [appearance, footer],
+  fields: [appearance, header, footer],
 };

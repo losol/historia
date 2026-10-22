@@ -368,10 +368,13 @@ const contentSelection: PagesSelect = {
   breadcrumbs: true,
   story: {
     archive: {
+      title: true,
       description: true,
       relationTo: true,
       topics: true,
+      layout: true,
       showImages: true,
+      showAllLink: true,
       limit: true,
     },
     content: true,
