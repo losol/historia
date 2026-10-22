@@ -11,6 +11,7 @@ import { draftMode } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { type CollectionSlug, getPayload } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
+import { Byline } from '@/components/Byline';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { PayloadRedirects } from '@/components/PayloadRedirects';
 import { ProductActions } from '@/components/ProductActions';
@@ -200,6 +201,9 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
           )}
           <Heading as="h1">{titleToUse}</Heading>
           {hasLead && <Lead>{document.lead}</Lead>}
+          {'contributors' in document && (
+            <Byline contributors={document.contributors} locale={locale} />
+          )}
         </StoryHeader>
 
         <StoryBody>
