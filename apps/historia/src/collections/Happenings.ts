@@ -7,6 +7,7 @@ import { accessOR } from '@/access/utils/accessOR';
 import { config } from '@/fields/config';
 import { contentLocations } from '@/fields/contentLocations';
 import { endDate } from '@/fields/endDate';
+import { externalEvent } from '@/fields/externalEvent';
 import { image } from '@/fields/image';
 import { lead } from '@/fields/lead';
 import { program } from '@/fields/program';
@@ -43,7 +44,7 @@ export const Happenings: CollectionConfig = {
         },
         {
           label: 'Meta',
-          fields: [...slugField(), resourceId, config],
+          fields: [...slugField(), resourceId, externalEvent, config],
         },
         seoTab(),
       ],

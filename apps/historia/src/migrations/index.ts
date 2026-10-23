@@ -27,7 +27,8 @@ import * as migration_20260927_201404_order_payment_reference from './20260927_2
 import * as migration_20261010_205840_search_tenant from './20261010_205840_search_tenant';
 import * as migration_20261021_213317_user_identities from './20261021_213317_user_identities';
 import * as migration_20261022_203410_magazine_front from './20261022_203410_magazine_front';
-import * as migration_20261023_174515_event_list_block from './20261023_174515_event_list_block';
+import * as migration_20261023_180502_happening_external_event from './20261023_180502_happening_external_event';
+import * as migration_20261023_184339_event_list_block from './20261023_184339_event_list_block';
 
 export const migrations = [
   {
@@ -176,8 +177,13 @@ export const migrations = [
     name: '20261022_203410_magazine_front',
   },
   {
-    up: migration_20261023_174515_event_list_block.up,
-    down: migration_20261023_174515_event_list_block.down,
-    name: '20261023_174515_event_list_block'
+    up: migration_20261023_180502_happening_external_event.up,
+    down: migration_20261023_180502_happening_external_event.down,
+    name: '20261023_180502_happening_external_event',
+  },
+  {
+    up: migration_20261023_184339_event_list_block.up,
+    down: migration_20261023_184339_event_list_block.down,
+    name: '20261023_184339_event_list_block'
   },
 ];

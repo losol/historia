@@ -1560,6 +1560,13 @@ export interface Happening {
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
+  /**
+   * The same event in another system, such as Eventuras.
+   */
+  externalEvent?: {
+    system?: 'eventuras' | null;
+    uuid?: string | null;
+  };
   config?:
     | {
         [k: string]: unknown;
@@ -3009,6 +3016,12 @@ export interface HappeningsSelect<T extends boolean = true> {
   slug?: T;
   slugLock?: T;
   resourceId?: T;
+  externalEvent?:
+    | T
+    | {
+        system?: T;
+        uuid?: T;
+      };
   config?: T;
   meta?:
     | T
