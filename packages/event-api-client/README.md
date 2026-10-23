@@ -1,11 +1,9 @@
-# @eventuras/payload-event-api-client
+# @eventuras/event-api-client
 
-Eventuras events in a Payload site: a small client for the public event API, and a block that lists events and links to their pages on the Eventuras site.
-
-## The client
+A small client for the public, anonymous part of the Eventuras event API: list events, read one. Nothing here needs a token, and nothing is stored.
 
 ```ts
-import { createEventApiClient } from '@eventuras/payload-event-api-client';
+import { createEventApiClient } from '@eventuras/event-api-client';
 
 const eventuras = createEventApiClient({
   apiUrl: 'https://api.example.com',
@@ -24,12 +22,4 @@ items[0].url; // https://kurs.example.com/events/42/hjerte-lunge-redning
 
 The types are the package's own, so the Eventuras API can change without breaking the sites.
 
-## The block
-
-`EventListBlock` is a Payload block (`eventList`) with `heading`, `collectionId`, `limit` and `includePast`. The plugin adds it to the `story` field of the collections named:
-
-```ts
-eventApiClientPlugin({ collections: ['pages'] });
-```
-
-The package does not render the block: the site does, with its own components, through the client. Historia's `blocks/EventList/Component.tsx` is the example: it reads the Eventuras URLs from the environment, fetches the list when the page renders with a ten-minute cache, and shows a note instead of the list when Eventuras cannot be reached.
+Historia's `blocks/HappeningList` is the consumer: a block that lists happenings from the site itself or, as an option, from Eventuras through this client.

@@ -6,6 +6,7 @@ import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Archive } from '@/blocks/ArchiveBlock/config';
 import { Content } from '@/blocks/Content/config';
+import { HappeningList } from '@/blocks/HappeningList/config';
 import { Image } from '@/blocks/Image/config';
 import { Product } from '@/blocks/Product/config';
 import { contributors } from '@/fields/contributors';
@@ -72,7 +73,13 @@ export const Pages: CollectionConfig<'pages'> = {
       tabs: [
         {
           label: 'Content',
-          fields: [name, title, lead, image, storyField([Archive, Content, Image, Product])],
+          fields: [
+            name,
+            title,
+            lead,
+            image,
+            storyField([Archive, Content, HappeningList, Image, Product]),
+          ],
         },
         {
           label: 'Meta',
