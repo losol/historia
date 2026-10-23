@@ -371,7 +371,7 @@ export interface Page {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ArchiveBlock | ContentBlock | ImageBlock | ProductsBlock)[] | null;
+  story?: (ArchiveBlock | ContentBlock | HappeningListBlock | ImageBlock | ProductsBlock)[] | null;
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
@@ -935,6 +935,29 @@ export interface ArchiveBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappeningListBlock".
+ */
+export interface HappeningListBlock {
+  /**
+   * Shown above the list, e.g. "Neste kurs". Leave empty for none.
+   */
+  heading?: string | null;
+  /**
+   * Where the happenings come from. Eventuras needs EVENTURAS_API_URL and EVENTURAS_SITE_URL on the server.
+   */
+  source?: ('historia' | 'eventuras') | null;
+  /**
+   * Only events in this Eventuras collection (its id). Empty lists all upcoming events.
+   */
+  collectionId?: number | null;
+  limit?: number | null;
+  includePast?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'happeningList';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3347,6 +3370,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         archive?: T | ArchiveBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
+        happeningList?: T | HappeningListBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
         products?: T | ProductsBlockSelect<T>;
       };
@@ -3389,6 +3413,19 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   showImages?: T;
   showAllLink?: T;
   limit?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappeningListBlock_select".
+ */
+export interface HappeningListBlockSelect<T extends boolean = true> {
+  heading?: T;
+  source?: T;
+  collectionId?: T;
+  limit?: T;
+  includePast?: T;
   id?: T;
   blockName?: T;
 }
