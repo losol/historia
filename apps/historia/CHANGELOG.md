@@ -1,5 +1,28 @@
 # @eventuras/historia
 
+## 0.30.0
+
+### Minor Changes
+
+- b5e6a19: Articles and other `/c/` pages show their contributors under the lead: "Av Kari Nordmann og Ola Nordmann" in Norwegian, "By … and …" in English. Contributors were stored but never shown.
+- 6f20044: The Content block's editor has bulleted and numbered lists, block quotes and horizontal rules. The site already rendered them; now they can be written, and imported content that has them (from WordPress, say) opens in the admin.
+- 3f54e1a: Happenings get an "External event" field: which system the event also lives in (Eventuras) and its uuid there, so a happening can be matched with the event it is about.
+- d696ff5: A start on the magazine front page. The site settings have a header navigation, shown as links in a sticky top bar with a menu button on small screens. The Archive block has a heading, a link to the full list and a layout: a grid of cards, a featured story with the rest beside it, or a compact list. Its documents are teasers in the magazine look (picture, topic and date, serif title, lead); articles come newest first, and happenings from the next one on. Collection listings use the same teasers.
+- e161801: Vipps Login goes through `@eventuras/payload-oidc-auth`, which serves the login routes as Payload endpoints and matches users by their Vipps subject (the new `identities` field on users). An email Vipps has not verified no longer links to an existing user. Ready for more identity providers.
+- ca9bd62: Login through any OpenID Connect provider, such as Keycloak (Tessera), configured with `OIDC_LOGIN_ENABLED`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ALLOW_SIGNUP` and `OIDC_LOGIN_LABEL`. The routes are `/api/auth/oidc/*`, and a button appears on the admin login.
+- 18e81f9: Redirects now work for any path, not only `/c/…`: a page that isn't found, or a first segment that isn't a locale (`/nyheter/<slug>` from an old site), is looked up in Redirects before the 404. These answer 308, so search engines move the old URL's ranking to the new one.
+
+### Patch Changes
+
+- 52ad16c: Follow-up to the search topics fix: the search collection's topics array no longer declares its own `id` field, so Payload's built-in row id (with its generated default) is used. Without it, a document with any topic failed to save with `null value in column "id"`.
+- a759714: Saving an article, note or page with a topic that another document already had could be lost without an error: the search index stored the topic's id as the array row's id, the duplicate rolled back the save, and the search plugin only logged it. Search topics no longer reuse the topic's id.
+- 9c72271: Sentry SDK 11. The SDK dropped the `sendDefaultPii` switch and now collects everything unless told otherwise, so `SENTRY_SEND_DEFAULT_PII` keeps its meaning by turning the new `dataCollection` options off when it is unset: no user info, cookies, headers, query strings, request bodies, stack frame variables or database queries leave the server. With it set, the SDK's defaults apply.
+- edbd3c1: The image runs Node with jemalloc (`LD_PRELOAD`). With glibc's allocator, memory grew with every media upload and was never returned, so a run of ordinary images could get the process OOM-killed; sharp recommends jemalloc on glibc.
+- Updated dependencies [e161801]
+- Updated dependencies [e161801]
+  - @eventuras/payload-oidc-auth@0.1.0
+  - @eventuras/payload-vipps-auth@0.3.0
+
 ## 0.29.2
 
 ### Patch Changes
