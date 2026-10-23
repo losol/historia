@@ -1544,6 +1544,13 @@ export interface Happening {
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
+  /**
+   * The same event in another system, such as Eventuras.
+   */
+  externalEvent?: {
+    system?: 'eventuras' | null;
+    uuid?: string | null;
+  };
   config?:
     | {
         [k: string]: unknown;
@@ -2342,8 +2349,8 @@ export interface Search {
   topics?:
     | {
         relationTo?: string | null;
-        id?: string | null;
         title?: string | null;
+        id?: string | null;
       }[]
     | null;
   updatedAt: string;
@@ -2993,6 +3000,12 @@ export interface HappeningsSelect<T extends boolean = true> {
   slug?: T;
   slugLock?: T;
   resourceId?: T;
+  externalEvent?:
+    | T
+    | {
+        system?: T;
+        uuid?: T;
+      };
   config?: T;
   meta?:
     | T
@@ -4088,8 +4101,8 @@ export interface SearchSelect<T extends boolean = true> {
     | T
     | {
         relationTo?: T;
-        id?: T;
         title?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
