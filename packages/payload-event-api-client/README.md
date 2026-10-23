@@ -17,8 +17,8 @@ const { items } = await eventuras.events.list({ limit: 10 });
 items[0].url; // https://kurs.example.com/events/42/hjerte-lunge-redning
 ```
 
-- `events.list({ collectionId, includePast, limit, page, signal })` returns a page of `EventurasEvent`: id, slug, title, headline, category, type, status, `registrationOpen`, city, location, dates, `featuredImageUrl` and `url`. Only published events; past ones only with `includePast`.
-- `events.get(id)` returns one event, or `null`.
+- `events.list({ collectionId, includePast, limit, page, signal })` returns a page of `EventurasEvent`: id, uuid, slug, title, headline, category, type, status, `registrationOpen`, city, location, dates, `featuredImageUrl` and `url`. Only published events; past ones only with `includePast`.
+- `events.get(id)` returns one event by its numeric id or its uuid, or `null`. Links to the Eventuras site use the numeric id, which is what its event pages take.
 - A failed request throws `EventApiError` with `status` (0 when the API could not be reached).
 - `fetch` can be injected, e.g. one with Next's `revalidate`.
 

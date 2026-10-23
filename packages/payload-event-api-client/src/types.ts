@@ -17,6 +17,8 @@ export type EventurasEventType = 'course' | 'conference' | 'onlineCourse' | 'soc
 
 export interface EventurasEvent {
   id: number;
+  /** The event's stable id; null from an Eventuras older than October 2026. */
+  uuid: string | null;
   slug: string;
   title: string;
   /** A one-line summary, when the organiser wrote one. */

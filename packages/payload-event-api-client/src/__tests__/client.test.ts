@@ -6,6 +6,7 @@ const SITE = 'https://kurs.example.com';
 
 const rawEvent = {
   id: 42,
+  uuid: '0190a5b2-7c3e-7d4a-9b1f-2e6c8a4d1f03',
   slug: 'hjerte-lunge-redning',
   title: 'Hjerte-lunge-redning',
   headline: 'Et kurs',
@@ -55,6 +56,7 @@ describe('events.list', () => {
     expect(page).toMatchObject({ page: 1, totalPages: 3, totalItems: 25 });
     expect(page.items[0]).toEqual({
       id: 42,
+      uuid: '0190a5b2-7c3e-7d4a-9b1f-2e6c8a4d1f03',
       slug: 'hjerte-lunge-redning',
       title: 'Hjerte-lunge-redning',
       headline: 'Et kurs',
@@ -131,6 +133,20 @@ describe('events.get', () => {
 
     expect(calls[0]?.url.pathname).toBe('/v3/events/42');
     expect(event?.title).toBe('Hjerte-lunge-redning');
+  });
+
+  it('reads the event by uuid', async () => {
+    const { calls, fetchImpl } = fakeFetch(rawEvent);
+    const event = await client(fetchImpl).events.get('0190a5b2-7c3e-7d4a-9b1f-2e6c8a4d1f03');
+
+    expect(calls[0]?.url.pathname).toBe('/v3/events/0190a5b2-7c3e-7d4a-9b1f-2e6c8a4d1f03');
+    expect(event?.uuid).toBe('0190a5b2-7c3e-7d4a-9b1f-2e6c8a4d1f03');
+  });
+
+  it('has a null uuid from an Eventuras without one', async () => {
+    const { uuid: _, ...withoutUuid } = rawEvent;
+    const { fetchImpl } = fakeFetch(withoutUuid);
+    expect((await client(fetchImpl).events.get(42))?.uuid).toBeNull();
   });
 
   it('returns null for an unknown id', async () => {

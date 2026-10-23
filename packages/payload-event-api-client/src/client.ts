@@ -34,6 +34,7 @@ export class EventApiError extends Error {
 /** What the API returns, as far as this client reads it. */
 interface RawEvent {
   id?: number;
+  uuid?: string | null;
   slug?: string | null;
   title?: string | null;
   headline?: string | null;
@@ -81,8 +82,8 @@ export interface EventApiClient {
   events: {
     /** Published events, upcoming unless `includePast`, one page at a time. */
     list(options?: ListEventsOptions): Promise<EventurasPage<EventurasEvent>>;
-    /** One event by id, or null when there is none. */
-    get(id: number, options?: { signal?: AbortSignal }): Promise<EventurasEvent | null>;
+    /** One event by its numeric id or its uuid, or null when there is none. */
+    get(id: number | string, options?: { signal?: AbortSignal }): Promise<EventurasEvent | null>;
   };
   /** The event's page on the Eventuras site. */
   eventUrl(event: Pick<EventurasEvent, 'id' | 'slug'>): string;
@@ -155,6 +156,7 @@ export function createEventApiClient(options: EventApiClientOptions): EventApiCl
     const slug = raw.slug ?? '';
     return {
       id: raw.id,
+      uuid: raw.uuid ?? null,
       slug,
       title: raw.title ?? '',
       headline: raw.headline ?? null,
@@ -205,7 +207,7 @@ export function createEventApiClient(options: EventApiClientOptions): EventApiCl
       async get(id, getOptions = {}) {
         try {
           const raw = await request<RawEvent>(
-            `/v3/events/${id}`,
+            `/v3/events/${encodeURIComponent(String(id))}`,
             {},
             options.organizationId,
             getOptions.signal,
