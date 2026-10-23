@@ -9,6 +9,7 @@ import type { APIError } from 'payload';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { defaultLexical } from '@/fields/defaultLexical';
+import { sentryRuntimeConfig } from '@/lib/observability/sentryOptions';
 import { Articles } from './collections/Articles';
 import { BusinessEvents } from './collections/BusinessEvents';
 import { Carts } from './collections/Carts';
@@ -242,9 +243,9 @@ export default buildConfig({
               user: {
                 id: args.req.user.id,
                 collection: args.req.user.collection,
-                // The IP address is personal data: only with the SDK's PII opt-in. The
+                // The IP address is personal data: only with the PII opt-in. The
                 // header lists every proxy; the client's address is the first entry.
-                ...(sentryClient.getOptions().sendDefaultPii && {
+                ...(sentryRuntimeConfig()?.sendDefaultPii && {
                   ip_address:
                     args.req.headers?.get('X-Forwarded-For')?.split(',')[0]?.trim() || undefined,
                 }),
