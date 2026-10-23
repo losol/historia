@@ -48,10 +48,10 @@ jobs:
           pnpm --filter @eventuras/historia-sdk typecheck
           pnpm --filter @eventuras/historia-sdk test
 
-      - name: Typecheck & test (payload-event-api-client)
+      - name: Typecheck & test (event-api-client)
         run: |
-          pnpm --filter @eventuras/payload-event-api-client typecheck
-          pnpm --filter @eventuras/payload-event-api-client test
+          pnpm --filter @eventuras/event-api-client typecheck
+          pnpm --filter @eventuras/event-api-client test
 
       # payload-vipps-auth imports payload-oidc-auth and vipps from their dist.
       - name: Typecheck & test (payload-oidc-auth, payload-vipps-auth)

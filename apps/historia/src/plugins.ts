@@ -4,7 +4,6 @@
  * Centralized configuration for all Payload plugins used in Historia.
  */
 
-import { eventApiClientPlugin } from '@eventuras/payload-event-api-client';
 import { type OidcProvider, oidcAuthPlugin } from '@eventuras/payload-oidc-auth';
 import { vippsProvider } from '@eventuras/payload-vipps-auth';
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder';
@@ -283,8 +282,4 @@ export const plugins: Plugin[] = [
     allowedDomains: () => getAllowedDomainsFromAllowedOrigins(allowedOrigins),
     providers: identityProviders,
   }),
-  // The "Event list" block on pages: upcoming events from Eventuras, linking to
-  // their pages there. The block is always in the schema, so the database is
-  // the same with or without Eventuras; the block renders nothing when it is off.
-  eventApiClientPlugin({ collections: ['pages'] }),
 ];

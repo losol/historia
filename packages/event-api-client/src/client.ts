@@ -14,7 +14,7 @@ import type {
 } from './types';
 
 const logger = Logger.create({
-  namespace: 'payload-event-api-client',
+  namespace: 'event-api-client',
   context: { module: 'EventApiClient' },
 });
 

@@ -371,7 +371,7 @@ export interface Page {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ArchiveBlock | ContentBlock | ImageBlock | ProductsBlock | EventListBlock)[] | null;
+  story?: (ArchiveBlock | ContentBlock | HappeningListBlock | ImageBlock | ProductsBlock)[] | null;
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
@@ -938,6 +938,29 @@ export interface ArchiveBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappeningListBlock".
+ */
+export interface HappeningListBlock {
+  /**
+   * Shown above the list, e.g. "Neste kurs". Leave empty for none.
+   */
+  heading?: string | null;
+  /**
+   * Where the happenings come from. Eventuras needs EVENTURAS_API_URL and EVENTURAS_SITE_URL on the server.
+   */
+  source?: ('historia' | 'eventuras') | null;
+  /**
+   * Only events in this Eventuras collection (its id). Empty lists all upcoming events.
+   */
+  collectionId?: number | null;
+  limit?: number | null;
+  includePast?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'happeningList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ImageBlock".
  */
 export interface ImageBlock {
@@ -1076,22 +1099,6 @@ export interface Product {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "EventListBlock".
- */
-export interface EventListBlock {
-  heading?: string | null;
-  /**
-   * Only events in this Eventuras collection (its id). Empty lists all upcoming events.
-   */
-  collectionId?: number | null;
-  limit?: number | null;
-  includePast?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'eventList';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3363,9 +3370,9 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         archive?: T | ArchiveBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
+        happeningList?: T | HappeningListBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
         products?: T | ProductsBlockSelect<T>;
-        eventList?: T | EventListBlockSelect<T>;
       };
   slug?: T;
   slugLock?: T;
@@ -3411,10 +3418,11 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "EventListBlock_select".
+ * via the `definition` "HappeningListBlock_select".
  */
-export interface EventListBlockSelect<T extends boolean = true> {
+export interface HappeningListBlockSelect<T extends boolean = true> {
   heading?: T;
+  source?: T;
   collectionId?: T;
   limit?: T;
   includePast?: T;

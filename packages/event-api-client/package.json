@@ -1,8 +1,8 @@
 {
-  "name": "@eventuras/payload-event-api-client",
+  "name": "@eventuras/event-api-client",
   "version": "0.0.0",
   "private": true,
-  "description": "Eventuras event API client and a Payload block that lists events",
+  "description": "A client for the public Eventuras event API: list events, read one",
   "type": "module",
   "exports": {
     ".": {
@@ -27,12 +27,8 @@
     "@eventuras/vite-config": "^0.5.0",
     "@types/node": "^24.12.0",
     "@typescript/typescript6": "^6.0.2",
-    "payload": "3.90.2",
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
     "vitest": "^5.0.2"
-  },
-  "peerDependencies": {
-    "payload": "^3.0.0"
   }
 }
