@@ -1,6 +1,7 @@
 import type React from 'react';
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component';
 import { ContentBlock } from '@/blocks/Content/Component';
+import { EventListBlock } from '@/blocks/EventList/Component';
 import { FormBlock } from '@/blocks/Form/Component';
 import { ImageBlock } from '@/blocks/Image/Component';
 import { InstructionBlock } from '@/blocks/InstructionBlock/Component';
@@ -12,6 +13,7 @@ import { ResourcesBlock } from '@/blocks/ResourcesBlock/Component';
 const blockComponents: Record<string, React.FC<any>> = {
   archive: ArchiveBlock,
   content: ContentBlock,
+  eventList: EventListBlock,
   formBlock: FormBlock,
   image: ImageBlock,
   instruction: InstructionBlock,

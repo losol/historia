@@ -46,6 +46,7 @@ WORKDIR /app
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/historia/package.json ./apps/historia/package.json
 COPY packages/vipps/package.json ./packages/vipps/package.json
+COPY packages/payload-event-api-client/package.json ./packages/payload-event-api-client/package.json
 COPY packages/payload-oidc-auth/package.json ./packages/payload-oidc-auth/package.json
 COPY packages/payload-vipps-auth/package.json ./packages/payload-vipps-auth/package.json
 COPY packages/notitia-templates/package.json ./packages/notitia-templates/package.json

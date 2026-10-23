@@ -371,7 +371,7 @@ export interface Page {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ArchiveBlock | ContentBlock | ImageBlock | ProductsBlock)[] | null;
+  story?: (ArchiveBlock | ContentBlock | ImageBlock | ProductsBlock | EventListBlock)[] | null;
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
@@ -1076,6 +1076,22 @@ export interface Product {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventListBlock".
+ */
+export interface EventListBlock {
+  heading?: string | null;
+  /**
+   * Only events in this Eventuras collection (its id). Empty lists all upcoming events.
+   */
+  collectionId?: number | null;
+  limit?: number | null;
+  includePast?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'eventList';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3349,6 +3365,7 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
         products?: T | ProductsBlockSelect<T>;
+        eventList?: T | EventListBlockSelect<T>;
       };
   slug?: T;
   slugLock?: T;
@@ -3389,6 +3406,18 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   showImages?: T;
   showAllLink?: T;
   limit?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventListBlock_select".
+ */
+export interface EventListBlockSelect<T extends boolean = true> {
+  heading?: T;
+  collectionId?: T;
+  limit?: T;
+  includePast?: T;
   id?: T;
   blockName?: T;
 }

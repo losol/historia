@@ -25,6 +25,7 @@
     "@eventuras/fides-auth-next": "^0.7.2",
     "@eventuras/logger": "^0.9.2",
     "@eventuras/notitia-templates": "workspace:*",
+    "@eventuras/payload-event-api-client": "workspace:*",
     "@eventuras/payload-oidc-auth": "workspace:*",
     "@eventuras/payload-vipps-auth": "workspace:*",
     "@eventuras/ratio-ui": "^2.34.2",
