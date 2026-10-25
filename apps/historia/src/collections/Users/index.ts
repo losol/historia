@@ -10,6 +10,7 @@ import { updateAndDeleteAccess } from './access/updateAndDelete';
 import { createVerifiedFieldAccess, verificationFlagAccess } from './access/verifiedFieldAccess';
 import { ensureFirstUserIsAdmin } from './hooks/ensureFirstUserIsAdmin';
 import { protectApiKeyFields } from './hooks/protectApiKeyFields';
+import { refusePasswordLogin } from './hooks/refusePasswordLogin';
 import { setCookieBasedOnDomain } from './hooks/setCookieBasedOnDomain';
 
 const defaultTenantArrayField = tenantsArrayField({
@@ -233,6 +234,7 @@ export const Users: CollectionConfig = {
   hooks: {
     afterLogin: [setCookieBasedOnDomain],
     beforeOperation: [
+      refusePasswordLogin,
       ({ args, operation }) => {
         // Bypass tenant filtering for system admins on read operations
         // Check if user is from 'users' collection before passing to isSystemAdmin

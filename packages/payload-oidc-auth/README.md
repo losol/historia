@@ -77,7 +77,7 @@ A provider:
 
 ## Notes
 
-- **Email and password login stays on.** Payload registers its JWT strategy, the one that reads the session cookie, only while some auth collection keeps the local strategy. With `disableLocalStrategy` on the users collection, nobody could stay logged in after an OIDC login either.
+- **Email and password login stays on.** Payload registers its JWT strategy, the one that reads the session cookie, only while some auth collection keeps the local strategy. With `disableLocalStrategy` on the users collection, nobody could stay logged in after an OIDC login either. To make the provider the only way in, keep the strategy and refuse the `login`, `forgotPassword` and `resetPassword` operations in a `beforeOperation` hook instead, as Historia does.
 - **Custom paths.** `OidcLoginButton` defaults to `/api/auth/{name}/login`; pass `loginPath` when a provider has its own `basePath` or Payload's API route is not `/api`.
 - **The handoff cookie** is scoped to `/api/auth/{name}/session`, carries its own expiry (60 s) and is cleared once used.
 
