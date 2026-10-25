@@ -2,15 +2,11 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_pages_blocks_happening_list_source" AS ENUM('historia', 'eventuras');
-  CREATE TYPE "public"."enum__pages_v_blocks_happening_list_source" AS ENUM('historia', 'eventuras');
-  CREATE TABLE "pages_blocks_happening_list" (
+   CREATE TABLE "pages_blocks_happening_list" (
   	"_order" integer NOT NULL,
   	"_parent_id" uuid NOT NULL,
   	"_path" text NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"source" "enum_pages_blocks_happening_list_source" DEFAULT 'historia',
-  	"collection_id" numeric,
   	"limit" numeric DEFAULT 10,
   	"include_past" boolean DEFAULT false,
   	"block_name" varchar
@@ -28,8 +24,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" uuid NOT NULL,
   	"_path" text NOT NULL,
   	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-  	"source" "enum__pages_v_blocks_happening_list_source" DEFAULT 'historia',
-  	"collection_id" numeric,
   	"limit" numeric DEFAULT 10,
   	"include_past" boolean DEFAULT false,
   	"_uuid" varchar,
@@ -62,7 +56,5 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
    DROP TABLE "pages_blocks_happening_list" CASCADE;
   DROP TABLE "pages_blocks_happening_list_locales" CASCADE;
   DROP TABLE "_pages_v_blocks_happening_list" CASCADE;
-  DROP TABLE "_pages_v_blocks_happening_list_locales" CASCADE;
-  DROP TYPE "public"."enum_pages_blocks_happening_list_source";
-  DROP TYPE "public"."enum__pages_v_blocks_happening_list_source";`)
+  DROP TABLE "_pages_v_blocks_happening_list_locales" CASCADE;`)
 }

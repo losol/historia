@@ -13002,20 +13002,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "source": {
-          "name": "source",
-          "type": "enum_pages_blocks_happening_list_source",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'historia'"
-        },
-        "collection_id": {
-          "name": "collection_id",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
         "limit": {
           "name": "limit",
           "type": "numeric",
@@ -14862,20 +14848,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "source": {
-          "name": "source",
-          "type": "enum__pages_v_blocks_happening_list_source",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'historia'"
-        },
-        "collection_id": {
-          "name": "collection_id",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
         },
         "limit": {
           "name": "limit",
@@ -32558,14 +32530,6 @@
         "list"
       ]
     },
-    "public.enum_pages_blocks_happening_list_source": {
-      "name": "enum_pages_blocks_happening_list_source",
-      "schema": "public",
-      "values": [
-        "historia",
-        "eventuras"
-      ]
-    },
     "public.enum_pages_status": {
       "name": "enum_pages_status",
       "schema": "public",
@@ -32591,14 +32555,6 @@
         "grid",
         "featured",
         "list"
-      ]
-    },
-    "public.enum__pages_v_blocks_happening_list_source": {
-      "name": "enum__pages_v_blocks_happening_list_source",
-      "schema": "public",
-      "values": [
-        "historia",
-        "eventuras"
       ]
     },
     "public.enum__pages_v_version_status": {
@@ -32981,6 +32937,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "5558ad62-a085-4ee6-abd5-b6217d8a5c23",
+  "id": "0e007150-050b-4514-ada7-a4f0423a3537",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

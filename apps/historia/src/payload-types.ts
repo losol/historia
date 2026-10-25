@@ -945,14 +945,6 @@ export interface HappeningListBlock {
    * Shown above the list, e.g. "Neste kurs". Leave empty for none.
    */
   heading?: string | null;
-  /**
-   * Where the happenings come from. Eventuras needs EVENTURAS_API_URL and EVENTURAS_SITE_URL on the server.
-   */
-  source?: ('historia' | 'eventuras') | null;
-  /**
-   * Only events in this Eventuras collection (its id). Empty lists all upcoming events.
-   */
-  collectionId?: number | null;
   limit?: number | null;
   includePast?: boolean | null;
   id?: string | null;
@@ -3422,8 +3414,6 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
  */
 export interface HappeningListBlockSelect<T extends boolean = true> {
   heading?: T;
-  source?: T;
-  collectionId?: T;
   limit?: T;
   includePast?: T;
   id?: T;
