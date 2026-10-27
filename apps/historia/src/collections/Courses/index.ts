@@ -6,6 +6,7 @@ import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
+import { Section } from '@/blocks/Section/config';
 import { config } from '@/fields/config';
 import { contributors } from '@/fields/contributors';
 import { externalEvent } from '@/fields/externalEvent';
@@ -20,9 +21,9 @@ import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
 
 /**
- * A course: an ordered set of lessons a participant goes through at their own
- * pace. The course page is the `story`; the lessons are their own documents,
- * joined here by `lessons.course` and ordered from this side.
+ * A course: lessons in sections, taken at the participant's own pace. The
+ * course page is the `story`; the `syllabus` orders the lessons, which are
+ * their own documents pointing back at the course.
  *
  * Not registered in the Payload config yet: the model first, the migration
  * when the frontend and access come. Enrolment, progress and quizzes are
@@ -54,14 +55,12 @@ export const Courses: CollectionConfig = {
             image,
             storyField([Content, Image]),
             {
-              name: 'lessons',
-              type: 'join',
-              // @ts-expect-error - not a CollectionSlug until Lessons is registered in the config
-              collection: 'lessons',
-              on: 'course',
-              orderable: true,
+              name: 'syllabus',
+              type: 'blocks',
+              blocks: [Section],
               admin: {
-                description: 'The lessons in the order participants take them.',
+                description:
+                  'The sections of the course and the lessons in each, in the order participants take them.',
               },
             },
           ],

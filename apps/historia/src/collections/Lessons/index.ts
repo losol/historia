@@ -17,8 +17,8 @@ import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 
 /**
- * One lesson of a course. The content is the `story`; the course orders its
- * lessons through the join on `course`. The slug only has to be unique within
+ * One lesson of a course. The content is the `story`; the course's `syllabus`
+ * places the lesson in a section and orders it. The slug only has to be unique within
  * the course, so "Introduction" can open every course; the course route will
  * resolve it.
  *
