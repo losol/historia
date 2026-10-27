@@ -5,8 +5,8 @@ import { getPayload } from 'payload';
 import { DocTeaser } from '@/components/Teaser';
 import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsiteId } from '@/lib/website';
-import type { Happening, HappeningListBlock as HappeningListBlockProps } from '@/payload-types';
-import styles from './HappeningList.module.css';
+import type { Happening, HappeningsBlock as HappeningsBlockProps } from '@/payload-types';
+import styles from './Happenings.module.css';
 
 const labels = {
   en: { none: 'No upcoming happenings.' },
@@ -42,8 +42,8 @@ async function siteHappenings(options: {
 }
 
 /** The site's upcoming happenings as a compact list of teaser rows. */
-export const HappeningListBlock: React.FC<
-  HappeningListBlockProps & { id?: string; locale: string }
+export const HappeningsBlock: React.FC<
+  HappeningsBlockProps & { id?: string; locale: string }
 > = async ({ id, heading, limit, includePast, locale }) => {
   const t = locale === 'en' ? labels.en : labels.no;
   const happenings = await siteHappenings({

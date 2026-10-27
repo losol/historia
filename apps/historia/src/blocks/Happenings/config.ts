@@ -1,12 +1,12 @@
 import type { Block } from 'payload';
 
 /** A list of the site's upcoming happenings, the next ones first. */
-export const HappeningList: Block = {
-  slug: 'happeningList',
-  interfaceName: 'HappeningListBlock',
+export const Happenings: Block = {
+  slug: 'happenings',
+  interfaceName: 'HappeningsBlock',
   labels: {
-    singular: 'Happening list',
-    plural: 'Happening lists',
+    singular: 'Happenings',
+    plural: 'Happenings blocks',
   },
   fields: [
     {

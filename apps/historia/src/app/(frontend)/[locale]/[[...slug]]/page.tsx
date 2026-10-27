@@ -386,6 +386,6 @@ const contentSelection: PagesSelect = {
       products: true,
       showImage: true,
     },
-    happeningList: true,
+    happenings: true,
   },
 };

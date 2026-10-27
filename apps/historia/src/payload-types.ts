@@ -371,7 +371,7 @@ export interface Page {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ArchiveBlock | ContentBlock | HappeningListBlock | ImageBlock | ProductsBlock)[] | null;
+  story?: (ArchiveBlock | ContentBlock | HappeningsBlock | ImageBlock | ProductsBlock)[] | null;
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
@@ -938,9 +938,9 @@ export interface ArchiveBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HappeningListBlock".
+ * via the `definition` "HappeningsBlock".
  */
-export interface HappeningListBlock {
+export interface HappeningsBlock {
   /**
    * Shown above the list, e.g. "Neste kurs". Leave empty for none.
    */
@@ -949,7 +949,7 @@ export interface HappeningListBlock {
   includePast?: boolean | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'happeningList';
+  blockType: 'happenings';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3362,7 +3362,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         archive?: T | ArchiveBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
-        happeningList?: T | HappeningListBlockSelect<T>;
+        happenings?: T | HappeningsBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
         products?: T | ProductsBlockSelect<T>;
       };
@@ -3410,9 +3410,9 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HappeningListBlock_select".
+ * via the `definition` "HappeningsBlock_select".
  */
-export interface HappeningListBlockSelect<T extends boolean = true> {
+export interface HappeningsBlockSelect<T extends boolean = true> {
   heading?: T;
   limit?: T;
   includePast?: T;
