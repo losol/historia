@@ -29,6 +29,7 @@ import * as migration_20261021_213317_user_identities from './20261021_213317_us
 import * as migration_20261022_203410_magazine_front from './20261022_203410_magazine_front';
 import * as migration_20261023_180502_happening_external_event from './20261023_180502_happening_external_event';
 import * as migration_20261027_185355_happenings_block from './20261027_185355_happenings_block';
+import * as migration_20261031_195645_payload_3_91 from './20261031_195645_payload_3_91';
 
 export const migrations = [
   {
@@ -184,6 +185,11 @@ export const migrations = [
   {
     up: migration_20261027_185355_happenings_block.up,
     down: migration_20261027_185355_happenings_block.down,
-    name: '20261027_185355_happenings_block'
+    name: '20261027_185355_happenings_block',
+  },
+  {
+    up: migration_20261031_195645_payload_3_91.up,
+    down: migration_20261031_195645_payload_3_91.down,
+    name: '20261031_195645_payload_3_91'
   },
 ];
