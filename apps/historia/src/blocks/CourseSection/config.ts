@@ -4,9 +4,9 @@ import type { Block } from 'payload';
  * A section of a course's syllabus: a heading and the lessons under it, in the
  * order participants take them. Sections are ordered as blocks.
  */
-export const Section: Block = {
-  slug: 'section',
-  interfaceName: 'SectionBlock',
+export const CourseSection: Block = {
+  slug: 'courseSection',
+  interfaceName: 'CourseSectionBlock',
   labels: {
     singular: 'Section',
     plural: 'Sections',

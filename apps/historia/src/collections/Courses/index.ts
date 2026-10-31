@@ -5,8 +5,8 @@ import { siteEditors } from '@/access/siteRoleAccess';
 import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
+import { CourseSection } from '@/blocks/CourseSection/config';
 import { Image } from '@/blocks/Image/config';
-import { Section } from '@/blocks/Section/config';
 import { config } from '@/fields/config';
 import { contributors } from '@/fields/contributors';
 import { externalEvent } from '@/fields/externalEvent';
@@ -57,7 +57,7 @@ export const Courses: CollectionConfig = {
             {
               name: 'syllabus',
               type: 'blocks',
-              blocks: [Section],
+              blocks: [CourseSection],
               admin: {
                 description:
                   'The sections of the course and the lessons in each, in the order participants take them.',
