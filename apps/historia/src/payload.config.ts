@@ -108,6 +108,8 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       views: {
+        // Drops the email and password form when PASSWORD_LOGIN_ENABLED is false.
+        login: { Component: '@/components/Login' },
         packingQueue: {
           path: '/packing-queue',
           Component: '@/collections/Orders/views/PackingQueuePage',

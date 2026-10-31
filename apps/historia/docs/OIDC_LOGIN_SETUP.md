@@ -38,6 +38,29 @@ OIDC_LOGIN_LABEL=Logg inn med Tessera
 `CMS_ALLOWED_ORIGINS` must list the public origins, as for Vipps: it is what
 makes a forwarded host trusted when the redirect URI is built behind a proxy.
 
+## OIDC only: turning off email and password login
+
+Where the provider manages the editors, `PASSWORD_LOGIN_ENABLED=false` makes it
+the only way into the admin:
+
+- `/admin/login` shows the provider button(s) and no email and password form, so
+  no "forgot password" either.
+- Login, forgot password and reset password answer 403, over REST
+  (`/api/users/login`, `/forgot-password`, `/reset-password`) and GraphQL alike.
+- Sessions, API keys, `/api/users/me` and logout work as before.
+
+The setting is ignored, with an error in the log, unless `OIDC_LOGIN_ENABLED` or
+`VIPPS_LOGIN_ENABLED` is `true`; otherwise nobody could log in. The first user on
+an empty install is created with a password through `/admin/create-first-user`
+whatever the setting, and the first user to log in through the provider becomes a
+system admin as well, so an empty install needs no password step.
+
+**Break-glass.** When the provider is down, set `PASSWORD_LOGIN_ENABLED=true` and
+restart. Existing users keep their passwords, so the form works at once. Keep one
+account for this: its own email, not linked to a provider identity, with a strong
+password in the password manager. Every other password is live again while the
+flag is on, so passwords set by hand before the switch are worth rotating.
+
 ## How users are matched
 
 The same rules as for Vipps: a returning person is found by the provider's
