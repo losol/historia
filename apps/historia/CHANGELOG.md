@@ -1,5 +1,12 @@
 # @eventuras/historia
 
+## 0.31.0
+
+### Minor Changes
+
+- a94812f: A "Happenings" block for pages: the site's upcoming happenings as a compact list, the next ones first, with a heading, a limit and the option to include past ones.
+- 33a49f2: `PASSWORD_LOGIN_ENABLED=false` makes an identity provider the only way into the admin: the login page loses the email and password form, and login, forgot password and reset password answer 403 over REST and GraphQL. Sessions and API keys are unaffected. Ignored, with an error logged, unless OIDC or Vipps login is on. Setting it back to `true` is the break-glass; see `docs/OIDC_LOGIN_SETUP.md`.
+
 ## 0.30.0
 
 ### Minor Changes
