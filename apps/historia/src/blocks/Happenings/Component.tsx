@@ -14,7 +14,7 @@ const labels = {
 };
 
 /** The site's happenings: the next ones first, or every one newest first with the past. */
-async function siteHappenings(options: {
+async function happenings(options: {
   limit: number;
   includePast: boolean;
   locale: string;
@@ -46,7 +46,7 @@ export const HappeningsBlock: React.FC<
   HappeningsBlockProps & { id?: string; locale: string }
 > = async ({ id, heading, limit, includePast, locale }) => {
   const t = locale === 'en' ? labels.en : labels.no;
-  const happenings = await siteHappenings({
+  const docs = await happenings({
     limit: limit ?? 10,
     includePast: includePast ?? false,
     locale,
@@ -59,11 +59,11 @@ export const HappeningsBlock: React.FC<
           <Section.Title>{heading}</Section.Title>
         </Section.Header>
       )}
-      {happenings.length === 0 ? (
+      {docs.length === 0 ? (
         <p>{t.none}</p>
       ) : (
         <div className={styles.list}>
-          {happenings.map((doc) => (
+          {docs.map((doc) => (
             <DocTeaser
               key={doc.id}
               doc={doc}
