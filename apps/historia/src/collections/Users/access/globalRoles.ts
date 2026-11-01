@@ -3,7 +3,11 @@ import { adminsFieldLevel } from '@/access/admins';
 import { getOidcLoginEnv } from '@/lib/oidc/login-config';
 import type { User } from '@/payload-types';
 
-/** Whether the user has logged in through the generic OIDC provider. */
+/**
+ * Whether the user has logged in through the generic OIDC provider. Only the
+ * provider writes `identities` (the field refuses other writes), so this cannot
+ * be faked by editing the user.
+ */
 export function hasOidcIdentity(user: Partial<User> | undefined): boolean {
   return Boolean(user?.identities?.some((identity) => identity.provider === 'oidc'));
 }

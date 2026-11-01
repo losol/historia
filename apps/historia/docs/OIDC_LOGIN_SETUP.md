@@ -60,8 +60,8 @@ The setting is ignored, with an error in the log, unless `OIDC_LOGIN_ENABLED` or
 an empty install is created with a password through `/admin/create-first-user`
 whatever the setting, and the first user to log in through the provider becomes a
 system admin as well, so an empty install needs no password step. With
-`OIDC_SYSTEM_ADMIN_ROLE` set, the provider decides instead: see "Global roles
-from the provider".
+`OIDC_SYSTEM_ADMIN_ROLE` set, the provider decides for its own users instead: see
+"Global roles from the provider".
 
 **Break-glass.** When the provider is down, set `PASSWORD_LOGIN_ENABLED=true` and
 restart. Existing users keep their passwords, so the form works at once. Keep one
@@ -104,9 +104,11 @@ What this does and does not cover:
   example because the mapper below is not set up, every login takes the system
   admin role away. Fix the provider and log in again to get it back.
 
-The first user on an empty install does not become a system admin by being first
-when this is on, since the provider decides who is one. Log in through the
-provider with the role to get the first admin.
+The first user on an empty install still becomes a system admin when created
+with a password through `/admin/create-first-user`, since the install has to be
+bootstrapped somehow. A first user the provider creates does not get the role by
+being first: the provider decides, so log in with the role to get the first
+admin that way.
 
 ### Keycloak
 
@@ -118,6 +120,8 @@ what Historia reads. In the realm, under Client scopes → `roles` → Mappers �
 
 A client role works the same way: turn on **Add to userinfo** on the
 `client roles` mapper and set `OIDC_ROLES_CLAIM=resource_access.<client id>.roles`.
+A dot in the client ID is escaped with a backslash, so the client `historia.admin`
+is `resource_access.historia\.admin.roles`.
 
 ## Troubleshooting
 

@@ -28,6 +28,14 @@ export const identitiesField: Field = {
   name: IDENTITIES_FIELD,
   type: 'array',
   label: 'Identities',
+  // Only the plugin writes this field, through the local API with access
+  // overridden. Nobody else may: a user who could edit their own identities
+  // could claim another person's login, or shed the link to a provider that
+  // decides what they may do.
+  access: {
+    create: () => false,
+    update: () => false,
+  },
   admin: {
     description: 'Logins at identity providers that belong to this user.',
     position: 'sidebar',

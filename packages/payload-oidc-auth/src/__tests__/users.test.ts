@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { resolveProvider } from '../provider';
 import type { OidcProvider } from '../types';
-import { findOrCreateUser, OidcLoginFailure } from '../users';
+import { findOrCreateUser, identitiesField, OidcLoginFailure } from '../users';
 import { fakePayload } from './fake-payload';
 
 const base: OidcProvider = {
@@ -177,5 +177,16 @@ describe('findOrCreateUser', () => {
     );
 
     expect(user.nick).toBe('K+Kari');
+  });
+});
+
+describe('identitiesField', () => {
+  it('refuses writes from anyone, so only the plugin itself can set identities', () => {
+    const access = 'access' in identitiesField ? (identitiesField.access ?? {}) : {};
+    // biome-ignore lint/suspicious/noExplicitAny: the access functions read nothing from the args
+    const args = {} as any;
+    expect(access.create?.(args)).toBe(false);
+    expect(access.update?.(args)).toBe(false);
+    expect(access.read).toBeUndefined();
   });
 });
