@@ -2,7 +2,7 @@ import { identitiesField } from '@eventuras/payload-oidc-auth';
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields';
 import type { CollectionConfig } from 'payload';
 import { adminsFieldLevel } from '../../access/admins';
-import { isSystemAdmin } from '../../access/isSystemAdmin';
+import { isSystemAdmin, systemAdminsFieldLevel } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
 import { createAccess } from './access/create';
 import { globalRolesCreateAccess, globalRolesUpdateAccess } from './access/globalRoles';
@@ -18,7 +18,14 @@ const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',
   tenantsArrayTenantFieldName: 'tenant',
   tenantsCollectionSlug: 'websites',
-  arrayFieldAccess: {},
+  // Which sites a user belongs to, and with which roles, is granted by a system
+  // admin only (ADR 0001). A user may update their own document and a site admin
+  // the users of their sites, so an open field would let either of them join any
+  // site as its admin. Read stays open: the admin's site switcher needs it.
+  arrayFieldAccess: {
+    create: systemAdminsFieldLevel,
+    update: systemAdminsFieldLevel,
+  },
   tenantFieldAccess: {},
   rowFields: [
     {
@@ -34,7 +41,8 @@ const defaultTenantArrayField = tenantsArrayField({
       ],
       required: true,
       admin: {
-        description: 'Site-specific roles. Users can have multiple roles on a website.',
+        description:
+          'Site-specific roles. Users can have multiple roles on a website. Only system admins can assign them.',
       },
     },
   ],
