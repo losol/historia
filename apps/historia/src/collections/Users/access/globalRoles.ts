@@ -1,5 +1,5 @@
 import type { FieldAccess } from 'payload';
-import { adminsFieldLevel } from '@/access/admins';
+import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { getOidcLoginEnv } from '@/lib/oidc/login-config';
 import type { User } from '@/payload-types';
 
@@ -13,15 +13,27 @@ export function hasOidcIdentity(user: Partial<User> | undefined): boolean {
 }
 
 /**
- * Who may change the global roles. Admins, as for the other admin-only fields,
- * except on a user the OIDC provider is the source of the roles for: a change
- * made by hand there would be undone on the next login, so it is refused up
- * front, and the field is read-only in the admin. The provider's own writes go
- * through the local API with access overridden, so they are unaffected.
+ * Only a system admin may grant or take away the global roles (ADR 0001). A
+ * site admin may update the users of their own sites, and could otherwise make
+ * any of them, or themselves, a system admin. The first user on an empty
+ * install still gets the role from ensureFirstUserIsAdmin, which runs after
+ * this check and is not subject to it.
+ */
+const systemAdminsOnly: FieldAccess = ({ req: { user } }) =>
+  Boolean(user && 'email' in user && isSystemAdmin(user as User));
+
+export const globalRolesCreateAccess: FieldAccess = systemAdminsOnly;
+
+/**
+ * Who may change the global roles: system admins, except on a user the OIDC
+ * provider is the source of the roles for. A change made by hand there would
+ * be undone on the next login, so it is refused up front, and the field is
+ * read-only in the admin. The provider's own writes go through the local API
+ * with access overridden, so they are unaffected.
  */
 export const globalRolesUpdateAccess: FieldAccess = (args) => {
   if (getOidcLoginEnv().rolesSynced && hasOidcIdentity(args.doc as Partial<User> | undefined)) {
     return false;
   }
-  return adminsFieldLevel(args);
+  return systemAdminsOnly(args);
 };

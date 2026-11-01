@@ -5,7 +5,7 @@ import { adminsFieldLevel } from '../../access/admins';
 import { isSystemAdmin } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
 import { createAccess } from './access/create';
-import { globalRolesUpdateAccess } from './access/globalRoles';
+import { globalRolesCreateAccess, globalRolesUpdateAccess } from './access/globalRoles';
 import { readAccess } from './access/read';
 import { updateAndDeleteAccess } from './access/updateAndDelete';
 import { createVerifiedFieldAccess, verificationFlagAccess } from './access/verifiedFieldAccess';
@@ -212,7 +212,7 @@ export const Users: CollectionConfig = {
         beforeChange: [ensureFirstUserIsAdmin],
       },
       access: {
-        create: adminsFieldLevel,
+        create: globalRolesCreateAccess,
         read: adminsFieldLevel,
         update: globalRolesUpdateAccess,
       },
