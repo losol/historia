@@ -104,6 +104,11 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 
 ## Assigning Roles to Users
 
+Only a **system admin** can add a user to a website or change their site roles.
+A site admin can edit the users of their own websites, but the Tenants field is
+read-only for them, as it is for a user editing their own profile: otherwise
+either could join any website as its admin.
+
 ### In Payload Admin UI
 
 1. Navigate to **Users** collection
