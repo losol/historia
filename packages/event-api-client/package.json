@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/event-api-client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "A client for the public Eventuras event API: list events, read one",
   "type": "module",

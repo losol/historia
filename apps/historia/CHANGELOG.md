@@ -1,5 +1,20 @@
 # @eventuras/historia
 
+## 0.31.0
+
+### Minor Changes
+
+- a94812f: A "Happenings" block for pages: the site's upcoming happenings as a compact list, the next ones first, with a heading, a limit and the option to include past ones.
+- 5123449: With `OIDC_SYSTEM_ADMIN_ROLE` set, the OIDC provider (Keycloak) is the source of the global roles: every login through it sets `roles` from its claims, so a user with the named role is a system admin and one without it is not, whatever was granted by hand. The roles of such users are read-only in the admin, and a first user the provider creates no longer becomes a system admin by being first (one created with a password still does). `OIDC_ROLES_CLAIM` says where the roles are in the userinfo (default `realm_access.roles`). See `docs/OIDC_LOGIN_SETUP.md`.
+- 33a49f2: `PASSWORD_LOGIN_ENABLED=false` makes an identity provider the only way into the admin: the login page loses the email and password form, and login, forgot password and reset password answer 403 over REST and GraphQL. Sessions and API keys are unaffected. Ignored, with an error logged, unless OIDC or Vipps login is on. Setting it back to `true` is the break-glass; see `docs/OIDC_LOGIN_SETUP.md`.
+
+### Patch Changes
+
+- 8edae0e: Only a system admin can grant or take away the global `system-admin` role. The field's access let site admins through as well, so a site admin could make any user they may update, themselves included, a system admin. The first user on an empty install still becomes one.
+- Updated dependencies [5123449]
+  - @eventuras/payload-oidc-auth@0.1.1
+  - @eventuras/payload-vipps-auth@0.3.1
+
 ## 0.30.0
 
 ### Minor Changes

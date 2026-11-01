@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/payload-oidc-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "OpenID Connect login for Payload CMS, with one plugin for any number of providers",
   "type": "module",
