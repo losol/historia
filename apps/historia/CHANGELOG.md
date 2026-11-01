@@ -1,5 +1,11 @@
 # @eventuras/historia
 
+## 0.31.1
+
+### Patch Changes
+
+- 226ec5f: Only a system admin can add a user to a website or change their site roles. The `tenants` field on users had no field-level access, so a user could join any website as its admin by updating their own document, and a site admin could do the same for the users of their sites.
+
 ## 0.31.0
 
 ### Minor Changes
