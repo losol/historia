@@ -5,6 +5,7 @@ import { adminsFieldLevel } from '../../access/admins';
 import { isSystemAdmin } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
 import { createAccess } from './access/create';
+import { globalRolesUpdateAccess } from './access/globalRoles';
 import { readAccess } from './access/read';
 import { updateAndDeleteAccess } from './access/updateAndDelete';
 import { createVerifiedFieldAccess, verificationFlagAccess } from './access/verifiedFieldAccess';
@@ -213,10 +214,12 @@ export const Users: CollectionConfig = {
       access: {
         create: adminsFieldLevel,
         read: adminsFieldLevel,
-        update: adminsFieldLevel,
+        update: globalRolesUpdateAccess,
       },
       admin: {
-        description: 'Global system administrator role. Only system admins can assign this role.',
+        description:
+          'Global system administrator role. Only system admins can assign this role. ' +
+          'For users who log in through the OIDC provider it is set by the provider when OIDC_SYSTEM_ADMIN_ROLE is configured.',
       },
     },
     {

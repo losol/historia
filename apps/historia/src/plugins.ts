@@ -23,6 +23,7 @@ import { siteScoped } from '@/access/siteScoped';
 import { allowedOrigins, getAllowedDomainsFromAllowedOrigins } from '@/config/allowed-origins';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
 import { getOidcLoginEnv } from '@/lib/oidc/login-config';
+import { globalRolesFromClaims } from '@/lib/oidc/roles';
 import { mergeVippsAddress } from '@/lib/vipps/login-address';
 import { getVippsLoginEnv } from '@/lib/vipps/login-config';
 import type { Config, User } from '@/payload-types';
@@ -64,6 +65,10 @@ if (oidcLogin.enabled) {
       email_verified: user.email_verified,
       given_name: user.given_name,
       family_name: user.family_name,
+      // With OIDC_SYSTEM_ADMIN_ROLE set, the provider is authoritative for the
+      // global roles: they are set from its claims on every login, so a role
+      // it no longer sends is taken away. Without it, roles are left alone.
+      ...(oidcLogin.rolesSynced ? { roles: globalRolesFromClaims(user, oidcLogin) } : {}),
     }),
   });
 }
