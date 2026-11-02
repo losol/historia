@@ -1140,17 +1140,17 @@ export interface User {
       }[]
     | null;
   /**
-   * Global system administrator role. Only system admins can assign this role.
+   * Global system administrator role. Only system admins can assign this role. For users who log in through the OIDC provider it is set by the provider when OIDC_SYSTEM_ADMIN_ROLE is configured.
    */
   roles?: 'system-admin'[] | null;
   /**
-   * Optional: Assign user to specific websites/tenants. Leave empty for global access.
+   * The websites this user has a role on. Without one, the user cannot open the admin, unless they are a system admin.
    */
   tenants?:
     | {
         tenant: string | Website;
         /**
-         * Site-specific roles. Users can have multiple roles on a website.
+         * Site-specific roles. Users can have multiple roles on a website. Only system admins can assign them.
          */
         siteRoles: ('admin' | 'editor' | 'commerce' | 'member')[];
         id?: string | null;
