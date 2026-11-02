@@ -105,14 +105,14 @@ Example user configuration:
 | Collection | member | editor | commerce | admin | system admin |
 |------------|--------|--------|----------|-------|--------------|
 | **Content Collections** |
-| Articles | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Happenings | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Notes | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Cases | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Pages | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
+| Articles | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too | ✅ Full access | ✅ Full access |
+| Happenings | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too | ✅ Full access | ✅ Full access |
+| Notes | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too | ✅ Full access | ✅ Full access |
+| Cases | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too | ✅ Full access | ✅ Full access |
+| Pages | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too | ✅ Full access | ✅ Full access |
 | Media | Read | ✅ Create/Update<br>❌ Delete | Read | ✅ Full access | ✅ Full access |
 | **E-commerce Collections** |
-| Products | Read published | Read published | ✅ Create/Update<br>❌ Delete | ✅ Full access | ✅ Full access |
+| Products | Read, drafts too | Read, drafts too | ✅ Create/Update<br>❌ Delete | ✅ Full access | ✅ Full access |
 | Carts | Own cart only | Own cart only | Read all | ✅ Full access | ✅ Full access |
 | Orders | Own orders only | Own orders only | ✅ Read/Update all<br>❌ Delete | ✅ Full access | ✅ Full access |
 | Shipments | Own shipments | Own shipments | ✅ Create/Update<br>❌ Delete | ✅ Full access | ✅ Full access |
@@ -128,9 +128,14 @@ Example user configuration:
 **Legend**:
 - ✅ = Has permission
 - ❌ = No permission
-- "Read published" = Can only see published content
+- "Read, drafts too" = Can see the site's content, drafts included, without changing it
 - "Own X only" = Can only see/edit their own records
 - Global admin = Users with `system-admin` in global `roles` (super admin)
+
+**Admin access**: any site role, `member` included, lets a user open the admin;
+a user with no site role and no `system-admin` cannot (`access.admin` on users,
+see `access/adminAccess.ts`). Being a user is not enough, since logging in
+through an identity provider or buying something makes one.
 
 **Notes on Role Combination**:
 - Permissions are **additive** — users with multiple roles get the union of permissions

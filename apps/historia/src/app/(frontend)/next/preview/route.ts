@@ -3,6 +3,10 @@ import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { CollectionSlug, PayloadRequest } from 'payload';
 import { getPayload } from 'payload';
+import { canPreviewWebsite } from '@/access/adminAccess';
+import type { User } from '@/payload-types';
+import { findWebsiteForHost } from '@/utilities/findWebsiteForHost';
+import { getRequestHost } from '@/utilities/requestHost';
 
 export async function GET(req: Request): Promise<Response> {
   const payload = await getPayload({ config: configPromise });
@@ -39,12 +43,20 @@ export async function GET(req: Request): Promise<Response> {
 
   const draft = await draftMode();
 
-  if (!user) {
+  if (!user || !('email' in user)) {
     draft.disable();
     return new Response('You are not allowed to preview this page', { status: 403 });
   }
 
-  // You can add additional checks here to see if the user is allowed to preview this page
+  // Draft mode reads past access control on the website this host serves, so
+  // being logged in is not enough: anyone can be, through an identity provider.
+  // The user needs a role on that website, or to be a system admin.
+  const host = getRequestHost(req.headers);
+  const website = host ? await findWebsiteForHost(payload, host, { depth: 0 }) : null;
+  if (!canPreviewWebsite(user as User, website?.id ?? null)) {
+    draft.disable();
+    return new Response('You are not allowed to preview this page', { status: 403 });
+  }
 
   draft.enable();
 

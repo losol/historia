@@ -9,7 +9,7 @@ export const isSystemAdminAccess: Access = ({ req }): boolean => {
   return false;
 };
 
-export const isSystemAdmin = (user: User | null): boolean => {
+export const isSystemAdmin = (user: Pick<User, 'roles'> | null | undefined): boolean => {
   return Boolean(user?.roles?.includes('system-admin'));
 };
 

@@ -80,8 +80,11 @@ is refused (`?error=email_not_verified`) and never written to a user.
 With `OIDC_ALLOW_SIGNUP=false`, a person without a user is refused
 (`?error=signup_disabled`).
 
-A new user has no roles and no tenant access until an admin grants it, unless
-the provider is the source of the global roles (next section).
+A new user has no roles and no website, and cannot open the admin: they see
+"this user does not have access to the admin panel" until a system admin adds
+them to a website. The exception is a user the provider makes a system admin,
+when it is the source of the global roles (next section). See "Who can open the
+admin" in [the role guide](administrator/role-based-access-control.md).
 
 ## Global roles from the provider
 

@@ -23,6 +23,21 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 
 **Important:** As of v3.x, only `system-admin` exists as a global role. All other access must be granted through site-specific roles assigned per website.
 
+### Who can open the admin
+
+Being a user is not enough. The admin opens for system admins and for users with
+a role on at least one website, `member` included. Anyone else gets Payload's
+page "this user does not have access to the admin panel" until a system admin
+adds them to a website. That covers a person logging in through Tessera or Vipps
+for the first time, and a customer the Vipps checkout made a user.
+
+The same rule holds where the admin's reach goes beyond the admin:
+
+- **Preview** of drafts works for a system admin, and otherwise only on a website
+  the user has a role on.
+- **MCP API keys** are created only by users who can open the admin, and a key
+  stops working (401) once its user can no longer open the admin.
+
 ---
 
 ## Site Roles Explained

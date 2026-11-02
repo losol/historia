@@ -1,6 +1,7 @@
 import { identitiesField } from '@eventuras/payload-oidc-auth';
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields';
 import type { CollectionConfig } from 'payload';
+import { adminPanelAccess } from '../../access/adminAccess';
 import { adminsFieldLevel } from '../../access/admins';
 import { isSystemAdmin, systemAdminsFieldLevel } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
@@ -51,6 +52,8 @@ const defaultTenantArrayField = tenantsArrayField({
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
+    // Only system admins and users with a role on a website get into the admin.
+    admin: adminPanelAccess,
     create: createAccess,
     delete: () => false,
     read: readAccess,

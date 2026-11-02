@@ -22,6 +22,7 @@ import { isSystemAdmin } from '@/access/isSystemAdmin';
 import { siteScoped } from '@/access/siteScoped';
 import { allowedOrigins, getAllowedDomainsFromAllowedOrigins } from '@/config/allowed-origins';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
+import { requireAdminAccessForMcp, restrictMcpKeyCreation } from '@/lib/mcp/access';
 import { getOidcLoginEnv } from '@/lib/oidc/login-config';
 import { globalRolesFromClaims } from '@/lib/oidc/roles';
 import { mergeVippsAddress } from '@/lib/vipps/login-address';
@@ -144,6 +145,10 @@ export const plugins: Plugin[] = [
         enabled: true,
       },
     },
+    // Keys are for the people who may use the admin; see lib/mcp/access.ts.
+    overrideApiKeyCollection: restrictMcpKeyCreation,
+    overrideAuth: (_req, getDefaultMcpAccessSettings) =>
+      requireAdminAccessForMcp(getDefaultMcpAccessSettings),
   }),
   s3Storage({
     enabled: areAllS3VarsPresent,
