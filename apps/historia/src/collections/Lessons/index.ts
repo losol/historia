@@ -17,10 +17,11 @@ import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 
 /**
- * One lesson of a course. The content is the `story`; the course's `syllabus`
- * places the lesson in a section and orders it. The slug only has to be unique within
- * the course, so "Introduction" can open every course; the course route will
- * resolve it.
+ * One lesson. The content is the `story`; a video is a lesson whose story holds
+ * a video block. A lesson does not point at a course: a course's `syllabus`
+ * places it in a section and orders it, so the same lesson can be used in more
+ * than one course. The slug is unique per website, as for the other content;
+ * the course route finds the lesson through the course in the URL.
  *
  * Not registered in the Payload config yet; see `Courses`.
  */
@@ -34,21 +35,10 @@ export const Lessons: CollectionConfig = {
     delete: admins,
   },
   admin: {
-    defaultColumns: ['title', 'course', 'updatedAt'],
+    defaultColumns: ['title', 'durationMinutes', 'updatedAt'],
     useAsTitle: 'title',
   },
   fields: [
-    {
-      name: 'course',
-      type: 'relationship',
-      // @ts-expect-error - not a CollectionSlug until Courses is registered in the config
-      relationTo: 'courses',
-      required: true,
-      index: true,
-      admin: {
-        position: 'sidebar',
-      },
-    },
     {
       name: 'durationMinutes',
       type: 'number',

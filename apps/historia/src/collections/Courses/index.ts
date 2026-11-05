@@ -22,8 +22,9 @@ import { topics } from '@/fields/topics';
 
 /**
  * A course: lessons in sections, taken at the participant's own pace. The
- * course page is the `story`; the `syllabus` orders the lessons, which are
- * their own documents pointing back at the course.
+ * course page is the `story`; the `syllabus` says which lessons the course has
+ * and in what order. Lessons are their own documents and can be used in more
+ * than one course.
  *
  * Not registered in the Payload config yet: the model first, the migration
  * when the frontend and access come. Enrolment, progress and quizzes are
@@ -58,6 +59,7 @@ export const Courses: CollectionConfig = {
               name: 'syllabus',
               type: 'blocks',
               blocks: [CourseSection],
+              labels: { singular: 'Section', plural: 'Sections' },
               admin: {
                 description:
                   'The sections of the course and the lessons in each, in the order participants take them.',
