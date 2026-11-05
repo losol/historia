@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { handshakeCookies, parseCookies } from '../cookies';
-import { handleOidcCallback, handleOidcLogin } from '../handlers';
+import { handleOidcCallback, handleOidcLogin, handleOidcSession } from '../handlers';
 import { getPublicRequestOrigin } from '../origin';
 import { resolveProvider } from '../provider';
 import type { OidcClient, OidcUserInfo } from '../types';
@@ -94,6 +94,30 @@ describe('handleOidcLogin', () => {
   });
 });
 
+describe('handleOidcLogin with returnTo', () => {
+  const login = (query: string) =>
+    handleOidcLogin(
+      { url: `https://shop.example.com/api/auth/idp/login?${query}`, headers: new Headers() },
+      provider(fakeClient()),
+    );
+
+  it('keeps a path on this site for after the login', async () => {
+    const response = await login('returnTo=%2Fno%2Fkurs%2Fforbedring');
+    expect(setCookies(response)).toContain('idp_return_st4te=%2Fno%2Fkurs%2Fforbedring');
+  });
+
+  it('drops a return path that leaves the site', async () => {
+    for (const bad of [
+      'https%3A%2F%2Fevil.example.com',
+      '%2F%2Fevil.example.com',
+      '%2Fapi%2Fauth%2Fidp%2Flogin',
+    ]) {
+      const response = await login(`returnTo=${bad}`);
+      expect(setCookies(response).some((c) => c.startsWith('idp_return_'))).toBe(false);
+    }
+  });
+});
+
 describe('handleOidcCallback', () => {
   const cookies = handshakeCookies('idp', 'st4te');
   const callback = (client: OidcClient, query = 'code=c0de&state=st4te', cookie?: string) => {
@@ -134,12 +158,35 @@ describe('handleOidcCallback', () => {
     expect(set.get('__idp_session_pending')).toBeTruthy();
     expect(set.get(cookies.verifier)).toBe('');
     expect(set.get(cookies.redirectUri)).toBe('');
+    expect(set.get(cookies.returnTo)).toBe('');
 
     // Only the session route gets the pending cookie, so no other request can use it up.
     const pendingHeader = response.headers
       .getSetCookie()
       .find((c) => c.startsWith('__idp_session_pending='));
     expect(pendingHeader).toContain('; Path=/api/auth/idp/session;');
+  });
+
+  it('passes the return path on to the session route', async () => {
+    const cookie = [
+      `${cookies.verifier}=verifier`,
+      `${cookies.redirectUri}=${encodeURIComponent('https://shop.example.com/api/auth/idp/callback')}`,
+      `${cookies.returnTo}=${encodeURIComponent('/no/kurs?x=1')}`,
+    ].join('; ');
+    const response = await callback(fakeClient(), undefined, cookie).response;
+    expect(response.headers.get('location')).toBe(
+      'https://shop.example.com/api/auth/idp/session?returnTo=%2Fno%2Fkurs%3Fx%3D1',
+    );
+  });
+
+  it('checks the return path cookie again, and drops it when it leaves the site', async () => {
+    const cookie = [
+      `${cookies.verifier}=verifier`,
+      `${cookies.redirectUri}=${encodeURIComponent('https://shop.example.com/api/auth/idp/callback')}`,
+      `${cookies.returnTo}=${encodeURIComponent('//evil.example.com')}`,
+    ].join('; ');
+    const response = await callback(fakeClient(), undefined, cookie).response;
+    expect(response.headers.get('location')).toBe('https://shop.example.com/api/auth/idp/session');
   });
 
   it('rejects a state that is not one of ours, so it never reaches a cookie header', async () => {
@@ -156,7 +203,11 @@ describe('handleOidcCallback', () => {
     const response = await callback(fakeClient(), 'state=st4te').response;
 
     expect(response.headers.get('location')).toContain('error=invalid_callback');
-    expect(setCookies(response)).toEqual([`${cookies.verifier}=`, `${cookies.redirectUri}=`]);
+    expect(setCookies(response)).toEqual([
+      `${cookies.verifier}=`,
+      `${cookies.redirectUri}=`,
+      `${cookies.returnTo}=`,
+    ]);
   });
 
   it('fails with the provider error', async () => {
@@ -177,5 +228,54 @@ describe('handleOidcCallback', () => {
 
     expect(response.headers.get('location')).toContain('error=email_not_verified');
     expect(docs.size).toBe(0);
+  });
+});
+
+describe('handleOidcSession', () => {
+  const payload = {
+    secret: 'p'.repeat(32),
+    config: { cookiePrefix: 'payload' },
+    collections: {
+      users: {
+        config: { auth: { tokenExpiration: 7200, cookies: { sameSite: 'Lax', secure: true } } },
+      },
+    },
+  };
+  const session = (query = '') =>
+    handleOidcSession(
+      { url: `https://shop.example.com/api/auth/idp/session${query}`, headers: new Headers() },
+      payload as never,
+      {
+        collection: 'users',
+        successPath: '/admin',
+        errorPath: '/admin/login?error={error}',
+        basePath: '/api/auth/idp',
+        user: { id: 'u1', email: 'kari@example.com' } as never,
+      },
+    );
+
+  it('sets the Payload cookie and goes to the success path', async () => {
+    const response = await session();
+    expect(response.headers.get('location')).toBe('https://shop.example.com/admin');
+    expect(setCookies(response)[0]).toMatch(/^payload-token=/);
+  });
+
+  it('goes back to the page the login was started from', async () => {
+    const response = await session('?returnTo=%2Fno%2Fkurs%2Fforbedring');
+    expect(response.headers.get('location')).toBe('https://shop.example.com/no/kurs/forbedring');
+  });
+
+  it('ignores a return path that leaves the site or loops back into login', async () => {
+    for (const bad of [
+      '%2F%2Fevil.example.com',
+      'https%3A%2F%2Fevil.example.com',
+      '%2Fapi%2Fauth%2Fidp%2Flogin',
+      // Becomes //evil.example.com once the dot segments are resolved.
+      '%2Fa%2F..%2F%2Fevil.example.com',
+      '%2F%252e%252e%2F%2Fevil.example.com',
+    ]) {
+      const response = await session(`?returnTo=${bad}`);
+      expect(response.headers.get('location')).toBe('https://shop.example.com/admin');
+    }
   });
 });

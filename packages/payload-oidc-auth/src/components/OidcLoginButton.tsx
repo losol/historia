@@ -16,6 +16,12 @@ export interface OidcLoginButtonProps {
   helperText?: string | null;
   /** @default `/api/auth/${provider}/login` */
   loginPath?: string;
+  /**
+   * The path on this site to come back to after login. Without it, the page's
+   * own `?redirect=` (where Payload's login page keeps a deep link) is used, and
+   * without that the plugin's `successPath`. The server checks it either way.
+   */
+  returnTo?: string;
   /** @default '#1f2937' */
   color?: string;
   hoverColor?: string;
@@ -27,6 +33,7 @@ export const OidcLoginButton: React.FC<OidcLoginButtonProps> = ({
   label = `Logg inn med ${provider}`,
   helperText = 'eller bruk e-post og passord nedenfor',
   loginPath = `/api/auth/${provider}/login`,
+  returnTo,
   color = '#1f2937',
   hoverColor,
   icon,
@@ -35,7 +42,7 @@ export const OidcLoginButton: React.FC<OidcLoginButtonProps> = ({
     <button
       type="button"
       onClick={() => {
-        window.location.href = loginPath;
+        window.location.href = loginUrl(loginPath, returnTo);
       }}
       style={{
         width: '100%',
@@ -70,3 +77,13 @@ export const OidcLoginButton: React.FC<OidcLoginButtonProps> = ({
     )}
   </div>
 );
+
+/** The login path with where to come back to, if anything says so. */
+export function loginUrl(loginPath: string, returnTo?: string, current?: string): string {
+  const back =
+    returnTo ?? new URL(current ?? window.location.href).searchParams.get('redirect') ?? undefined;
+  if (!back) return loginPath;
+  const url = new URL(loginPath, 'http://login.invalid');
+  url.searchParams.set('returnTo', back);
+  return `${url.pathname}${url.search}`;
+}
