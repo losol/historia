@@ -1,5 +1,12 @@
 # @eventuras/payload-vipps-auth
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [d14bf2c]
+  - @eventuras/payload-oidc-auth@0.2.0
+
 ## 0.3.1
 
 ### Patch Changes
