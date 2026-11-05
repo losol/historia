@@ -4,6 +4,7 @@ import type { CollectionConfig } from 'payload';
 import { adminsFieldLevel } from '../../access/admins';
 import { isSystemAdmin, systemAdminsFieldLevel } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
+import { adminPanelAccess } from './access/adminPanel';
 import { createAccess } from './access/create';
 import { globalRolesCreateAccess, globalRolesUpdateAccess } from './access/globalRoles';
 import { readAccess } from './access/read';
@@ -51,6 +52,8 @@ const defaultTenantArrayField = tenantsArrayField({
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
+    // Logging in is not enough to open the admin; see adminPanelAccess.
+    admin: adminPanelAccess,
     create: createAccess,
     delete: () => false,
     read: readAccess,

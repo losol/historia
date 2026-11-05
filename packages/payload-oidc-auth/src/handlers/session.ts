@@ -7,15 +7,19 @@
 import type { Payload, TypedUser } from 'payload';
 import { generatePayloadCookie, jwtSign } from 'payload';
 import { redirect } from '../cookies';
-import { getPublicRequestOrigin } from '../origin';
+import { getPublicRequestOrigin, requestUrl } from '../origin';
+import { RETURN_TO_PARAM, safeReturnPath } from '../return-path';
 import type { IncomingRequest } from '../types';
 import { errorRedirect } from './callback';
 
 export interface SessionOptions {
   collection: string;
   allowedDomains?: string[];
+  /** Where to go when the login did not ask for a page with `?returnTo=`. */
   successPath: string;
   errorPath: string;
+  /** The provider's routes; a return path under them is refused. */
+  basePath?: string;
   /**
    * The user Payload already authenticated for this request (`req.user` in an
    * endpoint). Given, the strategies are not run a second time, which would
@@ -61,5 +65,9 @@ export async function handleOidcSession(
     token,
   });
 
-  return redirect(new URL(options.successPath, origin), [cookie]);
+  const returnTo = safeReturnPath(
+    requestUrl(request).searchParams.get(RETURN_TO_PARAM),
+    options.basePath,
+  );
+  return redirect(new URL(returnTo ?? options.successPath, origin), [cookie]);
 }

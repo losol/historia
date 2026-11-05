@@ -57,8 +57,19 @@ Declare `identitiesField` on the collection yourself when the plugin can be off 
 | `enabled` | `true` | |
 | `usersCollection` | `'users'` | The auth-enabled collection |
 | `allowedDomains` | none | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
-| `successPath` | `'/admin'` | |
+| `successPath` | `'/admin'` | Where a login ends, unless it was started with `?returnTo=` |
 | `errorPath` | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, … |
+
+### Coming back to the page
+
+Start a login with `?returnTo=<path>` to end it on that page instead of
+`successPath`, for example `/api/auth/oidc/login?returnTo=/courses/intro`. Only
+a path on the same site is accepted, and not one under the provider's own
+routes; anything else is dropped, so the parameter is not an open redirect. The
+path is kept in a handshake cookie during the login and checked again at the
+callback and the session route. `OidcLoginButton` takes a `returnTo` prop and
+otherwise passes on the `?redirect=` that Payload's login page keeps for a deep
+link. `safeReturnPath` is exported for building such links.
 
 A provider:
 

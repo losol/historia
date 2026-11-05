@@ -55,6 +55,7 @@ export function oidcEndpoints(config: ResolvedOidcAuthPluginConfig, apiRoute = '
           handleOidcSession(req, req.payload, {
             ...common(),
             successPath: config.successPath,
+            basePath: provider.basePath,
             user: req.user,
           }),
       },

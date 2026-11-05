@@ -83,6 +83,32 @@ With `OIDC_ALLOW_SIGNUP=false`, a person without a user is refused
 A new user has no roles and no tenant access until an admin grants it, unless
 the provider is the source of the global roles (next section).
 
+## Members: logging in without the admin
+
+Logging in does not open the admin. Only system admins and users with a role on
+a website (admin, editor, commerce or member) can use it; anyone else who logs in
+is a member of the public site, and the admin tells them they are not allowed in.
+Their API access is what the collections allow anyone signed in without a
+website: published shared content (persons, places, media and the like) and
+their own user, and nothing that belongs to a website.
+
+That makes `OIDC_ALLOW_SIGNUP=true` safe to leave on: signing up gives a person
+a user and nothing more. Who can sign up is then up to the provider, for
+Keycloak the realm's registration settings.
+
+To log members in from the site, link to the login route with the page to come
+back to:
+
+```text
+/api/auth/oidc/login?returnTo=/no/kurs/forbedring
+```
+
+`returnTo` must be a path on this site. Anything else, another origin, `//host`
+or a path under `/api/auth/`, is ignored and the login ends on `/admin` as
+before. The button on the admin login passes along the page a person was trying
+to open, so a deep link into the admin survives the login. A failed login still
+ends on the admin login page with the error.
+
 ## Global roles from the provider
 
 With `OIDC_SYSTEM_ADMIN_ROLE` set, the provider is authoritative for the global
