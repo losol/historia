@@ -38,5 +38,9 @@ export function safeReturnPath(
   if (basePath && (url.pathname === basePath || url.pathname.startsWith(`${basePath}/`))) {
     return undefined;
   }
-  return `${url.pathname}${url.search}${url.hash}`;
+  // Resolving dot segments can turn `/a/..//host` into `//host`, which a browser
+  // reads as another origin. So the result is checked again, as it will be used.
+  const path = `${url.pathname}${url.search}${url.hash}`;
+  if (path.startsWith('//') || new URL(path, BASE).origin !== BASE) return undefined;
+  return path;
 }

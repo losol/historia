@@ -41,6 +41,26 @@ describe('safeReturnPath', () => {
   it('normalises dot segments instead of letting them climb out', () => {
     expect(safeReturnPath('/a/../../b')).toBe('/b');
   });
+
+  it('refuses a path that only becomes //host once dot segments are resolved', () => {
+    for (const value of [
+      '/a/..//evil.example.com',
+      '/a/../..//evil.example.com',
+      '/./' + '/evil.example.com',
+      '/%2e%2e//evil.example.com',
+      '/a/%2E%2E//evil.example.com',
+    ]) {
+      expect(safeReturnPath(value), value).toBeUndefined();
+    }
+  });
+
+  it('never returns a path that resolves to another origin', () => {
+    const origin = 'https://shop.example.com';
+    for (const value of ['/a/..//evil.example.com', '/./' + '/evil.example.com', '/ok/path']) {
+      const path = safeReturnPath(value);
+      if (path) expect(new URL(path, origin).origin, value).toBe(origin);
+    }
+  });
 });
 
 describe('loginUrl', () => {

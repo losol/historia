@@ -270,6 +270,9 @@ describe('handleOidcSession', () => {
       '%2F%2Fevil.example.com',
       'https%3A%2F%2Fevil.example.com',
       '%2Fapi%2Fauth%2Fidp%2Flogin',
+      // Becomes //evil.example.com once the dot segments are resolved.
+      '%2Fa%2F..%2F%2Fevil.example.com',
+      '%2F%252e%252e%2F%2Fevil.example.com',
     ]) {
       const response = await session(`?returnTo=${bad}`);
       expect(response.headers.get('location')).toBe('https://shop.example.com/admin');
