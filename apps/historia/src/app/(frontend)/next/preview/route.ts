@@ -3,6 +3,10 @@ import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { CollectionSlug, PayloadRequest } from 'payload';
 import { getPayload } from 'payload';
+import { canPreviewWebsite } from '@/access/preview';
+import type { User } from '@/payload-types';
+import { findWebsiteForHost } from '@/utilities/findWebsiteForHost';
+import { getRequestHost } from '@/utilities/requestHost';
 
 export async function GET(req: Request): Promise<Response> {
   const payload = await getPayload({ config: configPromise });
@@ -21,7 +25,8 @@ export async function GET(req: Request): Promise<Response> {
     return new Response('Insufficient search params', { status: 404 });
   }
 
-  if (!path.startsWith('/')) {
+  // A path on this site only: `//host` and `/\host` are read as another origin.
+  if (!path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) {
     return new Response('This endpoint can only be used for relative previews', { status: 500 });
   }
 
@@ -39,12 +44,14 @@ export async function GET(req: Request): Promise<Response> {
 
   const draft = await draftMode();
 
-  if (!user) {
+  // Draft mode reads past access control on the website this host serves, so
+  // the user needs a role on that website, or to be a system admin.
+  const host = getRequestHost(req.headers);
+  const website = host ? await findWebsiteForHost(payload, host, { depth: 0 }) : null;
+  if (!user || !('email' in user) || !canPreviewWebsite(user as User, website?.id)) {
     draft.disable();
     return new Response('You are not allowed to preview this page', { status: 403 });
   }
-
-  // You can add additional checks here to see if the user is allowed to preview this page
 
   draft.enable();
 

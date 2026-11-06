@@ -6,9 +6,10 @@ import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';
 /**
  * Who may open the admin: system admins, and anyone with a role on a website.
  * Everybody else who logs in, such as a person who signed up through the
- * identity provider and has not been given a website, is a member of the
- * public site only. What they may do through the API is held to what a visitor
- * may, outside their own documents, by access/signedInWithoutRole.test.ts.
+ * identity provider and has not been given a website, is a signed-in visitor
+ * of the public site only. What they may do through the API is held to what
+ * a visitor may, outside their own documents, by
+ * access/signedInWithoutRole.test.ts.
  */
 export function canAccessAdmin(user: User | null | undefined): boolean {
   if (!user) return false;

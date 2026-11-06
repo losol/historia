@@ -23,6 +23,26 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 
 **Important:** As of v3.x, only `system-admin` exists as a global role. All other access must be granted through site-specific roles assigned per website.
 
+### Who can open the admin
+
+Being a user is not enough. The admin opens for system admins and for users with
+a role on at least one website, `member` included. Anyone else who logs in, such
+as a person who signed up through Tessera or Vipps or a customer the Vipps
+checkout made a user, is a **signed-in visitor**: they use the public site, and
+the admin tells them they are not allowed in. Through the API they may do no
+more than a visitor, apart from reading and editing their own user.
+
+The same rule reaches past the admin:
+
+- **Preview** of drafts works for a system admin, and otherwise only on a website
+  the user has a role on.
+- **MCP API keys** are created only by users who can open the admin, and a key
+  stops working once its user cannot.
+
+Some collections are not tied to a website and are for **system admins only**:
+forms, form submissions, redirects, imports, exports and the job queue. Site
+admins and editors see forms and redirects but cannot change them.
+
 ---
 
 ## Site Roles Explained
@@ -99,6 +119,10 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 - ❌ View other users' orders
 
 **Use case:** Reviewers, stakeholders, clients with preview access
+
+**Not for:** people who use the public site, such as course participants or
+customers. A member opens the admin and reads every draft of the website; a
+signed-in visitor needs no role at all.
 
 ---
 
