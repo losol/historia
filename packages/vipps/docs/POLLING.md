@@ -40,16 +40,11 @@ Poll until payment reaches desired state:
 import { pollPaymentStatus } from '@eventuras/vipps/epayment-v1';
 
 // Poll until AUTHORIZED or TERMINATED
-const result = await pollPaymentStatus(
-  config,
-  reference,
-  ['AUTHORIZED', 'TERMINATED'],
-  {
-    onPoll: (attempt, payment) => {
-      console.log(`Attempt ${attempt}: ${payment.state}`);
-    },
-  }
-);
+const result = await pollPaymentStatus(config, reference, ['AUTHORIZED', 'TERMINATED'], {
+  onPoll: (attempt, payment) => {
+    console.log(`Attempt ${attempt}: ${payment.state}`);
+  },
+});
 
 if (result.success && result.payment.state === 'AUTHORIZED') {
   console.log(`Payment authorized after ${result.attempts} attempts (${result.elapsed}ms)`);

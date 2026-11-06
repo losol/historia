@@ -1,6 +1,7 @@
 # ADR 0002 — Verified User Fields
 
 ## Status
+
 Proposed
 
 ## Context
@@ -126,7 +127,7 @@ await payload.create({
   collection: 'business-events',
   data: {
     type: 'user.verified',
-    source: 'vipps',  // or 'bankid', 'system-admin', etc.
+    source: 'vipps', // or 'bankid', 'system-admin', etc.
     userId: user.id,
     metadata: {
       verified_fields: ['name', 'email', 'phone_number'],

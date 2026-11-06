@@ -1,6 +1,7 @@
 # ADR 0005 — Schema-Driven Resources System
 
 ## Status
+
 Draft
 
 ## Context
@@ -71,6 +72,7 @@ Introduce three new Payload collections to enable schema-driven resource managem
 - **Academic integrity:** Researchers must be able to reference specific versions
 - **Auditability:** Track how data has evolved over time
 - **Configuration:**
+
   ```typescript
   versions: {
     drafts: {
@@ -106,13 +108,13 @@ export const ResourceSchemas: CollectionConfig = {
   slug: 'resource-schemas',
   admin: {
     group: 'System',
-    description: 'Define JSON schemas for resource types'
+    description: 'Define JSON schemas for resource types',
   },
   access: {
     read: () => true,
     create: isSystemAdmin,
     update: isSystemAdmin,
-    delete: isSystemAdmin
+    delete: isSystemAdmin,
   },
   fields: [
     {
@@ -121,31 +123,31 @@ export const ResourceSchemas: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique identifier (e.g., "team-canvas-v1", "fhir-questionnaire-r4")'
-      }
+        description: 'Unique identifier (e.g., "team-canvas-v1", "fhir-questionnaire-r4")',
+      },
     },
     {
       name: 'version',
       type: 'text',
       required: true,
       admin: {
-        description: 'Semantic version (e.g., "1.0.0")'
-      }
+        description: 'Semantic version (e.g., "1.0.0")',
+      },
     },
     {
       name: 'name',
       type: 'text',
       required: true,
       admin: {
-        description: 'Human-readable name (e.g., "Team Canvas")'
-      }
+        description: 'Human-readable name (e.g., "Team Canvas")',
+      },
     },
     {
       name: 'description',
       type: 'textarea',
       admin: {
-        description: 'Explain what this schema is for and when to use it'
-      }
+        description: 'Explain what this schema is for and when to use it',
+      },
     },
     {
       name: 'category',
@@ -155,36 +157,36 @@ export const ResourceSchemas: CollectionConfig = {
         { label: 'Health & Wellbeing', value: 'health' },
         { label: 'Assessment Framework', value: 'framework' },
         { label: 'Dataset / Statistics', value: 'dataset' },
-        { label: 'Other', value: 'other' }
+        { label: 'Other', value: 'other' },
       ],
       admin: {
-        description: 'Category for organizing schemas'
-      }
+        description: 'Category for organizing schemas',
+      },
     },
     {
       name: 'jsonSchema',
       type: 'json',
       required: true,
       admin: {
-        description: 'JSON Schema (draft-07 or later) defining the structure'
-      }
+        description: 'JSON Schema (draft-07 or later) defining the structure',
+      },
     },
     {
       name: 'uiSchema',
       type: 'json',
       admin: {
-        description: 'UI hints for external editors (e.g., react-jsonschema-form)'
-      }
+        description: 'UI hints for external editors (e.g., react-jsonschema-form)',
+      },
     },
     {
       name: 'exampleData',
       type: 'json',
       admin: {
-        description: 'Example document conforming to this schema (for testing/documentation)'
-      }
-    }
-  ]
-}
+        description: 'Example document conforming to this schema (for testing/documentation)',
+      },
+    },
+  ],
+};
 ```
 
 **Example Schema 1: Team Canvas**
@@ -352,13 +354,13 @@ export const ResourceTemplates: CollectionConfig = {
   slug: 'resource-templates',
   admin: {
     group: 'Resources',
-    description: 'Reusable templates with default data and descriptions'
+    description: 'Reusable templates with default data and descriptions',
   },
   access: {
-    read: () => true,  // All public templates visible
+    read: () => true, // All public templates visible
     create: isAuthenticated,
     update: isOwnerOrAdmin,
-    delete: isOwnerOrAdmin
+    delete: isOwnerOrAdmin,
   },
   fields: [
     {
@@ -366,15 +368,15 @@ export const ResourceTemplates: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Template name (e.g., "Team Canvas - Project Kickoff")'
-      }
+        description: 'Template name (e.g., "Team Canvas - Project Kickoff")',
+      },
     },
     {
       name: 'description',
       type: 'textarea',
       admin: {
-        description: 'Explain what this template is for and when to use it'
-      }
+        description: 'Explain what this template is for and when to use it',
+      },
     },
     {
       name: 'schema',
@@ -382,44 +384,42 @@ export const ResourceTemplates: CollectionConfig = {
       relationTo: 'resource-schemas',
       required: true,
       admin: {
-        description: 'The schema this template conforms to'
-      }
+        description: 'The schema this template conforms to',
+      },
     },
     {
       name: 'defaultData',
       type: 'json',
       admin: {
-        description: 'Pre-filled values and placeholder text'
-      }
+        description: 'Pre-filled values and placeholder text',
+      },
     },
     {
       name: 'isPublic',
       type: 'checkbox',
       defaultValue: false,
       admin: {
-        description: 'Allow other organizations to use this template'
-      }
+        description: 'Allow other organizations to use this template',
+      },
     },
     {
       name: 'organization',
       type: 'relationship',
       relationTo: 'organizations',
       admin: {
-        description: 'Organization that owns this template (optional for global templates)'
-      }
+        description: 'Organization that owns this template (optional for global templates)',
+      },
     },
     {
       name: 'tags',
       type: 'array',
-      fields: [
-        { name: 'tag', type: 'text' }
-      ],
+      fields: [{ name: 'tag', type: 'text' }],
       admin: {
-        description: 'Tags for searching and filtering'
-      }
-    }
-  ]
-}
+        description: 'Tags for searching and filtering',
+      },
+    },
+  ],
+};
 ```
 
 **Example Template:**
@@ -430,11 +430,7 @@ export const ResourceTemplates: CollectionConfig = {
   "isPublic": true,
   "defaultData": {
     "purpose": "Define your team's purpose and reason for existence...",
-    "values": [
-      "Example: Collaboration",
-      "Example: Innovation",
-      "Example: Customer Focus"
-    ],
+    "values": ["Example: Collaboration", "Example: Innovation", "Example: Customer Focus"],
     "goals": [
       {
         "goal": "Example: Launch MVP by Q2",
@@ -458,11 +454,11 @@ export const Resources: CollectionConfig = {
   admin: {
     group: 'Resources',
     useAsTitle: 'title',
-    description: 'Schema-driven structured documents'
+    description: 'Schema-driven structured documents',
   },
   versions: {
     maxPerDoc: 50,
-    drafts: true
+    drafts: true,
   },
   access: {
     read: ({ req: { user }, data }) => {
@@ -480,10 +476,7 @@ export const Resources: CollectionConfig = {
 
       // Team: owner + collaborators
       if (data?.visibility === 'team') {
-        return (
-          data.owner === user.id ||
-          data.collaborators?.some(c => c.user === user.id)
-        );
+        return data.owner === user.id || data.collaborators?.some((c) => c.user === user.id);
       }
 
       // Private: only owner
@@ -500,17 +493,12 @@ export const Resources: CollectionConfig = {
       if (data?.owner === user.id) return true;
 
       // Collaborators with 'editor' role can update
-      return data?.collaborators?.some(
-        c => c.user === user.id && c.role === 'editor'
-      );
+      return data?.collaborators?.some((c) => c.user === user.id && c.role === 'editor');
     },
     delete: ({ req: { user }, data }) => {
       // Only owner or system admin can delete
-      return (
-        user.roles?.includes('system-admin') ||
-        data?.owner === user.id
-      );
-    }
+      return user.roles?.includes('system-admin') || data?.owner === user.id;
+    },
   },
   fields: [
     {
@@ -518,8 +506,8 @@ export const Resources: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Resource title (e.g., "Our Team Canvas Q1 2026")'
-      }
+        description: 'Resource title (e.g., "Our Team Canvas Q1 2026")',
+      },
     },
     {
       name: 'schema',
@@ -527,24 +515,24 @@ export const Resources: CollectionConfig = {
       relationTo: 'resource-schemas',
       required: true,
       admin: {
-        description: 'Schema this resource conforms to'
-      }
+        description: 'Schema this resource conforms to',
+      },
     },
     {
       name: 'template',
       type: 'relationship',
       relationTo: 'resource-templates',
       admin: {
-        description: 'Template used to create this resource (optional)'
-      }
+        description: 'Template used to create this resource (optional)',
+      },
     },
     {
       name: 'data',
       type: 'json',
       required: true,
       admin: {
-        description: 'The actual resource data (validated against schema)'
-      }
+        description: 'The actual resource data (validated against schema)',
+      },
     },
 
     // Sharing & Access Control
@@ -557,19 +545,19 @@ export const Resources: CollectionConfig = {
         { label: 'Private - Only me', value: 'private' },
         { label: 'Team - Me and collaborators', value: 'team' },
         { label: 'Logged in - All authenticated users', value: 'logged-in' },
-        { label: 'Public - Anyone with the link', value: 'public' }
+        { label: 'Public - Anyone with the link', value: 'public' },
       ],
       admin: {
-        description: 'Who can view this resource'
-      }
+        description: 'Who can view this resource',
+      },
     },
     {
       name: 'organization',
       type: 'relationship',
       relationTo: 'organizations',
       admin: {
-        description: 'Organization this resource belongs to (optional)'
-      }
+        description: 'Organization this resource belongs to (optional)',
+      },
     },
     {
       name: 'owner',
@@ -578,22 +566,22 @@ export const Resources: CollectionConfig = {
       required: true,
       admin: {
         readOnly: true,
-        description: 'Resource owner (automatically set)'
-      }
+        description: 'Resource owner (automatically set)',
+      },
     },
     {
       name: 'collaborators',
       type: 'array',
       admin: {
         condition: (data) => data.visibility === 'team' || data.visibility === 'private',
-        description: 'Users who can view/edit this resource'
+        description: 'Users who can view/edit this resource',
       },
       fields: [
         {
           name: 'user',
           type: 'relationship',
           relationTo: 'users',
-          required: true
+          required: true,
         },
         {
           name: 'role',
@@ -601,10 +589,10 @@ export const Resources: CollectionConfig = {
           required: true,
           options: [
             { label: 'Editor - Can edit', value: 'editor' },
-            { label: 'Viewer - Read only', value: 'viewer' }
-          ]
-        }
-      ]
+            { label: 'Viewer - Read only', value: 'viewer' },
+          ],
+        },
+      ],
     },
 
     // Metadata
@@ -613,19 +601,17 @@ export const Resources: CollectionConfig = {
       type: 'textarea',
       admin: {
         condition: (data) => data.visibility !== 'private',
-        description: 'Shown when resource is shared'
-      }
+        description: 'Shown when resource is shared',
+      },
     },
     {
       name: 'tags',
       type: 'array',
-      fields: [
-        { name: 'tag', type: 'text' }
-      ],
+      fields: [{ name: 'tag', type: 'text' }],
       admin: {
-        description: 'Tags for searching and organizing'
-      }
-    }
+        description: 'Tags for searching and organizing',
+      },
+    },
   ],
   hooks: {
     beforeValidate: [
@@ -635,7 +621,7 @@ export const Resources: CollectionConfig = {
           data.owner = req.user.id;
         }
         return data;
-      }
+      },
     ],
     beforeChange: [
       // Validate data against JSON Schema
@@ -643,7 +629,7 @@ export const Resources: CollectionConfig = {
         if (data.schema && data.data) {
           const schema = await req.payload.findByID({
             collection: 'resource-schemas',
-            id: data.schema
+            id: data.schema,
           });
 
           if (schema?.jsonSchema) {
@@ -653,20 +639,20 @@ export const Resources: CollectionConfig = {
           }
         }
         return data;
-      }
-    ]
-  }
-}
+      },
+    ],
+  },
+};
 ```
 
 ### Visibility Levels
 
-| Level | Who Can View | Example Use Case |
-|-------|-------------|------------------|
-| `private` | Only owner | Personal draft, sensitive data |
-| `team` | Owner + collaborators | Team Canvas for project team |
-| `logged-in` | All authenticated users | Shared framework, learning resources |
-| `public` | Anyone (including anonymous) | Public case study, documentation |
+| Level       | Who Can View                 | Example Use Case                     |
+| ----------- | ---------------------------- | ------------------------------------ |
+| `private`   | Only owner                   | Personal draft, sensitive data       |
+| `team`      | Owner + collaborators        | Team Canvas for project team         |
+| `logged-in` | All authenticated users      | Shared framework, learning resources |
+| `public`    | Anyone (including anonymous) | Public case study, documentation     |
 
 ### Data Flow
 
@@ -721,6 +707,7 @@ export const Resources: CollectionConfig = {
 ## Implementation Plan
 
 ### Phase 1: Core Collections (MVP)
+
 - [ ] Create `resource-schemas` collection
 - [ ] Create `resource-templates` collection
 - [ ] Create `resources` collection
@@ -729,11 +716,13 @@ export const Resources: CollectionConfig = {
 - [ ] Write API documentation
 
 ### Phase 2: Example Schemas
+
 - [ ] Create Team Canvas schema + template
 - [ ] Create FHIR Questionnaire schema + template
 - [ ] Document schema creation guide
 
 ### Phase 3: Frontend Integration (Future)
+
 - [ ] Generic JSON Schema form renderer
 - [ ] Custom editors for common types (Canvas, FHIR)
 - [ ] Template browser UI
@@ -751,21 +740,25 @@ export const Resources: CollectionConfig = {
 ## Future Enhancements
 
 ### Export/Import
+
 - Export resources as JSON files
 - Import resources from external systems
 - Bulk operations
 
 ### Advanced Collaboration
+
 - Real-time collaborative editing (via WebSockets)
 - Comment threads on specific fields
 - Activity feed per resource
 
 ### Schema Registry
+
 - Public schema registry (like schema.org)
 - Schema discovery and browsing
 - Schema inheritance and composition
 
 ### Analytics
+
 - Resource usage statistics
 - Popular templates
 - Schema adoption metrics

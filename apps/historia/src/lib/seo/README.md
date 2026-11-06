@@ -19,15 +19,15 @@ Generic helpers for SEO metadata generation in Next.js applications.
 import { generateMeta } from '@/lib/seo';
 import { getCurrentWebsite } from '@/lib/website';
 
-export async function generateMetadata({
-  params
-}: {
-  params: { slug: string }
-}) {
+export async function generateMetadata({ params }: { params: { slug: string } }) {
   const doc = await fetchArticle(params.slug);
   const website = await getCurrentWebsite();
 
-  return generateMeta({ doc, website, path: `/${params.locale}/c/artikler/${doc.slug}--${doc.resourceId}` });
+  return generateMeta({
+    doc,
+    website,
+    path: `/${params.locale}/c/artikler/${doc.slug}--${doc.resourceId}`,
+  });
 }
 ```
 
@@ -57,18 +57,21 @@ return generateMeta({
 ## Fallback Chain
 
 ### Title
+
 1. `doc.meta.title` - Custom SEO title
 2. `doc.title` - Content title
 3. `website.meta.title` - Site-wide default
 4. `"Historia"` - Hardcoded fallback
 
 ### Description
+
 1. `doc.meta.description` - Custom SEO description
 2. `doc.lead` - Article lead/excerpt
 3. `doc.excerpt` - Alternative excerpt field
 4. `website.meta.description` - Site-wide default
 
 ### Image
+
 1. `doc.meta.image` - Custom social image
 2. `doc.image` or `doc.featuredImage` - Content image
 3. `website.meta.image` - Site-wide fallback

@@ -41,6 +41,7 @@ const norwegianResult = notitiaTemplates.render('email', 'welcome', {
 The library comes with default templates for common notification scenarios:
 
 #### Email Templates
+
 - `email:welcome` - Welcome message for new users
 - `email:registration-confirmation` - Event registration confirmation
 - `email:event-reminder` - Reminder for upcoming events
@@ -50,6 +51,7 @@ The library comes with default templates for common notification scenarios:
 - `email:order-shipped` - Shipment notification
 
 #### SMS Templates
+
 - `sms:welcome` - Welcome SMS (short version)
 - `sms:registration-confirmation` - Registration confirmation (short version)
 - `sms:event-reminder` - Event reminder (short version)
@@ -83,7 +85,7 @@ The library includes built-in helper functions:
 
 - **formatDate** - Formats dates
 - **upper** - Converts text to uppercase
-- **lower** - Converts text to lowercase  
+- **lower** - Converts text to lowercase
 - **eq** - Compares values for equality
 
 Custom helper functions can also be registered:
@@ -101,34 +103,34 @@ notitiaTemplates.registerHelper('currency', function (amount: number, currency: 
 ```typescript
 class NotitiaTemplates {
   // Render a template with parameters
-  render(channel, type, params, options?): RenderedTemplate
-  
+  render(channel, type, params, options?): RenderedTemplate;
+
   // Render custom template string directly
-  renderCustom(templateString, params, options?): string
-  
+  renderCustom(templateString, params, options?): string;
+
   // Register custom template
-  registerTemplate(channel, type, template): void
-  
+  registerTemplate(channel, type, template): void;
+
   // Register multiple templates at once
-  registerTemplates(templates): void
-  
+  registerTemplates(templates): void;
+
   // Remove custom template
-  unregisterTemplate(channel, type): void
-  
+  unregisterTemplate(channel, type): void;
+
   // Clear all custom templates
-  clearCustomTemplates(): void
-  
+  clearCustomTemplates(): void;
+
   // Register Handlebars helper function
-  registerHelper(name, helper): void
-  
+  registerHelper(name, helper): void;
+
   // Check if template exists
-  hasTemplate(channel, type): boolean
-  
+  hasTemplate(channel, type): boolean;
+
   // Get available template keys
-  getAvailableTemplates(): string[]
-  
+  getAvailableTemplates(): string[];
+
   // Get template metadata
-  getTemplateInfo(channel, type): Template | undefined
+  getTemplateInfo(channel, type): Template | undefined;
 }
 ```
 
@@ -137,7 +139,7 @@ class NotitiaTemplates {
 ```typescript
 type NotificationChannel = 'email' | 'sms';
 
-type TemplateType = 
+type TemplateType =
   | 'welcome'
   | 'registration-confirmation'
   | 'event-reminder'
@@ -173,9 +175,9 @@ For simple applications with consistent templates:
 ```typescript
 import { notitiaTemplates } from '@eventuras/notitia-templates';
 
-const email = notitiaTemplates.render('email', 'welcome', { 
+const email = notitiaTemplates.render('email', 'welcome', {
   name: 'Jane',
-  organizationName: 'My Company' 
+  organizationName: 'My Company',
 });
 ```
 

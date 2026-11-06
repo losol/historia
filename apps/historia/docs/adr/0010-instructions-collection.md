@@ -1,6 +1,7 @@
 # ADR 0010 — Instructions Collection for Procedural Content
 
 ## Status
+
 Accepted
 
 ## Context
@@ -113,22 +114,21 @@ The story-based structure enables multiple presentation modes:
 ```typescript
 // Aggregate all materials across story
 const allMaterials = instruction.story
-  .filter(block => block.blockType === 'resources' && block.type === 'materials')
-  .flatMap(block => block.items);
+  .filter((block) => block.blockType === 'resources' && block.type === 'materials')
+  .flatMap((block) => block.items);
 
 // Get all tools
 const allTools = instruction.story
-  .filter(block => block.blockType === 'resources' && block.type === 'tools')
-  .flatMap(block => block.items);
+  .filter((block) => block.blockType === 'resources' && block.type === 'tools')
+  .flatMap((block) => block.items);
 ```
 
 **Section-specific Resources:**
 ```typescript
 // Get materials for a specific section
 const prepStepResources = instruction.story
-  .find(b => b.blockType === 'instructionSection' && b.title === 'Preparation')
-  ?.sectionContent
-  ?.filter(b => b.blockType === 'resourcesBlock');
+  .find((b) => b.blockType === 'instructionSection' && b.title === 'Preparation')
+  ?.sectionContent?.filter((b) => b.blockType === 'resourcesBlock');
 ```
 
 **Progressive Disclosure:**
@@ -234,6 +234,7 @@ The chosen structure allows the following additions without data migration:
 ## Acceptance Criteria
 
 ### Authoring (Payload CMS)
+
 - ✅ Editors can create Instructions with title, lead, and hero image
 - ✅ Editors can add ResourcesBlock with type selection (materials/tools)
 - ✅ Editors can add items to ResourcesBlock (name, quantity, unit, description)
@@ -245,6 +246,7 @@ The chosen structure allows the following additions without data migration:
 - ✅ Content block can be mixed with instruction blocks
 
 ### Frontend Rendering
+
 - ✅ Frontend can render complete instruction deterministically
 - ✅ RenderBlocks handles all instruction block types
 - ✅ ResourcesBlock renders materials and tools appropriately
@@ -254,6 +256,7 @@ The chosen structure allows the following additions without data migration:
 - ✅ Section-specific resources can be queried and displayed
 
 ### Data Integrity
+
 - ✅ Required fields validated (title, resource name, instruction title)
 - ✅ Optional fields remain optional (quantities, descriptions, images)
 - ✅ Type field enforces materials/tools selection
@@ -272,6 +275,7 @@ The chosen structure allows the following additions without data migration:
 ## Implementation Notes
 
 ### Collection Setup
+
 - Collection slug: `instructions`
 - Admin useAsTitle: `title`
 - Access control: Same pattern as other Historia collections (admins + site editors)
@@ -285,11 +289,13 @@ The chosen structure allows the following additions without data migration:
 - All blocks use clear interfaceName for type generation
 
 ### Field Reuse
+
 - Leverage existing fields: `title`, `lead`, `image`, `storyField`
 - Use `richText()` factory for content fields
 - Follow established field patterns for consistency
 
 ### Block Structure Files
+
 ```
 /apps/historia/src/blocks/
 ├── ResourcesBlock/

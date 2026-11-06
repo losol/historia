@@ -46,12 +46,12 @@ pnpm install   # first: the AppHost's dependencies come from the workspace lockf
 aspire run
 ```
 
-| What | Where |
-| --- | --- |
-| Admin | http://localhost:3100/admin |
-| Mailpit (every mail the app sends) | http://localhost:3101 |
-| Postgres | `postgres://postgres:historia@localhost:3103/cms` |
-| Dashboard | printed by `aspire run` |
+| What                               | Where                                             |
+| ---------------------------------- | ------------------------------------------------- |
+| Admin                              | http://localhost:3100/admin                       |
+| Mailpit (every mail the app sends) | http://localhost:3101                             |
+| Postgres                           | `postgres://postgres:historia@localhost:3103/cms` |
+| Dashboard                          | printed by `aspire run`                           |
 
 On an empty database the `seed` resource fills in a demo site through the REST
 API, in Norwegian and English: a website for `localhost:3100`, a home page, a

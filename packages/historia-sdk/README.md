@@ -32,13 +32,13 @@ Historia serves several websites from one deployment and answers each domain wit
 
 ## Options
 
-| Option | Default | |
-|---|---|---|
-| `baseUrl` | required | The website's address |
-| `locale` | `no` | Content language (`no`, `en`) |
-| `fetch` | global `fetch` | Your own fetch, e.g. with caching (`next: { revalidate }` in Next.js via a wrapper) |
-| `headers` | none | Extra headers on every request |
-| `timeoutMs` | `10000` | Give up on a request after this long |
+| Option      | Default        |                                                                                     |
+| ----------- | -------------- | ----------------------------------------------------------------------------------- |
+| `baseUrl`   | required       | The website's address                                                               |
+| `locale`    | `no`           | Content language (`no`, `en`)                                                       |
+| `fetch`     | global `fetch` | Your own fetch, e.g. with caching (`next: { revalidate }` in Next.js via a wrapper) |
+| `headers`   | none           | Extra headers on every request                                                      |
+| `timeoutMs` | `10000`        | Give up on a request after this long                                                |
 
 Every call also takes a `signal` to cancel it.
 
@@ -123,4 +123,3 @@ The first version is published by hand, because npm can only trust a workflow fo
 2. Run `cd packages/historia-sdk && pnpm publish --access public --no-git-checks`, logged in to npm (`pnpm login`) as an owner of the `@eventuras` scope.
 3. On npmjs.com, under the package's Settings → Trusted publishing, add GitHub Actions with repository `losol/historia` and workflow `historia.yml`.
 4. Merge the version PR. The release job sees the version on npm and skips it; later versions are published by the job.
-

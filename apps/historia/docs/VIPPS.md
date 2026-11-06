@@ -28,10 +28,10 @@ Create test users at [portal.vippsmobilepay.com](https://portal.vippsmobilepay.c
 
 We are currently using the following test users for development
 
-| SSN       | Phone Number | NIN    |
-|-----------|--------------|--------|
-|22123242541| +47 48755492   | 1236   |
-|24028293743| +47 92487769   | 1236   |
+| SSN         | Phone Number | NIN  |
+| ----------- | ------------ | ---- |
+| 22123242541 | +47 48755492 | 1236 |
+| 24028293743 | +47 92487769 | 1236 |
 
 **Important:**
 
@@ -59,13 +59,13 @@ We are currently using the following test users for development
 
 Use these amounts to trigger specific test scenarios:
 
-| Amount | Result |
-|--------|--------|
-| 151 | Insufficient funds |
-| 182 | Refused by issuer |
-| 183 | Suspected fraud |
-| 186 | Expired card |
-| 187 | Invalid card |
+| Amount | Result             |
+| ------ | ------------------ |
+| 151    | Insufficient funds |
+| 182    | Refused by issuer  |
+| 183    | Suspected fraud    |
+| 186    | Expired card       |
+| 187    | Invalid card       |
 
 **Refund testing:**
 
@@ -269,8 +269,8 @@ VippsCheckout({
     },
     customer_information_changed: (data) => {
       // React to user info changes
-    }
-  }
+    },
+  },
 });
 ```
 

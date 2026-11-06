@@ -48,6 +48,7 @@ admins and editors see forms and redirects but cannot change them.
 ## Site Roles Explained
 
 ### 👑 Admin
+
 **Full control of the website/tenant**
 
 **Can do:**
@@ -66,6 +67,7 @@ admins and editors see forms and redirects but cannot change them.
 ---
 
 ### ✍️ Editor
+
 **Content creation and editorial work**
 
 **Can do:**
@@ -87,6 +89,7 @@ admins and editors see forms and redirects but cannot change them.
 ---
 
 ### 🛒 Commerce
+
 **E-commerce and store management**
 
 **Can do:**
@@ -106,6 +109,7 @@ admins and editors see forms and redirects but cannot change them.
 ---
 
 ### 👥 Member
+
 **Read-only access with draft visibility**
 
 **Can do:**
@@ -172,34 +176,34 @@ Sarah Johnson
 
 ### Content Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Articles** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Happenings** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Notes** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Cases** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Pages** | Read published | Read published | Read published | ✅ Full | ✅ Full |
-| **Media** | Read | ✅ Upload/Edit<br>❌ Delete | Read | ✅ Full | ✅ Full |
+| Collection     | Member         | Editor                      | Commerce       | Admin   | Global Admin |
+| -------------- | -------------- | --------------------------- | -------------- | ------- | ------------ |
+| **Articles**   | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Happenings** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Notes**      | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Cases**      | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Pages**      | Read published | Read published              | Read published | ✅ Full | ✅ Full      |
+| **Media**      | Read           | ✅ Upload/Edit<br>❌ Delete | Read           | ✅ Full | ✅ Full      |
 
 ### E-commerce Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Products** | Read published | Read published | ✅ Create/Edit<br>❌ Delete | ✅ Full | ✅ Full |
-| **Carts** | Own cart only | Own cart only | View all | ✅ Full | ✅ Full |
-| **Orders** | Own orders | Own orders | ✅ View/Update<br>❌ Delete | ✅ Full | ✅ Full |
-| **Shipments** | Own shipments | Own shipments | ✅ Create/Update<br>❌ Delete | ✅ Full | ✅ Full |
-| **Transactions** | ❌ No access | ❌ No access | View only | ✅ Full | ✅ Full |
+| Collection       | Member         | Editor         | Commerce                      | Admin   | Global Admin |
+| ---------------- | -------------- | -------------- | ----------------------------- | ------- | ------------ |
+| **Products**     | Read published | Read published | ✅ Create/Edit<br>❌ Delete   | ✅ Full | ✅ Full      |
+| **Carts**        | Own cart only  | Own cart only  | View all                      | ✅ Full | ✅ Full      |
+| **Orders**       | Own orders     | Own orders     | ✅ View/Update<br>❌ Delete   | ✅ Full | ✅ Full      |
+| **Shipments**    | Own shipments  | Own shipments  | ✅ Create/Update<br>❌ Delete | ✅ Full | ✅ Full      |
+| **Transactions** | ❌ No access   | ❌ No access   | View only                     | ✅ Full | ✅ Full      |
 
 ### Structural Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Websites** | Read | Read | Read | Update only | ✅ Full |
-| **Organizations** | Read | ✅ Update | Read | ✅ Update | ✅ Full |
-| **Topics** | Read | Read | Read | ✅ Full | ✅ Full |
-| **Places** | Read | Read | Read | ✅ Full | ✅ Full |
-| **Persons** | Read | Read | Read | ✅ Full | ✅ Full |
+| Collection        | Member | Editor    | Commerce | Admin       | Global Admin |
+| ----------------- | ------ | --------- | -------- | ----------- | ------------ |
+| **Websites**      | Read   | Read      | Read     | Update only | ✅ Full      |
+| **Organizations** | Read   | ✅ Update | Read     | ✅ Update   | ✅ Full      |
+| **Topics**        | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
+| **Places**        | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
+| **Persons**       | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
 
 **Legend:**
 - ✅ = Has permission
@@ -213,6 +217,7 @@ Sarah Johnson
 ## Common Use Cases
 
 ### Scenario 1: Blog with Multiple Writers
+
 **Setup:**
 - Website: `company-blog.com`
 - User A: `editor` (writes articles)
@@ -224,6 +229,7 @@ Sarah Johnson
 ---
 
 ### Scenario 2: E-commerce Store with Content Team
+
 **Setup:**
 - Website: `online-store.com`
 - User A: `editor` (writes product descriptions and blog posts)
@@ -236,6 +242,7 @@ Sarah Johnson
 ---
 
 ### Scenario 3: Multi-Site Agency
+
 **Setup:**
 - User (Agency Manager):
   - `client-a.com` → `admin`
@@ -254,24 +261,28 @@ Sarah Johnson
 ## Troubleshooting
 
 ### "User cannot see website in admin UI"
+
 **Cause:** User is not assigned to the website's tenants.
 **Solution:** Add user to website in **Tenants** field with appropriate role.
 
 ---
 
 ### "Editor cannot delete content"
+
 **Cause:** Only admins and global admins can delete.
 **Solution:** This is by design. Assign `admin` role if deletion is required.
 
 ---
 
 ### "User can see drafts from other websites"
+
 **Cause:** User may have global `admin` role.
 **Solution:** This is expected for global admins. Site-specific roles are scoped to their websites.
 
 ---
 
 ### "Commerce user cannot edit articles"
+
 **Cause:** Commerce role is for products/orders, not content.
 **Solution:** Assign both `commerce` and `editor` roles if user needs both permissions.
 

@@ -51,14 +51,14 @@ Declare `identitiesField` on the collection yourself when the plugin can be off 
 
 ## Options
 
-| Option | Default | |
-|---|---|---|
-| `providers` | required | See below |
-| `enabled` | `true` | |
-| `usersCollection` | `'users'` | The auth-enabled collection |
-| `allowedDomains` | none | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
-| `successPath` | `'/admin'` | Where a login ends, unless it was started with `?returnTo=` |
-| `errorPath` | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, … |
+| Option            | Default                        |                                                                                                                                                     |
+| ----------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `providers`       | required                       | See below                                                                                                                                           |
+| `enabled`         | `true`                         |                                                                                                                                                     |
+| `usersCollection` | `'users'`                      | The auth-enabled collection                                                                                                                         |
+| `allowedDomains`  | none                           | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
+| `successPath`     | `'/admin'`                     | Where a login ends, unless it was started with `?returnTo=`                                                                                         |
+| `errorPath`       | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, …                                               |
 
 ### Coming back to the page
 
@@ -73,18 +73,18 @@ link. `safeReturnPath` is exported for building such links.
 
 A provider:
 
-| Option | Default | |
-|---|---|---|
-| `name` | required | Lowercase; used in the routes, cookies and identity rows |
-| `issuer` | required | Where discovery happens |
-| `clientId`, `clientSecret` | required | |
-| `scope` | `'openid profile email'` | |
-| `redirectUri` | from the request | Set it to pin one callback URL |
-| `basePath` | `/api/auth/{name}` | Must be under Payload's API route |
-| `allowSignup` | `true` | |
-| `requireVerifiedEmail` | `true` | |
-| `mapUser` | standard claims | |
-| `createClient` | plain OIDC | For a provider that needs its own client, e.g. extra headers on userinfo |
+| Option                     | Default                  |                                                                          |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------ |
+| `name`                     | required                 | Lowercase; used in the routes, cookies and identity rows                 |
+| `issuer`                   | required                 | Where discovery happens                                                  |
+| `clientId`, `clientSecret` | required                 |                                                                          |
+| `scope`                    | `'openid profile email'` |                                                                          |
+| `redirectUri`              | from the request         | Set it to pin one callback URL                                           |
+| `basePath`                 | `/api/auth/{name}`       | Must be under Payload's API route                                        |
+| `allowSignup`              | `true`                   |                                                                          |
+| `requireVerifiedEmail`     | `true`                   |                                                                          |
+| `mapUser`                  | standard claims          |                                                                          |
+| `createClient`             | plain OIDC               | For a provider that needs its own client, e.g. extra headers on userinfo |
 
 ## Notes
 

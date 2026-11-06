@@ -48,11 +48,7 @@ export function PaymentWaitingPage({ reference }: { reference: string }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1>Venter på betaling</h1>
-      <PaymentStatusSSE
-        reference={reference}
-        successUrl="/order/success"
-        failureUrl="/checkout"
-      />
+      <PaymentStatusSSE reference={reference} successUrl="/order/success" failureUrl="/checkout" />
     </div>
   );
 }
@@ -135,12 +131,8 @@ export default function PaymentWaitingPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">
-          Venter på bekreftelse fra Vipps
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Dette kan ta noen sekunder...
-        </p>
+        <h1 className="text-2xl font-bold mb-4">Venter på bekreftelse fra Vipps</h1>
+        <p className="text-gray-600 mb-8">Dette kan ta noen sekunder...</p>
         <PaymentStatusSSE
           reference={reference}
           successUrl="/order/success"
@@ -258,6 +250,7 @@ The SSE implementation handles:
 ### Manual Testing
 
 1. **Start Historia in development**:
+
    ```bash
    cd apps/historia
    pnpm dev
@@ -274,6 +267,7 @@ The SSE implementation handles:
    - Watch SSE messages
 
 4. **Trigger webhook manually** (optional):
+
    ```bash
    curl -X POST http://localhost:3100/api/webhooks/vipps \
      -H "Content-Type: application/json" \
@@ -302,13 +296,13 @@ test('payment status updates via SSE', async ({ page }) => {
 
 ## Benefits of SSE over Alternatives
 
-| Method | Pros | Cons |
-|--------|------|------|
-| **SSE** (✅ Current) | Real-time, efficient, auto-reconnect, native browser support | Requires connection during wait |
-| Polling | Simple, works everywhere | Inefficient, delayed updates, many requests |
-| WebSockets | Bi-directional, real-time | More complex, requires special server config |
-| Long Polling | Compatible | Complex, connection limits |
-| Revalidation only | Simple | Requires user refresh, not real-time |
+| Method               | Pros                                                         | Cons                                         |
+| -------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| **SSE** (✅ Current) | Real-time, efficient, auto-reconnect, native browser support | Requires connection during wait              |
+| Polling              | Simple, works everywhere                                     | Inefficient, delayed updates, many requests  |
+| WebSockets           | Bi-directional, real-time                                    | More complex, requires special server config |
+| Long Polling         | Compatible                                                   | Complex, connection limits                   |
+| Revalidation only    | Simple                                                       | Requires user refresh, not real-time         |
 
 ## Troubleshooting
 

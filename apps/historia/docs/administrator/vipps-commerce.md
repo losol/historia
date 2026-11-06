@@ -44,16 +44,16 @@ Historia matches incoming Vipps data to existing users **by email address only**
 
 When a Vipps payment is processed, these user fields are **automatically updated**:
 
-| Field | Description | Verified? |
-|-------|-------------|-----------|
-| `given_name` | First name from Folkeregisteret | ✅ Yes |
-| `middle_name` | Middle name (if any) | ✅ Yes |
-| `family_name` | Last name from Folkeregisteret | ✅ Yes |
-| `email` | Email address from Vipps | ✅ Yes |
-| `phone_number` | Mobile phone number | ✅ Yes |
-| `addresses` | Shipping/billing addresses | ❌ No* |
+| Field          | Description                     | Verified? |
+| -------------- | ------------------------------- | --------- |
+| `given_name`   | First name from Folkeregisteret | ✅ Yes    |
+| `middle_name`  | Middle name (if any)            | ✅ Yes    |
+| `family_name`  | Last name from Folkeregisteret  | ✅ Yes    |
+| `email`        | Email address from Vipps        | ✅ Yes    |
+| `phone_number` | Mobile phone number             | ✅ Yes    |
+| `addresses`    | Shipping/billing addresses      | ❌ No*    |
 
-\* *Addresses are merged with existing addresses, not marked as verified*
+\* _Addresses are merged with existing addresses, not marked as verified_
 
 ### Data Authority
 
@@ -89,11 +89,11 @@ Three boolean flags track verification status:
 
 ### Who Can See and Edit
 
-| User Role | Can View Verified Data | Can Edit Verified Data | Can Change Verification Flag |
-|-----------|------------------------|------------------------|------------------------------|
-| Customer (self) | ✅ Yes | ❌ No | ❌ No |
-| Tenant Admin | ✅ Yes | ❌ No | ❌ No |
-| System Admin | ✅ Yes | ✅ Yes | ✅ Yes |
+| User Role       | Can View Verified Data | Can Edit Verified Data | Can Change Verification Flag |
+| --------------- | ---------------------- | ---------------------- | ---------------------------- |
+| Customer (self) | ✅ Yes                 | ❌ No                  | ❌ No                        |
+| Tenant Admin    | ✅ Yes                 | ❌ No                  | ❌ No                        |
+| System Admin    | ✅ Yes                 | ✅ Yes                 | ✅ Yes                       |
 
 **Access control details:** See [ADR 0003 - User Field Access Control](../adr/0003-user-field-access-control.md)
 
@@ -424,15 +424,18 @@ When system-admins manually change verified data or flags, **create a business e
 ## Related Documentation
 
 ### Technical Details
+
 - [ADR 0002 - Verified User Fields](../adr/0002-verified-user-fields.md) — Technical specification for verification flags
 - [ADR 0003 - User Field Access Control](../adr/0003-user-field-access-control.md) — Permission model for verified data
 - [ADR 0004 - Trusted Identity Providers](../adr/0004-trusted-identity-providers.md) — User matching and update logic
 
 ### Vipps Setup and Integration
+
 - [Vipps Payment Integration](../VIPPS.md) — Webhook setup and payment processing
 - [Vipps Login Guide](vipps-login.md) — Alternative way to verify user data (authentication instead of payment)
 
 ### Payload CMS Documentation
+
 - [Business Events Collection](https://payloadcms.com/docs/admin/collections) — Understanding audit trail
 - [Access Control](https://payloadcms.com/docs/access-control/overview) — Field-level permissions
 
