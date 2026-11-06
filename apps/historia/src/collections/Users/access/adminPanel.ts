@@ -7,10 +7,14 @@ import { getUserTenantIDs } from '@/utilities/getUserTenantIDs';
  * Who may open the admin: system admins, and anyone with a role on a website.
  * Everybody else who logs in, such as a person who signed up through the
  * identity provider and has not been given a website, is a member of the
- * public site only. Their API access is unchanged and already limited by the
- * collections' own rules.
+ * public site only. What they may do through the API is held to what a visitor
+ * may, outside their own documents, by access/signedInWithoutRole.test.ts.
  */
-export const adminPanelAccess = ({ req: { user } }: { req: PayloadRequest }): boolean => {
-  if (!user || !('email' in user)) return false;
-  return isSystemAdmin(user as User) || getUserTenantIDs(user as User).length > 0;
-};
+export function canAccessAdmin(user: User | null | undefined): boolean {
+  if (!user) return false;
+  return isSystemAdmin(user) || getUserTenantIDs(user).length > 0;
+}
+
+/** `access.admin` on the users collection. */
+export const adminPanelAccess = ({ req: { user } }: { req: PayloadRequest }): boolean =>
+  Boolean(user && 'email' in user && canAccessAdmin(user as User));

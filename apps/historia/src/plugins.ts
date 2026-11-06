@@ -16,12 +16,13 @@ import { searchPlugin } from '@payloadcms/plugin-search';
 import { seoPlugin } from '@payloadcms/plugin-seo';
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { s3Storage } from '@payloadcms/storage-s3';
-import type { Plugin } from 'payload';
+import type { CollectionConfig, Plugin } from 'payload';
 import { anyone } from '@/access/anyone';
-import { isSystemAdmin } from '@/access/isSystemAdmin';
+import { isSystemAdmin, isSystemAdminAccess } from '@/access/isSystemAdmin';
 import { siteScoped } from '@/access/siteScoped';
 import { allowedOrigins, getAllowedDomainsFromAllowedOrigins } from '@/config/allowed-origins';
 import { revalidateRedirects } from '@/hooks/revalidateRedirects';
+import { requireAdminAccessForMcp, restrictMcpKeyCreation } from '@/lib/mcp/access';
 import { getOidcLoginEnv } from '@/lib/oidc/login-config';
 import { globalRolesFromClaims } from '@/lib/oidc/roles';
 import { mergeVippsAddress } from '@/lib/vipps/login-address';
@@ -106,6 +107,23 @@ if (vippsLogin.enabled) {
   );
 }
 
+/**
+ * The plugins below add collections with no access of their own for writing,
+ * and Payload's default then lets every logged-in user through, including one
+ * who only signed up. Those that are not tied to a website are for system
+ * admins: opening them to site roles would open every site's to each of them.
+ * access/signedInWithoutRole.test.ts catches a collection left open.
+ */
+const forSystemAdmins = (collection: CollectionConfig): CollectionConfig => ({
+  ...collection,
+  access: {
+    ...collection.access,
+    create: isSystemAdminAccess,
+    read: isSystemAdminAccess,
+    delete: isSystemAdminAccess,
+  },
+});
+
 export const plugins: Plugin[] = [
   importExportPlugin({
     collections: [
@@ -116,6 +134,11 @@ export const plugins: Plugin[] = [
       { slug: 'users' },
       { slug: 'orders' },
     ],
+    // An export file holds a whole collection, users and orders among them, and
+    // an import writes into one. The files record no owner, so "your own
+    // exports" is not possible without adding one.
+    overrideExportCollection: ({ collection }) => forSystemAdmins(collection),
+    overrideImportCollection: ({ collection }) => forSystemAdmins(collection),
   }),
   mcpPlugin({
     collections: {
@@ -144,6 +167,10 @@ export const plugins: Plugin[] = [
         enabled: true,
       },
     },
+    // Keys are for the people who may use the admin; see lib/mcp/access.ts.
+    overrideApiKeyCollection: restrictMcpKeyCreation,
+    overrideAuth: (_req, getDefaultMcpAccessSettings) =>
+      requireAdminAccessForMcp(getDefaultMcpAccessSettings),
   }),
   s3Storage({
     enabled: areAllS3VarsPresent,
@@ -182,6 +209,13 @@ export const plugins: Plugin[] = [
       hooks: {
         afterChange: [revalidateRedirects],
       },
+      // Visitors read them (the plugin's default); a redirect is not tied to a
+      // website, so only system admins write them.
+      access: {
+        create: isSystemAdminAccess,
+        update: isSystemAdminAccess,
+        delete: isSystemAdminAccess,
+      },
     },
   }),
   nestedDocsPlugin({
@@ -212,6 +246,22 @@ export const plugins: Plugin[] = [
           }
           return field;
         });
+      },
+      // Visitors read forms to fill them in (the plugin's default, which hides
+      // the email settings from them); forms are not tied to a website, so only
+      // system admins write them. A form's emails decide where submissions go.
+      access: {
+        create: isSystemAdminAccess,
+        update: isSystemAdminAccess,
+        delete: isSystemAdminAccess,
+      },
+    },
+    formSubmissionOverrides: {
+      // Anyone submits (the plugin's default); a submission holds what a person
+      // wrote in, from every website, so only system admins read or delete them.
+      access: {
+        read: isSystemAdminAccess,
+        delete: isSystemAdminAccess,
       },
     },
   }),
