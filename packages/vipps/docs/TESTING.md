@@ -29,11 +29,13 @@ Test users are required to complete payments in the MT test app:
 ### 3. Install MT Test App
 
 #### iOS
+
 - Open [TestFlight link](https://testflight.apple.com/join/hTAYrwea) on your iOS device
 - Install the Vipps MT app
 - No invitation code needed
 
 #### Android
+
 - Download from the [Google Play Store](https://play.google.com/store/apps/details?id=no.dnb.vipps.mt)
 
 ### 4. Set Up Test App
@@ -47,11 +49,13 @@ Test users are required to complete payments in the MT test app:
 ## Configuration
 
 1. Copy the environment template:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Fill in your test credentials in `.env`:
+
    ```env
    VIPPS_CLIENT_ID=your-client-id-here
    VIPPS_CLIENT_SECRET=your-client-secret-here
@@ -100,24 +104,24 @@ The Vipps test environment supports special amounts that trigger specific behavi
 
 ### Payment Test Amounts
 
-| Amount (øre) | Behavior |
-|--------------|----------|
-| 151 | Insufficient funds |
-| 182 | Refused by issuer |
-| 183 | Suspected fraud |
-| 184 | Withdrawal limit exceeded |
-| 186 | Expired card |
-| 187 | Invalid card |
-| 197 | 3D Secure denied (Norway only) |
-| 201 | Unknown result for 1 hour |
-| 202 | SCA required (Norway only) |
+| Amount (øre) | Behavior                       |
+| ------------ | ------------------------------ |
+| 151          | Insufficient funds             |
+| 182          | Refused by issuer              |
+| 183          | Suspected fraud                |
+| 184          | Withdrawal limit exceeded      |
+| 186          | Expired card                   |
+| 187          | Invalid card                   |
+| 197          | 3D Secure denied (Norway only) |
+| 201          | Unknown result for 1 hour      |
+| 202          | SCA required (Norway only)     |
 
 ### Refund Test Amounts
 
-| Amount (øre) | Behavior |
-|--------------|----------|
-| 123 | Cannot refund - user deleted or no receiving account |
-| 124 | Refund period expired |
+| Amount (øre) | Behavior                                             |
+| ------------ | ---------------------------------------------------- |
+| 123          | Cannot refund - user deleted or no receiving account |
+| 124          | Refund period expired                                |
 
 ## Manual Testing Required
 
@@ -185,7 +189,7 @@ These tests use the force approve endpoint to automatically complete payments wi
 **Complete flows tested:**
 
 - Create → Force Approve → Capture
-- Create → Force Approve → Capture → Refund  
+- Create → Force Approve → Capture → Refund
 - Create → Force Approve → Cancel
 - Partial capture scenarios
 - Test amount failures (e.g., insufficient funds)

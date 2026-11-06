@@ -79,16 +79,16 @@ When Vipps sends user data, Historia determines whether to create a new account 
 
 Every Vipps Login updates these user fields:
 
-| Field | Description | Verified? | Editable After Verification? |
-|-------|-------------|-----------|------------------------------|
-| `given_name` | First name from Folkeregisteret | ✅ Yes | ❌ No (system-admin only) |
-| `middle_name` | Middle name (if any) | ✅ Yes | ❌ No (system-admin only) |
-| `family_name` | Last name from Folkeregisteret | ✅ Yes | ❌ No (system-admin only) |
-| `email` | Email address from Vipps | ✅ Yes | ❌ No (system-admin only) |
-| `phone_number` | Mobile phone number | ✅ Yes | ❌ No (system-admin only) |
-| `addresses` | Addresses from Vipps | ❌ No* | ✅ Yes |
+| Field          | Description                     | Verified? | Editable After Verification? |
+| -------------- | ------------------------------- | --------- | ---------------------------- |
+| `given_name`   | First name from Folkeregisteret | ✅ Yes    | ❌ No (system-admin only)    |
+| `middle_name`  | Middle name (if any)            | ✅ Yes    | ❌ No (system-admin only)    |
+| `family_name`  | Last name from Folkeregisteret  | ✅ Yes    | ❌ No (system-admin only)    |
+| `email`        | Email address from Vipps        | ✅ Yes    | ❌ No (system-admin only)    |
+| `phone_number` | Mobile phone number             | ✅ Yes    | ❌ No (system-admin only)    |
+| `addresses`    | Addresses from Vipps            | ❌ No*    | ✅ Yes                       |
 
-\* *Vipps keeps one address up to date: the one labelled **Vipps** (their home address if they have one). It is updated on each Vipps login, or added if missing. Other addresses the user has are never changed. Addresses are not marked as verified.*
+\* _Vipps keeps one address up to date: the one labelled **Vipps** (their home address if they have one). It is updated on each Vipps login, or added if missing. Other addresses the user has are never changed. Addresses are not marked as verified._
 
 ### Data Authority
 
@@ -130,11 +130,11 @@ A **verified field** has three guarantees:
 
 Three boolean flags track verification status:
 
-| Flag | Covers | Set When |
-|------|--------|----------|
-| `name_verified` | `given_name`, `middle_name`, `family_name` | Vipps Login OR Vipps payment |
-| `email_verified` | `email` | Vipps Login OR Vipps payment |
-| `phone_number_verified` | `phone_number` | Vipps Login OR Vipps payment |
+| Flag                    | Covers                                     | Set When                     |
+| ----------------------- | ------------------------------------------ | ---------------------------- |
+| `name_verified`         | `given_name`, `middle_name`, `family_name` | Vipps Login OR Vipps payment |
+| `email_verified`        | `email`                                    | Vipps Login OR Vipps payment |
+| `phone_number_verified` | `phone_number`                             | Vipps Login OR Vipps payment |
 
 **Important:** Name fields are treated as an **atomic unit**. You cannot verify or edit individual name components – all three name fields are handled together.
 
@@ -638,20 +638,24 @@ User's legal name is "Kari" but Folkeregisteret shows "Karina" due to registry e
 ## Related Documentation
 
 ### Technical Details
+
 - [ADR 0002 - Verified User Fields](../adr/0002-verified-user-fields.md) — Technical specification for verification flags
 - [ADR 0003 - User Field Access Control](../adr/0003-user-field-access-control.md) — Permission model for verified data
 - [ADR 0004 - Trusted Identity Providers](../adr/0004-trusted-identity-providers.md) — User matching and update logic
 
 ### Vipps Setup and Integration
+
 - [Vipps Login Setup Guide](../VIPPS_LOGIN_SETUP.md) — How to configure Vipps Login authentication
 - [Vipps Commerce Guide](vipps-commerce.md) — How Vipps payments update user data
 
 ### Payload CMS Documentation
+
 - [Authentication Strategies](https://payloadcms.com/docs/authentication/overview) — Understanding Payload auth
 - [Business Events Collection](https://payloadcms.com/docs/admin/collections) — Audit trail and event logging
 - [Field-level Access Control](https://payloadcms.com/docs/access-control/fields) — How permissions work
 
 ### User Management
+
 - [Role-Based Access Control](role-based-access-control.md) — Understanding roles and permissions in Historia
 
 ## Support Contacts

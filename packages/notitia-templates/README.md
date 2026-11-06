@@ -113,7 +113,7 @@ const norwegianWelcome = notitiaTemplates.render(
     name: 'Kari Hansen',
     organizationName: 'Eventuras',
   },
-  { locale: 'nb-NO' } // Override locale for this render
+  { locale: 'nb-NO' }, // Override locale for this render
 );
 
 // Render in Nynorsk
@@ -124,7 +124,7 @@ const nynorskWelcome = notitiaTemplates.render(
     name: 'Per Olsen',
     organizationName: 'Eventuras',
   },
-  { locale: 'nn-NO' }
+  { locale: 'nn-NO' },
 );
 
 console.log(nynorskWelcome.subject);
@@ -181,7 +181,7 @@ Register multiple templates at once:
 notitiaTemplates.registerTemplates({
   'email:onboarding': {
     subject: 'Welcome aboard!',
-    content: 'Hello {{name}}, let\'s get started...',
+    content: "Hello {{name}}, let's get started...",
   },
   'sms:verification': {
     content: 'Your verification code is {{code}}',
@@ -228,7 +228,7 @@ const result = notitiaTemplates.render(
     helpers: {
       capitalize: (str: string) => str.charAt(0).toUpperCase() + str.slice(1),
     },
-  }
+  },
 );
 ```
 
@@ -237,13 +237,10 @@ const result = notitiaTemplates.render(
 Render template strings without registering them:
 
 ```typescript
-const result = notitiaTemplates.renderCustom(
-  'Hello {{name}}, your code is {{code}}',
-  {
-    name: 'Alice',
-    code: '12345',
-  }
-);
+const result = notitiaTemplates.renderCustom('Hello {{name}}, your code is {{code}}', {
+  name: 'Alice',
+  code: '12345',
+});
 // Output: "Hello Alice, your code is 12345"
 ```
 
@@ -410,12 +407,12 @@ getTemplateInfo(channel: 'email' | 'sms', type: TemplateType): Template | undefi
 
 ```typescript
 import type {
-  NotificationChannel,    // 'email' | 'sms'
-  TemplateType,           // 'welcome' | 'registration-confirmation' | ...
-  Template,               // Template definition
-  RenderedTemplate,       // Render result
-  BaseTemplateParams,     // Parameter object
-  RenderOptions,          // Rendering options
+  NotificationChannel, // 'email' | 'sms'
+  TemplateType, // 'welcome' | 'registration-confirmation' | ...
+  Template, // Template definition
+  RenderedTemplate, // Render result
+  BaseTemplateParams, // Parameter object
+  RenderOptions, // Rendering options
 } from '@eventuras/notitia-templates';
 ```
 
@@ -535,20 +532,20 @@ const detailedOrder = notitiaTemplates.render('email', 'order-confirmation-detai
       name: 'Wireless Headphones',
       quantity: 2,
       price: '599.00',
-      subtotal: '1198.00'
+      subtotal: '1198.00',
     },
     {
       name: 'USB-C Cable',
       quantity: 3,
       price: '99.00',
-      subtotal: '297.00'
+      subtotal: '297.00',
     },
     {
       name: 'Phone Case',
       quantity: 1,
       price: '249.00',
-      subtotal: '249.00'
-    }
+      subtotal: '249.00',
+    },
   ],
   subtotal: '1744.00',
   shipping: '99.00',
@@ -558,9 +555,9 @@ const detailedOrder = notitiaTemplates.render('email', 'order-confirmation-detai
     street: 'Storgata 15',
     postalCode: '0155',
     city: 'Oslo',
-    country: 'Norway'
+    country: 'Norway',
   },
-  trackingNumber: 'NO-TRACK-2025-001'
+  trackingNumber: 'NO-TRACK-2025-001',
 });
 ```
 

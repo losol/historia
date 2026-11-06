@@ -1,6 +1,7 @@
 # ADR 0004 — Trusted Identity Providers
 
 ## Status
+
 Proposed
 
 ## Context
@@ -103,7 +104,7 @@ await payload.update({
     // Merge addresses (don't overwrite all addresses)
     addresses: mergeAddresses(matchedUser.addresses, vippsData.addresses),
   },
-  overrideAccess: true,  // Bypass field-level access control
+  overrideAccess: true, // Bypass field-level access control
 });
 ```
 
@@ -131,9 +132,9 @@ mapVippsUser: (vippsUser) => ({
   family_name: vippsUser.family_name,
   phone_number: vippsUser.phone_number,
   phone_number_verified: vippsUser.phone_number_verified,
-  name_verified: true,  // ADD THIS
+  name_verified: true, // ADD THIS
   // ... addresses mapping
-})
+});
 ```
 
 The plugin handles user creation and updates automatically.
@@ -251,7 +252,7 @@ Create reusable utilities for Vipps user matching and updating:
 
 export async function findUserByVippsData(
   payload: Payload,
-  vippsData: VippsUserDetails
+  vippsData: VippsUserDetails,
 ): Promise<User | null> {
   // Match by email (primary key)
   if (vippsData.email) {
@@ -271,7 +272,7 @@ export async function findUserByVippsData(
 export async function updateUserFromVipps(
   payload: Payload,
   userId: string,
-  vippsData: VippsUserDetails
+  vippsData: VippsUserDetails,
 ): Promise<void> {
   // Update user data
   await payload.update({
@@ -332,12 +333,15 @@ if (paymentDetails.userDetails) {
 Log all Vipps user updates for audit and debugging:
 
 ```typescript
-logger.info({
-  userId,
-  vippsEmail: vippsData.email,
-  vippsPhone: vippsData.phone_number,
-  action: 'created' | 'updated',
-}, 'Synced user from Vipps');
+logger.info(
+  {
+    userId,
+    vippsEmail: vippsData.email,
+    vippsPhone: vippsData.phone_number,
+    action: 'created' | 'updated',
+  },
+  'Synced user from Vipps',
+);
 ```
 
 ## Related

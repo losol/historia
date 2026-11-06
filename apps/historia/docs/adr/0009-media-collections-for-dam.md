@@ -1,6 +1,7 @@
 # ADR 0009 — Media Collections for Digital Asset Management
 
 ## Status
+
 Accepted (Implemented)
 
 ## Context
@@ -334,7 +335,7 @@ export const MediaCollections: CollectionConfig = {
         // Prevent circular references in chain
         const checkCircular = async (
           parentId: string,
-          visitedIds = new Set<string>([originalDoc?.id])
+          visitedIds = new Set<string>([originalDoc?.id]),
         ): Promise<boolean> => {
           // If we've seen this ID before, we have a cycle
           if (visitedIds.has(parentId)) return true;
@@ -355,7 +356,7 @@ export const MediaCollections: CollectionConfig = {
               typeof parent.parentCollection === 'string'
                 ? parent.parentCollection
                 : parent.parentCollection.id,
-              visitedIds
+              visitedIds,
             );
           } catch (error) {
             // Parent not found = broken reference but not circular
@@ -366,13 +367,13 @@ export const MediaCollections: CollectionConfig = {
         const hasCircular = await checkCircular(
           typeof data.parentCollection === 'string'
             ? data.parentCollection
-            : data.parentCollection.id
+            : data.parentCollection.id,
         );
 
         if (hasCircular) {
           throw new Error(
             'Cannot create circular parent-child relationship. ' +
-            'This collection is already an ancestor of the selected parent.'
+              'This collection is already an ancestor of the selected parent.',
           );
         }
 
@@ -405,7 +406,7 @@ import { Media } from './collections/Media';
 export default buildConfig({
   collections: [
     // ... existing collections ...
-    Media,           // Updated with collection field
+    Media, // Updated with collection field
     MediaCollections, // New collection
     // ... other collections ...
   ],
@@ -450,6 +451,7 @@ export default buildConfig({
 ## Future Work
 
 ### Phase 2: Access Control
+
 - Implement read access logic based on `allowedTenants`
 - Define behavior for empty `allowedTenants`
 - Add admin UI indicators for access rules
@@ -457,6 +459,7 @@ export default buildConfig({
 - Create ADR for ACL implementation details
 
 ### Phase 3: Enhanced DAM Features
+
 - Metadata templates per collection
 - Collection-level default licenses
 - Bulk operations (move, tag, delete)
@@ -465,6 +468,7 @@ export default buildConfig({
 - Version history for media
 
 ### Phase 4: Advanced Organization
+
 - Tags in addition to collections (many-to-many)
 - Smart collections (auto-organize by rules)
 - Collection templates

@@ -15,12 +15,7 @@ A wrapper component for `@eventuras/ratio-ui` VippsButton that handles Express C
 ```tsx
 import { VippsExpressButton } from '@/components/payment/VippsExpressButton';
 
-<VippsExpressButton
-  amount={totalInCents}
-  currency="NOK"
-  items={cartItems}
-  locale={locale}
-/>
+<VippsExpressButton amount={totalInCents} currency="NOK" items={cartItems} locale={locale} />;
 ```
 
 **Props:**
@@ -38,11 +33,11 @@ The underlying button component is from `@eventuras/ratio-ui`:
 import { VippsButton } from '@eventuras/ratio-ui/core/Button';
 
 <VippsButton
-  locale="no"           // Auto-sets button text
+  locale="no" // Auto-sets button text
   loading={isLoading}
-  block                 // Full width
+  block // Full width
   onClick={handleClick}
-/>
+/>;
 ```
 
 **Features:**

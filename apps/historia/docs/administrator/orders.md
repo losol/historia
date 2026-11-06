@@ -17,6 +17,7 @@ Historia CMS provides a comprehensive order management system for e-commerce ope
 Orders in Historia follow a standard e-commerce lifecycle with five distinct statuses:
 
 ### 🕐 Pending
+
 **Description:** Order has been created but payment is not yet confirmed.
 
 **Typical Use:** Initial state when customer places order, awaiting payment confirmation.
@@ -26,6 +27,7 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 ---
 
 ### ⚙️ Processing
+
 **Description:** Payment confirmed, order is being prepared for shipment.
 
 **Typical Use:** Order is being picked, packed, or otherwise prepared for delivery.
@@ -35,6 +37,7 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 ---
 
 ### ⏸️ On Hold
+
 **Description:** Order is temporarily suspended (e.g., awaiting stock, payment issues, customer request).
 
 **Typical Use:** Order needs attention before it can proceed.
@@ -44,6 +47,7 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 ---
 
 ### ✅ Completed
+
 **Description:** Order has been fulfilled and delivered to the customer.
 
 **Typical Use:** Final state for successfully completed orders.
@@ -53,6 +57,7 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 ---
 
 ### ❌ Canceled
+
 **Description:** Order has been canceled (by customer or business).
 
 **Typical Use:** Order will not be fulfilled.
@@ -65,12 +70,12 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 
 ### General Permissions
 
-| Operation | Member | Editor | Commerce | Admin | System Admin |
-|-----------|--------|--------|----------|-------|--------------|
-| **Create (Admin Panel)** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Create (Checkout)** | 🟡 All users can place orders via checkout | | | | |
-| **Read** | Own only | ❌ | ✅ All in tenant | ✅ All in tenant | ✅ All |
-| **Delete** | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Operation                | Member                                     | Editor | Commerce         | Admin            | System Admin |
+| ------------------------ | ------------------------------------------ | ------ | ---------------- | ---------------- | ------------ |
+| **Create (Admin Panel)** | ❌                                         | ❌     | ✅               | ✅               | ✅           |
+| **Create (Checkout)**    | 🟡 All users can place orders via checkout |        |                  |                  |              |
+| **Read**                 | Own only                                   | ❌     | ✅ All in tenant | ✅ All in tenant | ✅ All       |
+| **Delete**               | ❌                                         | ❌     | ❌               | ✅               | ✅           |
 
 **Notes:**
 - **Create (Admin Panel):** Manually creating orders for phone/email orders or administrative corrections
@@ -84,13 +89,13 @@ Orders in Historia follow a standard e-commerce lifecycle with five distinct sta
 
 Order update permissions are **status-dependent** to protect financial and fulfillment data integrity:
 
-| Order Status | Commerce Manager | Site Admin | System Admin |
-|--------------|------------------|------------|--------------|
-| **Pending** | ✅ Can edit (own tenants) | ✅ Can edit (own tenants) | ✅ Can edit (all) |
+| Order Status   | Commerce Manager          | Site Admin                | System Admin      |
+| -------------- | ------------------------- | ------------------------- | ----------------- |
+| **Pending**    | ✅ Can edit (own tenants) | ✅ Can edit (own tenants) | ✅ Can edit (all) |
 | **Processing** | ✅ Can edit (own tenants) | ✅ Can edit (own tenants) | ✅ Can edit (all) |
-| **On-Hold** | ❌ Read only | ❌ Read only | ✅ Can edit |
-| **Completed** | ❌ Read only | ❌ Read only | ✅ Can edit |
-| **Canceled** | ❌ Read only | ❌ Read only | ✅ Can edit |
+| **On-Hold**    | ❌ Read only              | ❌ Read only              | ✅ Can edit       |
+| **Completed**  | ❌ Read only              | ❌ Read only              | ✅ Can edit       |
+| **Canceled**   | ❌ Read only              | ❌ Read only              | ✅ Can edit       |
 
 **Why status-based permissions?**
 Protecting completed and canceled orders from accidental changes maintains financial integrity and audit trails. Only system administrators with full platform access can modify locked orders (on-hold, completed, canceled).
@@ -100,6 +105,7 @@ Protecting completed and canceled orders from accidental changes maintains finan
 ## Practical Examples
 
 ### Example 1: Commerce Manager Updating Active Order
+
 **Scenario:** A commerce manager needs to update a customer's shipping address on a processing order.
 
 **Steps:**
@@ -114,6 +120,7 @@ Protecting completed and canceled orders from accidental changes maintains finan
 ---
 
 ### Example 2: Commerce Manager Trying to Edit Completed Order
+
 **Scenario:** A commerce manager notices a mistake in a completed order's total amount.
 
 **Steps:**
@@ -130,6 +137,7 @@ Protecting completed and canceled orders from accidental changes maintains finan
 ---
 
 ### Example 3: Admin Changing Order Status to On-Hold
+
 **Scenario:** A site admin needs to put an order on hold due to inventory shortage.
 
 **Steps:**
@@ -146,6 +154,7 @@ Protecting completed and canceled orders from accidental changes maintains finan
 ---
 
 ### Example 4: System Admin Correcting Completed Order
+
 **Scenario:** A system admin needs to update a completed order's metadata for accounting reconciliation.
 
 **Steps:**
@@ -162,6 +171,7 @@ Protecting completed and canceled orders from accidental changes maintains finan
 ## Order Fields and Structure
 
 ### Order Details Tab
+
 - **Order Items** — List of products/services in the order
   - Product name
   - Quantity
@@ -174,10 +184,12 @@ Protecting completed and canceled orders from accidental changes maintains finan
 - **Tax Exempt** — Whether order is tax-exempt
 
 ### Shipping Address Tab
+
 - Full address form for delivery location
 - Required for physical product orders
 
 ### Sidebar Fields
+
 - **Customer** — Link to user account (optional)
 - **User Email** — Email for order notifications (required)
 - **Status** — Current order status (see statuses above)
@@ -227,12 +239,14 @@ Protecting completed and canceled orders from accidental changes maintains finan
 For developers maintaining the order management system:
 
 ### Core Files
+
 - **Collection:** `apps/historia/src/collections/Orders.ts`
 - **Status Rules:** `apps/historia/src/lib/commerce/orderStatusRules.ts`
 - **Access Control:** `apps/historia/src/lib/commerce/orderPermissions.ts`
 - **Public API:** `apps/historia/src/lib/commerce/index.ts`
 
 ### Business Rules (Pure Functions)
+
 The order status logic is implemented as pure functions for testability:
 
 ```typescript
@@ -245,21 +259,22 @@ import {
 } from '@/lib/commerce';
 
 // Check if commerce/admin can edit
-isOrderEditableByCommerce('pending')    // true
-isOrderEditableByCommerce('processing') // true
-isOrderEditableByCommerce('completed')  // false
+isOrderEditableByCommerce('pending'); // true
+isOrderEditableByCommerce('processing'); // true
+isOrderEditableByCommerce('completed'); // false
 
 // Check if order is locked
-isOrderLocked('on-hold')    // true
-isOrderLocked('completed')  // true
-isOrderLocked('pending')    // false
+isOrderLocked('on-hold'); // true
+isOrderLocked('completed'); // true
+isOrderLocked('pending'); // false
 
 // Get explanation for locked orders
-getOrderLockReason('completed')
+getOrderLockReason('completed');
 // Returns: "Orders with status 'completed' can only be edited by system administrators"
 ```
 
 ### Access Control Implementation
+
 The `ordersUpdateAccess` function in `orderPermissions.ts` implements the status-based access control:
 
 1. **System admins** → Always return `true` (full access)
@@ -270,6 +285,7 @@ The `ordersUpdateAccess` function in `orderPermissions.ts` implements the status
      - No matching role → return `false`
 
 ### Tenant Scoping
+
 Orders use Payload's tenant constraint system to ensure users can only edit orders in their assigned tenants:
 
 ```typescript
@@ -281,12 +297,14 @@ return { tenant: { in: [...commerceTenantIDs, ...adminTenantIDs] } };
 ## Best Practices
 
 ### ✅ Do
+
 - Always verify order status before attempting edits
 - Use "canceled" status instead of deleting orders for audit trails
 - Update order status to reflect the current fulfillment state
 - Contact system admins when locked orders need corrections
 
 ### ❌ Don't
+
 - Don't manually change order totals without understanding the pricing hooks
 - Don't delete orders unless absolutely necessary (use "canceled" instead)
 - Don't change completed orders back to pending/processing

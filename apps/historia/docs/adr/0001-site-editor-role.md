@@ -1,6 +1,7 @@
 # ADR 0001 — Site Roles and Access Control
 
 ## Status
+
 Accepted
 
 ## Context
@@ -47,10 +48,10 @@ Rename `roles` → `siteRoles` in the tenant array field for clarity:
 
 ```typescript
 // Before (ambiguous)
-tenants: [{ tenant: Website, roles: ['site-admin'] }]
+tenants: [{ tenant: Website, roles: ['site-admin'] }];
 
 // After (clear)
-tenants: [{ tenant: Website, siteRoles: ['admin', 'editor'] }]
+tenants: [{ tenant: Website, siteRoles: ['admin', 'editor'] }];
 ```
 
 This eliminates confusion between:
@@ -102,28 +103,28 @@ Example user configuration:
 
 ### 3. Site Role Permissions Matrix
 
-| Collection | member | editor | commerce | admin | system admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Content Collections** |
-| Articles | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Happenings | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Notes | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Cases | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Pages | Read published | ✅ Create/Update<br>❌ Delete | Read published | ✅ Full access | ✅ Full access |
-| Media | Read | ✅ Create/Update<br>❌ Delete | Read | ✅ Full access | ✅ Full access |
+| Collection                 | member          | editor                        | commerce                        | admin                                | system admin                       |
+| -------------------------- | --------------- | ----------------------------- | ------------------------------- | ------------------------------------ | ---------------------------------- |
+| **Content Collections**    |
+| Articles                   | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
+| Happenings                 | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
+| Notes                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
+| Cases                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
+| Pages                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
+| Media                      | Read            | ✅ Create/Update<br>❌ Delete | Read                            | ✅ Full access                       | ✅ Full access                     |
 | **E-commerce Collections** |
-| Products | Read published | Read published | ✅ Create/Update<br>❌ Delete | ✅ Full access | ✅ Full access |
-| Carts | Own cart only | Own cart only | Read all | ✅ Full access | ✅ Full access |
-| Orders | Own orders only | Own orders only | ✅ Read/Update all<br>❌ Delete | ✅ Full access | ✅ Full access |
-| Shipments | Own shipments | Own shipments | ✅ Create/Update<br>❌ Delete | ✅ Full access | ✅ Full access |
-| Transactions | ❌ No access | ❌ No access | Read only | Read only | ✅ Full access (system-admin only) |
+| Products                   | Read published  | Read published                | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
+| Carts                      | Own cart only   | Own cart only                 | Read all                        | ✅ Full access                       | ✅ Full access                     |
+| Orders                     | Own orders only | Own orders only               | ✅ Read/Update all<br>❌ Delete | ✅ Full access                       | ✅ Full access                     |
+| Shipments                  | Own shipments   | Own shipments                 | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
+| Transactions               | ❌ No access    | ❌ No access                  | Read only                       | Read only                            | ✅ Full access (system-admin only) |
 | **Structural Collections** |
-| Websites | Read | Read | Read | ❌ Update only<br>(no create/delete) | ✅ Full access |
-| Users | Read own | Read own | Read own | Read own | ✅ Full access |
-| Organizations | Read | ✅ Update own org | Read | ✅ Update own org | ✅ Full access |
-| Topics | Read | Read | Read | ✅ Full access | ✅ Full access |
-| Places | Read | Read | Read | ✅ Full access | ✅ Full access |
-| Persons | Read | Read | Read | ✅ Full access | ✅ Full access |
+| Websites                   | Read            | Read                          | Read                            | ❌ Update only<br>(no create/delete) | ✅ Full access                     |
+| Users                      | Read own        | Read own                      | Read own                        | Read own                             | ✅ Full access                     |
+| Organizations              | Read            | ✅ Update own org             | Read                            | ✅ Update own org                    | ✅ Full access                     |
+| Topics                     | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Places                     | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Persons                    | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
 
 **Legend**:
 - ✅ = Has permission
@@ -144,7 +145,7 @@ Example user configuration:
 
 **Rename field and expand roles:**
 
-```typescript
+````typescript
 // apps/historia/src/collections/Users/index.ts
 
 // Before
@@ -176,7 +177,7 @@ export const getUserTenantIDs = (
         : tenant.tenant.id;
     });
 };
-```
+````
 
 **Create role-specific access control functions:**
 
@@ -193,9 +194,7 @@ export const siteEditors: Access = ({ req }) => {
 
   const editorTenantIDs = getUserTenantIDs(req.user, 'editor');
 
-  return editorTenantIDs.length > 0
-    ? { tenant: { in: editorTenantIDs } }
-    : false;
+  return editorTenantIDs.length > 0 ? { tenant: { in: editorTenantIDs } } : false;
 };
 
 /**
@@ -207,9 +206,7 @@ export const siteCommerceManagers: Access = ({ req }) => {
 
   const commerceTenantIDs = getUserTenantIDs(req.user, 'commerce');
 
-  return commerceTenantIDs.length > 0
-    ? { tenant: { in: commerceTenantIDs } }
-    : false;
+  return commerceTenantIDs.length > 0 ? { tenant: { in: commerceTenantIDs } } : false;
 };
 
 /**
@@ -221,9 +218,7 @@ export const siteMembers: Access = ({ req }) => {
 
   const memberTenantIDs = getUserTenantIDs(req.user, 'member');
 
-  return memberTenantIDs.length > 0
-    ? { tenant: { in: memberTenantIDs } }
-    : false;
+  return memberTenantIDs.length > 0 ? { tenant: { in: memberTenantIDs } } : false;
 };
 ```
 
@@ -246,9 +241,7 @@ export const accessOR = (...accessFunctions: Access[]): Access => {
     }
 
     // Collect constraint objects and combine with OR
-    const constraints = results.filter(
-      (result) => typeof result === 'object' && result !== null,
-    );
+    const constraints = results.filter((result) => typeof result === 'object' && result !== null);
 
     if (constraints.length === 0) return false;
     if (constraints.length === 1) return constraints[0];
@@ -395,9 +388,9 @@ export const accessOR = (...accessFunctions: Access[]): Access => {
         description: 'Site-specific roles. Users can have multiple roles on a website.',
       },
     },
-  ],
+],
 });
-```
+````
 
 **Database schema changes:**
 
@@ -507,7 +500,7 @@ await db.execute(sql`
     SET DATA TYPE "enum_users_roles"
     USING "value"::"enum_users_roles";
 `);
-```
+````
 
 **Migration Status:**
 - ✅ Both migrations created and tested
@@ -546,6 +539,7 @@ await db.execute(sql`
 - [ ] `pnpm payload generate:types` — Update TypeScript types
 
 #### Phase 2: Enhanced Draft Visibility (Optional)
+
 - [ ] `apps/historia/src/access/publishedOrEditableAccess.ts`
 - [ ] Update `read` access in content collections
   if (!req.user || !('email' in req.user)) return false;
@@ -560,10 +554,10 @@ await db.execute(sql`
 
   // Scope access to user's tenants
   return allTenantIDs.length > 0
-    ? { tenant: { in: allTenantIDs } }
-    : false;
-};
-```
+  ? { tenant: { in: allTenantIDs } }
+  : false;
+  };
+````
 
 #### 3. Collection Access Control Updates
 
@@ -620,7 +614,7 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 
   return publishedQuery;
 };
-```
+````
 
 ### Migration Strategy
 
@@ -632,6 +626,7 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 ### Files Modified
 
 #### Phase 1 (Core Implementation)
+
 - [ ] `apps/historia/src/collections/Users/index.ts` — Add `site-editor` to roles
 - [ ] `apps/historia/src/access/siteEditorAccess.ts` — New access control function
 - [ ] `apps/historia/src/collections/Articles/index.ts` — Update access
@@ -644,6 +639,7 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 - [ ] Database migration (auto-generated)
 
 #### Phase 2 (Enhanced Draft Visibility - Optional)
+
 - [ ] `apps/historia/src/access/publishedOrEditableAccess.ts` — New access function
 - [ ] Update `read` access in Articles, Happenings, Notes
 - [ ] Update `readVersions` access to `siteEditorAccess`
@@ -651,6 +647,7 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 ## Consequences
 
 ### Positive
+
 ✅ **Improved security** — Editors cannot delete content or modify structural elements
 ✅ **Better workflow** — Delegated content management without full admin privileges
 ✅ **Multi-tenant isolation** — Editors only access their assigned websites
@@ -659,11 +656,13 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 ✅ **Backward compatible** — Existing `site-admin` and `site-member` roles unchanged
 
 ### Considerations
+
 ⚠️ **Admin burden** — Admins must assign `site-editor` role to appropriate users
 ⚠️ **Role proliferation** — More roles to manage (3 instead of 2 per tenant)
 ⚠️ **Testing required** — Must verify editor permissions across all collections
 
 ### Future Enhancements
+
 - **Approval workflow** — Draft submissions require admin approval before publish
 - **Field-level permissions** — Restrict editors from changing specific fields (e.g., `publishedAt`)
 - **Collection-specific roles** — `article-editor`, `product-editor` for granular control
@@ -679,7 +678,9 @@ export const publishedOrEditableAccess: Access = ({ req }) => {
 - **Administrator Guide:** [Role-Based Access Control Guide](../administrator/role-based-access-control.md) — Practical guide for assigning and managing roles
 
 ## Decision Date
+
 2026-01-17
 
 ## Authors
+
 - Project Architect (with Content Architect consultation)

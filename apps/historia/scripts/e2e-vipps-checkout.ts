@@ -235,6 +235,7 @@ async function returnToSite(page: Page, reference: string, expected: RegExp, wha
     const text = (
       await page
         .locator('main')
+        // biome-ignore lint/performance/useDomNodeTextContent: Playwright diagnostics need rendered text, excluding hidden content.
         .innerText()
         .catch(() => '')
     ).replace(/\s+/g, ' ');
@@ -243,6 +244,7 @@ async function returnToSite(page: Page, reference: string, expected: RegExp, wha
   // The page empties the cart with a request of its own; leaving before it answers
   // would drop the new session cookie.
   await page.waitForLoadState('networkidle');
+  // biome-ignore lint/performance/useDomNodeTextContent: Playwright diagnostics need rendered text, excluding hidden content.
   const text = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
   ok(text.slice(0, 160));
 }

@@ -57,13 +57,11 @@ await capturePayment(config, 'ORDER-123', {
 ### Core Utilities
 
 ```typescript
-import {
-  getAccessToken,
-  buildHeaders,
-  type VippsConfig,
-} from '@eventuras/vipps/vipps-core';
+import { getAccessToken, buildHeaders, type VippsConfig } from '@eventuras/vipps/vipps-core';
 
-const config = { /* ... */ };
+const config = {
+  /* ... */
+};
 
 // Get access token
 const token = await getAccessToken(config);

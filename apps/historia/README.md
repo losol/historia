@@ -8,14 +8,14 @@ Installing, running and releasing are covered in the [repository README](../../R
 
 `pnpm dev` starts without any configuration, against a local SQLite file (`historia.db`). For anything beyond that, copy `.env.example` to `.env`. The variables the app reads are described in [`app.config.json`](./app.config.json) and in the guides below. The most important ones:
 
-| Variable | Purpose |
-| --- | --- |
-| `CMS_DATABASE_URL` | Database. A `postgres://` URL uses Postgres; unset means SQLite |
-| `CMS_SECRET` | Signs the Payload session cookie. Keep it stable in production |
-| `NEXT_PUBLIC_CMS_URL` | The app's public URL |
-| `CMS_ALLOWED_ORIGINS` | Comma-separated public origins, for CORS/CSRF and for trusting proxy headers |
-| `VIPPS_*` | Vipps ePayment (checkout), see [VIPPS.md](./docs/VIPPS.md) |
-| `VIPPS_LOGIN_*` | Vipps Login for the admin, see [VIPPS_LOGIN_SETUP.md](./docs/VIPPS_LOGIN_SETUP.md) |
+| Variable              | Purpose                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `CMS_DATABASE_URL`    | Database. A `postgres://` URL uses Postgres; unset means SQLite                    |
+| `CMS_SECRET`          | Signs the Payload session cookie. Keep it stable in production                     |
+| `NEXT_PUBLIC_CMS_URL` | The app's public URL                                                               |
+| `CMS_ALLOWED_ORIGINS` | Comma-separated public origins, for CORS/CSRF and for trusting proxy headers       |
+| `VIPPS_*`             | Vipps ePayment (checkout), see [VIPPS.md](./docs/VIPPS.md)                         |
+| `VIPPS_LOGIN_*`       | Vipps Login for the admin, see [VIPPS_LOGIN_SETUP.md](./docs/VIPPS_LOGIN_SETUP.md) |
 
 ## Local development with HTTPS
 

@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: docker.io
   repository: losolio/historia
-  tag: ""           # Set by ArgoCD
+  tag: "" # Set by ArgoCD
   pullPolicy: IfNotPresent
 
 service:
