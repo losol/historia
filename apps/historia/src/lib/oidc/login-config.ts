@@ -19,7 +19,8 @@ export function getOidcLoginEnv() {
     clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
     // Whether a person the provider vouches for, but who has no user yet, gets
     // one. A new user has no roles, so this grants nothing by itself: they are a
-    // member of the public site and cannot open the admin (adminPanelAccess).
+    // signed-in visitor of the public site and cannot open the admin
+    // (adminPanelAccess).
     allowSignup: process.env.OIDC_ALLOW_SIGNUP !== 'false',
     label: process.env.OIDC_LOGIN_LABEL || 'Logg inn',
     // The provider's role that makes a user a system admin. When set, the
