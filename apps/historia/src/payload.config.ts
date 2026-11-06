@@ -5,9 +5,10 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import * as Sentry from '@sentry/nextjs';
-import type { APIError } from 'payload';
+import type { APIError, PayloadRequest } from 'payload';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
+import { isSystemAdminAccess } from '@/access/isSystemAdmin';
 import { defaultLexical } from '@/fields/defaultLexical';
 import { sentryRuntimeConfig } from '@/lib/observability/sentryOptions';
 import { Articles } from './collections/Articles';
@@ -38,6 +39,9 @@ import { Websites } from './collections/Websites';
 import { allowedOrigins } from './config/allowed-origins';
 import { migrations } from './migrations';
 import { plugins } from './plugins';
+
+const systemAdminsOnly = ({ req }: { req: PayloadRequest }): boolean =>
+  isSystemAdminAccess({ req }) === true;
 
 const locales = process.env.NEXT_PUBLIC_CMS_LOCALES
   ? process.env.NEXT_PUBLIC_CMS_LOCALES.split(',')
@@ -265,6 +269,16 @@ export default buildConfig({
         }
       },
     ],
+  },
+  // The queue holds the import and export jobs. Payload lets every logged-in
+  // user run, queue and cancel jobs by default; nothing here runs them on a
+  // schedule, so only a system admin may, over /api/payload-jobs.
+  jobs: {
+    access: {
+      run: systemAdminsOnly,
+      queue: systemAdminsOnly,
+      cancel: systemAdminsOnly,
+    },
   },
   plugins: [
     ...plugins, // Additional plugins
