@@ -1,5 +1,16 @@
 # @eventuras/historia
 
+## 0.32.1
+
+### Patch Changes
+
+- f76beae: Forms, form submissions, redirects, imports, exports and the job queue were open to every logged-in user, since their plugins set no access for it and Payload then lets anyone logged in through. With signup on, that is anyone with an OIDC or Vipps account: they could read every form submission, change where a form's emails go, add redirects, and download the exports an admin had made, a users export included. These are not tied to a website, so they are now for system admins only; visitors still read forms and redirects and submit forms. Site admins and editors, who could use them before, no longer can.
+  
+  MCP API keys are now created only by users who can open the admin, and a key stops working once its user cannot.
+  
+  A new test builds the config with every plugin and fails if a logged-in user without a role may do more than a visitor, outside their own documents. CI now runs historia's unit tests.
+- bc64e52: Preview needs a role on the website. `/next/preview` turns on draft mode, which reads past access control, and it let in any logged-in user with the preview secret; now signing up is open, being logged in says little. It now needs a system admin or a role on the website the host serves, and it refuses a path that leads to another site (`//host`). A person who is logged in without a role on any website is now called a signed-in visitor in the docs, so they are not confused with the `member` site role, the admin's read-only reader. ADR 0001's matrix no longer says the site roles read published content only: they read drafts too. The websites field on users no longer says that leaving it empty gives global access.
+
 ## 0.32.0
 
 ### Minor Changes
