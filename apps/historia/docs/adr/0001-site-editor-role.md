@@ -103,35 +103,41 @@ Example user configuration:
 
 ### 3. Site Role Permissions Matrix
 
-| Collection                 | member          | editor                        | commerce                        | admin                                | system admin                       |
-| -------------------------- | --------------- | ----------------------------- | ------------------------------- | ------------------------------------ | ---------------------------------- |
+| Collection                 | member           | editor                        | commerce                        | admin                                | system admin                       |
+| -------------------------- | ---------------- | ----------------------------- | ------------------------------- | ------------------------------------ | ---------------------------------- |
 | **Content Collections**    |
-| Articles                   | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
-| Happenings                 | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
-| Notes                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
-| Cases                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
-| Pages                      | Read published  | ✅ Create/Update<br>❌ Delete | Read published                  | ✅ Full access                       | ✅ Full access                     |
-| Media                      | Read            | ✅ Create/Update<br>❌ Delete | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Articles                   | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too                | ✅ Full access                       | ✅ Full access                     |
+| Happenings                 | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too                | ✅ Full access                       | ✅ Full access                     |
+| Notes                      | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too                | ✅ Full access                       | ✅ Full access                     |
+| Cases                      | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too                | ✅ Full access                       | ✅ Full access                     |
+| Pages                      | Read, drafts too | ✅ Create/Update<br>❌ Delete | Read, drafts too                | ✅ Full access                       | ✅ Full access                     |
+| Media                      | Read             | ✅ Create/Update<br>❌ Delete | Read                            | ✅ Full access                       | ✅ Full access                     |
 | **E-commerce Collections** |
-| Products                   | Read published  | Read published                | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
-| Carts                      | Own cart only   | Own cart only                 | Read all                        | ✅ Full access                       | ✅ Full access                     |
-| Orders                     | Own orders only | Own orders only               | ✅ Read/Update all<br>❌ Delete | ✅ Full access                       | ✅ Full access                     |
-| Shipments                  | Own shipments   | Own shipments                 | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
-| Transactions               | ❌ No access    | ❌ No access                  | Read only                       | Read only                            | ✅ Full access (system-admin only) |
+| Products                   | Read, drafts too | Read, drafts too              | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
+| Carts                      | Own cart only    | Own cart only                 | Read all                        | ✅ Full access                       | ✅ Full access                     |
+| Orders                     | Own orders only  | Own orders only               | ✅ Read/Update all<br>❌ Delete | ✅ Full access                       | ✅ Full access                     |
+| Shipments                  | Own shipments    | Own shipments                 | ✅ Create/Update<br>❌ Delete   | ✅ Full access                       | ✅ Full access                     |
+| Transactions               | ❌ No access     | ❌ No access                  | Read only                       | Read only                            | ✅ Full access (system-admin only) |
 | **Structural Collections** |
-| Websites                   | Read            | Read                          | Read                            | ❌ Update only<br>(no create/delete) | ✅ Full access                     |
-| Users                      | Read own        | Read own                      | Read own                        | Read own                             | ✅ Full access                     |
-| Organizations              | Read            | ✅ Update own org             | Read                            | ✅ Update own org                    | ✅ Full access                     |
-| Topics                     | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
-| Places                     | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
-| Persons                    | Read            | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Websites                   | Read             | Read                          | Read                            | ❌ Update only<br>(no create/delete) | ✅ Full access                     |
+| Users                      | Read own         | Read own                      | Read own                        | Read own                             | ✅ Full access                     |
+| Organizations              | Read             | ✅ Update own org             | Read                            | ✅ Update own org                    | ✅ Full access                     |
+| Topics                     | Read             | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Places                     | Read             | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
+| Persons                    | Read             | Read                          | Read                            | ✅ Full access                       | ✅ Full access                     |
 
 **Legend**:
 - ✅ = Has permission
 - ❌ = No permission
-- "Read published" = Can only see published content
+- "Read, drafts too" = Can see the site's content, drafts included, without changing it
 - "Own X only" = Can only see/edit their own records
 - Global admin = Users with `system-admin` in global `roles` (super admin)
+
+**Admin access**: any site role, `member` included, lets a user open the admin;
+a user with no site role and no `system-admin` cannot (`access.admin` on users,
+`collections/Users/access/adminPanel.ts`). Such a user is a signed-in visitor of
+the public site. The `member` role is the read-only reader of the admin, not
+membership of the site: it reads every draft of the website.
 
 **Notes on Role Combination**:
 - Permissions are **additive** — users with multiple roles get the union of permissions

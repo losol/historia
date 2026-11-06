@@ -240,7 +240,7 @@ export const Users: CollectionConfig = {
         ...defaultTenantArrayField?.admin,
         position: 'sidebar',
         description:
-          'Optional: Assign user to specific websites/tenants. Leave empty for global access.',
+          'The websites this user has a role on. Without one, the user cannot open the admin, unless they are a system admin.',
       },
     },
   ],

@@ -113,6 +113,12 @@ jobs:
       - name: Typecheck
         run: pnpm --filter @eventuras/historia exec tsc -p tsconfig.json --noEmit
 
+      # Unit tests, among them access/signedInWithoutRole.test.ts: it builds the
+      # config with every plugin and fails if a logged-in user without a role may
+      # do more than a visitor. Needs the workspace packages built above.
+      - name: Test
+        run: pnpm --filter @eventuras/historia test
+
       # Production runs with `push: false` and applies these at startup, so a
       # migration that does not apply cleanly is an outage, not a test failure.
       - name: Run migrations

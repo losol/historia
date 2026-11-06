@@ -83,20 +83,28 @@ With `OIDC_ALLOW_SIGNUP=false`, a person without a user is refused
 A new user has no roles and no tenant access until an admin grants it, unless
 the provider is the source of the global roles (next section).
 
-## Members: logging in without the admin
+## Signed-in visitors: logging in without the admin
 
 Logging in does not open the admin. Only system admins and users with a role on
-a website (admin, editor, commerce or member) can use it; anyone else who logs in
-is a member of the public site, and the admin tells them they are not allowed in.
-Their API access is what the collections allow anyone signed in without a
-website: published shared content (persons, places, media and the like) and
-their own user, and nothing that belongs to a website.
+a website (admin, editor, commerce or member) can use it. Anyone else who logs in
+is a signed-in visitor of the public site, and the admin tells them they are not
+allowed in. Do not give such people the `member` site role to let them see more
+on the site: `member` is the read-only reader of the admin, who reads every draft
+of the website.
+Through the API they may do no more than a visitor, apart from their own user
+and admin preferences: read published shared content (persons, places, media
+and the like), submit forms, and nothing that belongs to a website. Forms, form
+submissions, redirects, imports, exports and the job queue are not tied to a
+website and are for system admins only. `src/access/signedInWithoutRole.test.ts`
+checks this for every collection, the plugins' included, so a collection that
+sets no access of its own, and so falls back to Payload's "any logged-in user",
+fails the build instead of opening up.
 
 That makes `OIDC_ALLOW_SIGNUP=true` safe to leave on: signing up gives a person
 a user and nothing more. Who can sign up is then up to the provider, for
 Keycloak the realm's registration settings.
 
-To log members in from the site, link to the login route with the page to come
+To log visitors in from the site, link to the login route with the page to come
 back to:
 
 ```text
