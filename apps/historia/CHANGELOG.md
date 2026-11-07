@@ -1,5 +1,13 @@
 # @eventuras/historia
 
+## 0.32.2
+
+### Patch Changes
+
+- Updated dependencies [52b8fe8]
+  - @eventuras/vipps@0.3.0
+  - @eventuras/payload-vipps-auth@0.3.3
+
 ## 0.32.1
 
 ### Patch Changes
