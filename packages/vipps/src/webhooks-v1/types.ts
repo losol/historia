@@ -28,6 +28,9 @@ export type RecurringAgreementEventType = (typeof RECURRING_AGREEMENT_EVENTS)[nu
 export type RecurringChargeEventType = (typeof RECURRING_CHARGE_EVENTS)[number];
 export type RecurringWebhookEventType = RecurringAgreementEventType | RecurringChargeEventType;
 
+/** Known values for autocomplete; Vipps may add others, which parse as plain strings. */
+type OpenString<T extends string> = T | (string & {});
+
 /**
  * ePayment and Recurring webhook event types
  */
@@ -55,7 +58,7 @@ export interface RecurringAgreementWebhookPayload extends RecurringWebhookBase {
   agreementUUID?: string;
   agreementExternalId?: string | null;
   /** Applicable to agreement-stopped only. */
-  actor?: 'MERCHANT' | 'USER' | 'ADMIN' | null;
+  actor?: OpenString<'MERCHANT' | 'USER' | 'ADMIN' | 'SYSTEM'> | null;
 }
 
 export interface RecurringChargeWebhookPayload extends RecurringWebhookBase {
@@ -65,15 +68,15 @@ export interface RecurringChargeWebhookPayload extends RecurringWebhookBase {
   transactionId?: string | null;
   /** Integer minor units, unlike the ePayment amount object. */
   amount: number;
-  chargeType: ChargeType;
-  currency: RecurringCurrency;
+  chargeType: OpenString<ChargeType>;
+  currency: OpenString<RecurringCurrency>;
   amountCaptured?: number;
   amountCanceled?: number;
   amountRefunded?: number;
   failureCode?: number | null;
   /** @deprecated Use failureReason. */
   failureText?: string | null;
-  failureReason?: ChargeFailureReason | null;
+  failureReason?: OpenString<ChargeFailureReason> | null;
 }
 
 export type RecurringWebhookPayload =

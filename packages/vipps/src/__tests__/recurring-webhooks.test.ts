@@ -106,20 +106,34 @@ describe('Recurring webhooks', () => {
     },
   );
 
+  it('parses agreement-stopped with actor SYSTEM', () => {
+    const payload = { ...agreement, actor: 'SYSTEM' };
+    expect(parseRecurringWebhookPayload(JSON.stringify(payload))).toEqual(payload);
+  });
+
+  it.each([
+    { ...agreement, actor: 'OTHER' },
+    { ...charge, failureReason: 'unknown' },
+    { ...charge, currency: 'INVALID' },
+    { ...charge, chargeType: 'NEW_TYPE' },
+  ])('accepts unlisted values in informational fields: %j', (payload) => {
+    expect(isValidRecurringWebhookPayload(payload)).toBe(true);
+    expect(parseRecurringWebhookPayload(payload)).toEqual(payload);
+  });
+
   it.each([
     null,
     [],
     {},
     { ...agreement, eventType: 'recurring.unknown.v1' },
     { ...agreement, occurred: undefined },
-    { ...agreement, actor: 'OTHER' },
     { ...agreement, actor: ['USER'] },
     { ...charge, amount: { value: 900, currency: 'NOK' } },
     { ...charge, chargeId: undefined },
     { ...charge, amountCaptured: '900' },
-    { ...charge, failureReason: 'unknown' },
-    { ...charge, currency: 'INVALID' },
+    { ...charge, failureReason: 42 },
     { ...charge, currency: ['NOK'] },
+    { ...charge, currency: undefined },
     { ...charge, chargeType: ['RECURRING'] },
   ])('rejects malformed payloads: %j', (payload) => {
     expect(isValidRecurringWebhookPayload(payload)).toBe(false);
