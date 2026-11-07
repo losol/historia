@@ -42,6 +42,19 @@ export type AgreementCampaign =
   | { type: 'PERIOD_CAMPAIGN'; price: number; period: AgreementInterval }
   | { type: 'EVENT_CAMPAIGN'; price: number; eventDate: string; eventText: string };
 
+/** Campaign read responses have their own schema, including computed expiry dates. */
+export type AgreementCampaignResponse =
+  | {
+      type: 'PRICE_CAMPAIGN';
+      price: number;
+      end: string;
+      /** @deprecated Text displayed in the app to explain the campaign. */
+      explanation?: string;
+    }
+  | { type: 'PERIOD_CAMPAIGN'; price: number; end: string; period: AgreementInterval }
+  | { type: 'EVENT_CAMPAIGN'; price: number; eventDate: string; eventText: string }
+  | { type: 'LEGACY_CAMPAIGN'; price: number; end: string };
+
 export interface InitialCharge {
   /** Integer minor units: 900 = NOK 9.00. */
   amount: number;
@@ -109,10 +122,7 @@ export interface Agreement {
   vippsConfirmationUrl?: string;
   paymentMethod: { blockedSources: 'COMMERCIAL_CARDS'[] };
   history: AgreementEvent[];
-  campaign?:
-    | (AgreementCampaign & { start?: string })
-    | { type: 'LEGACY'; price: number; start?: string; end?: string }
-    | null;
+  campaign?: AgreementCampaignResponse | null;
 }
 
 export interface ListAgreementsOptions {

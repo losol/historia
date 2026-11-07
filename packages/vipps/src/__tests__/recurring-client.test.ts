@@ -271,6 +271,39 @@ describe.each(cases)('$name', (operation) => {
 });
 
 describe('Recurring transport behavior', () => {
+  it('returns a legacy campaign with the documented discriminator and expiry', async () => {
+    const fixture = {
+      ...agreement,
+      campaign: { type: 'LEGACY_CAMPAIGN', price: 100, end: '2026-12-01T00:00:00Z' },
+    } satisfies Agreement;
+    mockResponses(fixture);
+    const result = await getAgreement(config, agreement.id);
+    expect(result).toEqual(fixture);
+    if (result.campaign?.type !== 'LEGACY_CAMPAIGN') throw new Error('Expected legacy campaign');
+    const end: string = result.campaign.end;
+    expect(end).toBe('2026-12-01T00:00:00Z');
+  });
+
+  it('returns the computed end date and period in listed period campaigns', async () => {
+    const fixture = {
+      ...agreement,
+      campaign: {
+        type: 'PERIOD_CAMPAIGN',
+        price: 100,
+        end: '2026-12-01T00:00:00Z',
+        period: { unit: 'MONTH', count: 1 },
+      },
+    } satisfies Agreement;
+    mockResponses([fixture]);
+    const results = await listAgreements(config);
+    expect(results).toEqual([fixture]);
+    const campaign = results[0]?.campaign;
+    if (campaign?.type !== 'PERIOD_CAMPAIGN') throw new Error('Expected period campaign');
+    const end: string = campaign.end;
+    expect(end).toBe('2026-12-01T00:00:00Z');
+    expect(campaign.period).toEqual({ unit: 'MONTH', count: 1 });
+  });
+
   it('uses the same key and body when createCharge is retried', async () => {
     mockResponses({ chargeId: charge.id }, 201);
     mockResponses({ chargeId: charge.id }, 201);
