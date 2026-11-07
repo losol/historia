@@ -1,13 +1,26 @@
 {
   "name": "@eventuras/vipps",
   "version": "0.2.11",
-  "private": true,
   "description": "Vipps MobilePay integration for Eventuras",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/losol/historia.git",
+    "directory": "packages/vipps"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "type": "module",
   "exports": {
     "./epayment-v1": {
       "types": "./dist/epayment-v1/index.d.ts",
       "import": "./dist/epayment-v1/index.js"
+    },
+    "./recurring-v3": {
+      "types": "./dist/recurring-v3/index.d.ts",
+      "import": "./dist/recurring-v3/index.js"
     },
     "./vipps-core": {
       "types": "./dist/vipps-core/index.d.ts",
@@ -25,6 +38,7 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "dev": "vite build --watch",
     "payment:get": "tsx --env-file=.env scripts/get-payment.ts",
+    "recurring:smoke": "tsx --env-file=.env scripts/recurring-smoke.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "test:ui": "vitest --ui",
