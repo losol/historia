@@ -2,6 +2,48 @@
 
 This document describes how to run integration tests against the Vipps MobilePay test environment.
 
+## Recurring API v3
+
+The Recurring client, Userinfo and webhook tests use mocked `fetch`; they need no
+credentials and never contact Vipps:
+
+```bash
+pnpm --filter @eventuras/vipps exec vitest run src/__tests__/recurring-client.test.ts src/__tests__/userinfo.test.ts src/__tests__/recurring-webhooks.test.ts
+pnpm --filter @eventuras/vipps typecheck
+pnpm --filter @eventuras/vipps build
+```
+
+The optional smoke script **does** call apitest. Before running it, confirm that
+the test sales unit/MSN has the **Recurring product enabled**; an ePayment-only
+test MSN is insufficient. Use test credentials for that sales unit and a test user
+who has completed registration in the Vipps/MobilePay test app. No production
+credentials or real customer phone numbers should be used.
+
+In `packages/vipps/.env`, configure the credential variables below, then add:
+
+```dotenv
+VIPPS_API_URL=https://apitest.vipps.no
+VIPPS_TEST_PHONE_NUMBER=your-registered-test-user
+VIPPS_RECURRING_ENABLED=true
+# Optional: accept via the test app rather than the force-accept endpoint.
+# VIPPS_RECURRING_FORCE_ACCEPT=false
+```
+
+```bash
+pnpm --filter @eventuras/vipps recurring:smoke
+```
+
+The script refuses other API origins and requires the explicit enable flag. It
+creates a NOK 1 agreement with an initial `RESERVE_CAPTURE` charge, force-accepts
+(or waits up to two minutes for the test app), reads the agreement/initial charge,
+creates and reads a future recurring charge, and stops the agreement in `finally`.
+Stopping cancels pending/reserved charges. It does not capture funds and does not
+require direct-capture permission. If cleanup fails, use the printed agreement ID
+to stop it in the test portal. Do not run against Vipps unless these prerequisites
+are already configured.
+
+See the official [Recurring test accept guide](https://developer.vippsmobilepay.com/docs/APIs/recurring-api/recurring-api-guide/#force-accept-agreement-in-test-environment).
+
 ## Prerequisites
 
 ### 1. Get Test Credentials

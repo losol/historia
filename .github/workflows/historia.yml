@@ -103,11 +103,11 @@ jobs:
     needs: [changesets, ci, docker]
     if: needs.changesets.outputs.pending == 'false'
     runs-on: ubuntu-latest
-    # Matches the environment in the SDK's trusted publisher on npmjs.com.
+    # Matches the environment in each package's trusted publisher on npmjs.com.
     environment: npm
     permissions:
       contents: write
-      # npm provenance: the published SDK is signed as built by this workflow.
+      # npm provenance: published packages are signed as built by this workflow.
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -124,7 +124,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # `publish` tags every release and publishes @eventuras/historia-sdk to
+      # `publish` tags every release and publishes @eventuras/historia-sdk and @eventuras/vipps to
       # npm (scripts/release-publish.sh). historia's release artifact is still
       # the Docker image, promoted by its tag.
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2

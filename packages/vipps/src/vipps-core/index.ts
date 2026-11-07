@@ -4,6 +4,8 @@
  * Common types, utilities, and helpers for Vipps MobilePay integration.
  */
 
+export { getUserInfo, type UserInfo, type UserInfoAddress } from './userinfo';
+
 /**
  * Vipps API Configuration
  */

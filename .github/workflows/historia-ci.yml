@@ -31,7 +31,11 @@ jobs:
       - name: Typecheck & test (vipps)
         run: |
           pnpm --filter @eventuras/vipps typecheck
-          pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
+          pnpm --filter @eventuras/vipps exec vitest run \
+            src/__tests__/epayment-redaction.test.ts \
+            src/__tests__/recurring-client.test.ts \
+            src/__tests__/userinfo.test.ts \
+            src/__tests__/recurring-webhooks.test.ts
 
       # The demo seed the AppHost runs (apphost/seed). Its own tsconfig, since the
       # AppHost's needs the SDK modules only the Aspire CLI generates.
