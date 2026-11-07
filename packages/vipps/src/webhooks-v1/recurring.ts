@@ -4,11 +4,10 @@ import {
   type RecurringWebhookPayload,
 } from './types';
 
-function isEnumValue(value: unknown, values: readonly string[]): boolean {
-  return typeof value === 'string' && values.includes(value);
-}
-
-/** Validates the documented Recurring envelope without requiring ePayment-only fields. */
+/**
+ * Validates the documented Recurring envelope without requiring ePayment-only fields.
+ * Only eventType must be a known value; other fields are type-checked so new Vipps values still parse.
+ */
 export function isValidRecurringWebhookPayload(
   payload: unknown,
 ): payload is RecurringWebhookPayload {
@@ -26,8 +25,7 @@ export function isValidRecurringWebhookPayload(
   if (RECURRING_AGREEMENT_EVENTS.some((event) => event === p.eventType)) {
     return (
       (p.agreementUUID === undefined || typeof p.agreementUUID === 'string') &&
-      (p.agreementExternalId == null || typeof p.agreementExternalId === 'string') &&
-      (p.actor == null || isEnumValue(p.actor, ['MERCHANT', 'USER', 'ADMIN']))
+      [p.agreementExternalId, p.actor].every((value) => value == null || typeof value === 'string')
     );
   }
 
@@ -36,23 +34,15 @@ export function isValidRecurringWebhookPayload(
     typeof p.chargeId === 'string' &&
     typeof p.amount === 'number' &&
     Number.isFinite(p.amount) &&
-    isEnumValue(p.currency, ['NOK', 'DKK', 'EUR', 'GBP', 'USD', 'SEK']) &&
-    isEnumValue(p.chargeType, ['INITIAL', 'RECURRING', 'UNSCHEDULED']) &&
-    [p.chargeExternalId, p.transactionId, p.failureText].every(
+    typeof p.currency === 'string' &&
+    typeof p.chargeType === 'string' &&
+    [p.chargeExternalId, p.transactionId, p.failureText, p.failureReason].every(
       (value) => value == null || typeof value === 'string',
     ) &&
     [p.amountCaptured, p.amountCanceled, p.amountRefunded].every(
       (value) => value === undefined || (typeof value === 'number' && Number.isFinite(value)),
     ) &&
-    (p.failureCode == null ||
-      (typeof p.failureCode === 'number' && Number.isFinite(p.failureCode))) &&
-    (p.failureReason == null ||
-      isEnumValue(p.failureReason, [
-        'user_action_required',
-        'charge_amount_too_high',
-        'non_technical_error',
-        'technical_error',
-      ]))
+    (p.failureCode == null || (typeof p.failureCode === 'number' && Number.isFinite(p.failureCode)))
   );
 }
 
