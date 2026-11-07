@@ -115,7 +115,7 @@ Calling from another site's browser needs that site's origin in Historia's `CMS_
 
 ## Releasing (maintainers)
 
-Versions go through changesets like the rest of the repo. When a "chore: version packages" PR is merged, the release job tags the release and publishes the SDK to npm if its version is not there yet (`scripts/release-publish.sh`). It uses trusted publishing (OIDC), so no npm token is stored.
+Versions go through changesets like the rest of the repo. When a "chore: version packages" PR is merged, the publish job in `historia.yml` publishes the SDK to npm if its version is not there yet (`scripts/release-publish.sh`). It uses trusted publishing (OIDC), so no npm token is stored.
 
 The first version is published by hand, because npm can only trust a workflow for a package that exists:
 

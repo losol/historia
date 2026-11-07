@@ -89,8 +89,8 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # No layer cache: exporting it took 3-5 minutes a run, and a hit saves
+          # under a minute (apt and pnpm install; any package.json change misses).
           secrets: |
             "cms_secret=${{ secrets.CMS_SECRET }}"
             "sentry_auth_token=${{ secrets.CMS_SENTRY_AUTH_TOKEN }}"
