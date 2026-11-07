@@ -1,5 +1,11 @@
 # @eventuras/vipps
 
+## 0.3.1
+
+### Patch Changes
+
+- d607b94: Recurring webhooks no longer reject an event because `actor`, `currency`, `chargeType` or `failureReason` has a value outside the documented list, so an agreement stopped with `actor: SYSTEM` now parses. Only `eventType` still has to be a known value. The unused `@eventuras/fides-auth` and `openid-client` dependencies are removed.
+
 ## 0.3.0
 
 ### Minor Changes
