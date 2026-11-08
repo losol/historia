@@ -122,4 +122,4 @@ The first version is published by hand, because npm can only trust a workflow fo
 1. Check out the "chore: version packages" branch that carries the SDK's first version. Run `pnpm install`, then `pnpm --filter @eventuras/historia-sdk build`.
 2. Run `cd packages/historia-sdk && pnpm publish --access public --no-git-checks`, logged in to npm (`pnpm login`) as an owner of the `@eventuras` scope.
 3. On npmjs.com, under the package's Settings → Trusted publishing, add GitHub Actions with repository `losol/historia` and workflow `historia.yml`.
-4. Merge the version PR. The release job sees the version on npm and skips it; later versions are published by the job.
+4. Merge the version PR. The publish job in `historia.yml` sees the version on npm and skips it; later versions are published by the job.

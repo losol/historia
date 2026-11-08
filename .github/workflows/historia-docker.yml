@@ -181,7 +181,7 @@ jobs:
           VERSION_TAG="${ORGANIZATION_NAME}/${IMAGE_NAME}:v${VERSION}"
           LATEST_TAG="${ORGANIZATION_NAME}/${IMAGE_NAME}:latest"
 
-          # The release job only tags after the main build has pushed this image,
+          # The tag job only tags after the main build has pushed this image,
           # but a hand-pushed tag can arrive first. Wait rather than fail outright.
           echo "Pulling existing staging image: ${SOURCE_TAG}"
           for attempt in $(seq 1 30); do

@@ -74,8 +74,9 @@ updates:
       default-days: 10
     groups:
       # All action bumps, majors included, in one PR. The PR runs CI and the Docker
-      # build, so a breaking major there shows up before merge. The release job
-      # (changesets/action) only runs on main: read its notes on a major bump.
+      # build, so a breaking major there shows up before merge. The tag job
+      # (changesets/action) and the publish job only run on main: read their
+      # actions' notes on a major bump.
       actions:
         patterns:
           - "*"
