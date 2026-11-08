@@ -1,30 +1,53 @@
 #!/usr/bin/env sh
-# The release job's publish step (changesets/action `publish-script`).
-#
-# 1. Tag every release, as before: the tags promote historia's Docker image, so
-#    nothing below may hold them back.
-# 2. Publish the SDK and Vipps packages to npm when their versions are not there yet,
-#    with npm's trusted publishing (OIDC, no token; the job has `id-token: write`)
-#    and provenance, both of which pnpm 11 supports. A failed publish is reported
-#    as an error but does not fail the step, so the tags are still pushed; the
-#    next release retries it.
+# The publish job in historia.yml: publishes each package below whose version is
+# not on npm yet, with trusted publishing (OIDC) and provenance. Any failure fails
+# the job. Tagging is the tag job's, so this never touches git.
 set -eu
 
-pnpm changeset git-tag
+field() {
+  node -p "require('./$1/package.json').$2"
+}
 
+# Asks the registry, not `npm view`: its CDN can miss a version for minutes after
+# a publish. The query string bypasses that cache.
+on_npm() {
+  curl -fsS "https://registry.npmjs.org/$(echo "$1" | sed 's|/|%2f|')?t=$(date +%s)" |
+    node -e 'let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () =>
+      process.exit(JSON.parse(s).versions?.[process.argv[1]] ? 0 : 1))' "$2"
+}
+
+todo=""
 for dir in packages/historia-sdk packages/vipps; do
-  name="$(node -p "require('./$dir/package.json').name")"
-  version="$(node -p "require('./$dir/package.json').version")"
-
-  if [ -n "$(npm view "$name@$version" version 2>/dev/null || true)" ]; then
-    echo "$name@$version is already on npm."
-    continue
-  fi
-
-  pnpm --filter "$name" build
-  if (cd "$dir" && pnpm publish --provenance --access public --no-git-checks); then
-    echo "Published $name@$version to npm."
+  if on_npm "$(field "$dir" name)" "$(field "$dir" version)"; then
+    echo "$(field "$dir" name)@$(field "$dir" version) is already on npm."
   else
-    echo "::error::Publishing $name@$version to npm failed. Is trusted publishing set up for losol/historia's historia.yml on npmjs.com?"
+    todo="$todo $dir"
   fi
 done
+
+if [ -z "$todo" ]; then
+  echo "Nothing to publish."
+  exit 0
+fi
+
+pnpm install --frozen-lockfile --ignore-scripts
+
+failed=0
+for dir in $todo; do
+  name="$(field "$dir" name)"
+  version="$(field "$dir" version)"
+  # test:unit, where there is one, leaves out suites that need live credentials.
+  tests="$(node -p "require('./$dir/package.json').scripts['test:unit'] ? 'test:unit' : 'test'")"
+
+  if pnpm --filter "$name" typecheck &&
+    pnpm --filter "$name" run "$tests" &&
+    pnpm --filter "$name" build &&
+    (cd "$dir" && pnpm publish --provenance --access public --no-git-checks); then
+    echo "Published $name@$version to npm."
+  else
+    echo "::error::$name@$version was not published. If its checks passed, check its trusted publisher on npmjs.com: losol/historia, historia.yml, environment npm."
+    failed=1
+  fi
+done
+
+exit "$failed"
