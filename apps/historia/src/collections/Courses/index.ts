@@ -5,7 +5,6 @@ import { siteEditors } from '@/access/siteRoleAccess';
 import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
-import { CourseSection } from '@/blocks/CourseSection/config';
 import { Image } from '@/blocks/Image/config';
 import { config } from '@/fields/config';
 import { contributors } from '@/fields/contributors';
@@ -19,17 +18,21 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
+import { syllabus } from './fields/syllabus';
 
 /**
- * A course: lessons in sections, taken at the participant's own pace. The
- * course page is the `story`; the `syllabus` says which lessons the course has
- * and in what order. Lessons are their own documents and can be used in more
- * than one course.
+ * A course, small or large, taken at the participant's own pace.
+ *
+ * A small course is this document alone: the `story` is the course, and the
+ * `syllabus` stays empty. A larger one adds lessons in the `syllabus`, in one
+ * section or several, and the `story` becomes its front page. Growing from the
+ * one to the other is adding a section, not changing kind. Lessons are their
+ * own documents and can be used in more than one course.
  *
  * Not registered in the Payload config yet: the model first, the migration
- * when the frontend and access come. Enrolment, progress and quizzes are
- * separate collections later; `access` is stored now so they need no schema
- * change on the course.
+ * when the frontend and access come. Enrolment and progress are separate
+ * collections later; `access` is stored now so they need no schema change on
+ * the course. See docs/adr/0012-courses-and-lessons.md.
  */
 export const Courses: CollectionConfig = {
   slug: 'courses',
@@ -42,6 +45,7 @@ export const Courses: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'slug', 'access', 'updatedAt'],
+    group: 'Courses',
     useAsTitle: 'title',
   },
   fields: [
@@ -50,22 +54,7 @@ export const Courses: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          fields: [
-            title,
-            lead,
-            image,
-            storyField([Content, Image]),
-            {
-              name: 'syllabus',
-              type: 'blocks',
-              blocks: [CourseSection],
-              labels: { singular: 'Section', plural: 'Sections' },
-              admin: {
-                description:
-                  'The sections of the course and the lessons in each, in the order participants take them.',
-              },
-            },
-          ],
+          fields: [title, lead, image, storyField([Content, Image]), syllabus],
         },
         {
           label: 'Details',
@@ -81,6 +70,16 @@ export const Courses: CollectionConfig = {
               admin: {
                 description:
                   'Who can read the lessons. Enrolment is not enforced yet; the value is kept so it will be.',
+              },
+            },
+            {
+              name: 'durationMinutes',
+              type: 'number',
+              min: 0,
+              admin: {
+                step: 1,
+                description:
+                  'About how long the course takes, in minutes. Leave empty to use the sum of the lessons.',
               },
             },
             contributors,
