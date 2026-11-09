@@ -1,6 +1,7 @@
 # ADR 0007 — Terms/Glossary Collection
 
 ## Status
+
 Draft
 
 ## Context
@@ -66,6 +67,7 @@ This flexibility allows editors to choose the most appropriate structure based o
 - **Rationale:** Editors need to review and refine definitions before publication
 - **No full history:** Definitions are updated in place, not preserved as versions
 - **Configuration:**
+
   ```typescript
   versions: {
     drafts: {
@@ -115,7 +117,8 @@ export const Terms: CollectionConfig = {
       required: false,
       label: 'Context',
       admin: {
-        description: 'Optional context/specialization (e.g., "historical method", "media studies"). Leave empty for general terms.',
+        description:
+          'Optional context/specialization (e.g., "historical method", "media studies"). Leave empty for general terms.',
       },
     },
     {
@@ -137,7 +140,8 @@ export const Terms: CollectionConfig = {
       minRows: 1,
       label: 'Definitions',
       admin: {
-        description: 'Add multiple definitions if the term has different meanings within the same context.',
+        description:
+          'Add multiple definitions if the term has different meanings within the same context.',
       },
       fields: [
         {
@@ -166,7 +170,8 @@ export const Terms: CollectionConfig = {
           type: 'text',
           label: 'Variant',
           admin: {
-            description: 'Optional sub-context or variant (e.g., "early period", "modern usage", "legal")',
+            description:
+              'Optional sub-context or variant (e.g., "early period", "modern usage", "legal")',
           },
         },
         {
@@ -199,11 +204,13 @@ export const Terms: CollectionConfig = {
       admin: {
         description: 'Alternative terms, translations, or common misspellings',
       },
-      fields: [{
-        name: 'synonym',
-        type: 'text',
-        required: true,
-      }],
+      fields: [
+        {
+          name: 'synonym',
+          type: 'text',
+          required: true,
+        },
+      ],
     },
 
     // Semantic relationships
@@ -240,16 +247,14 @@ export const Terms: CollectionConfig = {
 
         // Auto-generate title from term + context
         if (data.term) {
-          data.title = data.context
-            ? `${data.term} (${data.context})`
-            : data.term;
+          data.title = data.context ? `${data.term} (${data.context})` : data.term;
         }
 
         return data;
       },
     ],
   },
-}
+};
 ```
 
 ### Key Design Decisions

@@ -1,14 +1,38 @@
 /**
- * Vipps MobilePay ePayment Webhooks
+ * Vipps MobilePay ePayment and Recurring Webhooks
  *
  * Types and utilities for handling Vipps ePayment webhook events.
  * https://developer.vippsmobilepay.com/docs/APIs/epayment-api/api-guide/webhooks/
  */
 
+import type { ChargeFailureReason, ChargeType, RecurringCurrency } from '../recurring-v3/types';
 import type { PaymentAmount } from '../vipps-core';
 
+export const RECURRING_AGREEMENT_EVENTS = [
+  'recurring.agreement-activated.v1',
+  'recurring.agreement-rejected.v1',
+  'recurring.agreement-stopped.v1',
+  'recurring.agreement-expired.v1',
+] as const;
+
+export const RECURRING_CHARGE_EVENTS = [
+  'recurring.charge-reserved.v1',
+  'recurring.charge-captured.v1',
+  'recurring.charge-canceled.v1',
+  'recurring.charge-refunded.v1',
+  'recurring.charge-failed.v1',
+  'recurring.charge-creation-failed.v1',
+] as const;
+
+export type RecurringAgreementEventType = (typeof RECURRING_AGREEMENT_EVENTS)[number];
+export type RecurringChargeEventType = (typeof RECURRING_CHARGE_EVENTS)[number];
+export type RecurringWebhookEventType = RecurringAgreementEventType | RecurringChargeEventType;
+
+/** Known values for autocomplete; Vipps may add others, which parse as plain strings. */
+type OpenString<T extends string> = T | (string & {});
+
 /**
- * ePayment webhook event types
+ * ePayment and Recurring webhook event types
  */
 export type WebhookEventType =
   | 'epayments.payment.created.v1'
@@ -18,7 +42,46 @@ export type WebhookEventType =
   | 'epayments.payment.captured.v1'
   | 'epayments.payment.refunded.v1'
   | 'epayments.payment.authorized.v1'
-  | 'epayments.payment.terminated.v1';
+  | 'epayments.payment.terminated.v1'
+  | RecurringWebhookEventType;
+
+interface RecurringWebhookBase {
+  agreementId: string;
+  /** ISO 8601 UTC timestamp (not the ePayment timestamp field). */
+  occurred: string;
+  /** Present in current deliveries; older examples omit it. */
+  msn?: string;
+}
+
+export interface RecurringAgreementWebhookPayload extends RecurringWebhookBase {
+  eventType: RecurringAgreementEventType;
+  agreementUUID?: string;
+  agreementExternalId?: string | null;
+  /** Applicable to agreement-stopped only. */
+  actor?: OpenString<'MERCHANT' | 'USER' | 'ADMIN' | 'SYSTEM'> | null;
+}
+
+export interface RecurringChargeWebhookPayload extends RecurringWebhookBase {
+  eventType: RecurringChargeEventType;
+  chargeId: string;
+  chargeExternalId?: string | null;
+  transactionId?: string | null;
+  /** Integer minor units, unlike the ePayment amount object. */
+  amount: number;
+  chargeType: OpenString<ChargeType>;
+  currency: OpenString<RecurringCurrency>;
+  amountCaptured?: number;
+  amountCanceled?: number;
+  amountRefunded?: number;
+  failureCode?: number | null;
+  /** @deprecated Use failureReason. */
+  failureText?: string | null;
+  failureReason?: OpenString<ChargeFailureReason> | null;
+}
+
+export type RecurringWebhookPayload =
+  | RecurringAgreementWebhookPayload
+  | RecurringChargeWebhookPayload;
 
 /**
  * Payment event name (same as in PaymentEvent from epayment-v1)

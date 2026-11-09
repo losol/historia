@@ -6,6 +6,7 @@
 import { handshakeCookies, redirect, setCookieHeader } from '../cookies';
 import { createLogger } from '../logger';
 import { getPublicRequestOrigin, requestUrl } from '../origin';
+import { RETURN_TO_PARAM, safeReturnPath } from '../return-path';
 import type { IncomingRequest, OidcUserInfo, ResolvedOidcProvider } from '../types';
 
 /** The handshake cookies live this long; a login takes seconds. */
@@ -37,12 +38,21 @@ export async function handleOidcLogin<TUser extends OidcUserInfo>(
     // The verifier is kept in a cookie, not in memory, so it survives a restart
     // and works with several instances. The redirect URI goes along so the
     // callback uses the very same one, whatever host it is reached on.
-    const secure = requestUrl(request).protocol === 'https:' || origin.startsWith('https:');
+    const url = requestUrl(request);
+    const secure = url.protocol === 'https:' || origin.startsWith('https:');
     const cookies = handshakeCookies(provider.name, pkce.state);
-    return redirect(authUrl, [
+    const handshake = [
       setCookieHeader(cookies.verifier, pkce.code_verifier, { maxAge: HANDSHAKE_MAX_AGE, secure }),
       setCookieHeader(cookies.redirectUri, redirectUri, { maxAge: HANDSHAKE_MAX_AGE, secure }),
-    ]);
+    ];
+    // Where the page that started the login wants the person back, if anywhere.
+    const returnTo = safeReturnPath(url.searchParams.get(RETURN_TO_PARAM), provider.basePath);
+    if (returnTo) {
+      handshake.push(
+        setCookieHeader(cookies.returnTo, returnTo, { maxAge: HANDSHAKE_MAX_AGE, secure }),
+      );
+    }
+    return redirect(authUrl, handshake);
   } catch (error) {
     log.error({ error }, 'Failed to start login');
     return new Response('Failed to start login', { status: 500 });

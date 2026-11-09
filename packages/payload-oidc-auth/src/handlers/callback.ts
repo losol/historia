@@ -17,6 +17,7 @@ import {
 } from '../cookies';
 import { createLogger } from '../logger';
 import { getPublicRequestOrigin, requestUrl } from '../origin';
+import { RETURN_TO_PARAM, safeReturnPath } from '../return-path';
 import type { IncomingRequest, OidcLoginError, OidcUserInfo, ResolvedOidcProvider } from '../types';
 import { findOrCreateUser, OidcLoginFailure } from '../users';
 import { redirectUriFor } from './login';
@@ -59,7 +60,11 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
   const state = isValidState(rawState) ? rawState : undefined;
   const cookies = state ? handshakeCookies(provider.name, state) : undefined;
   const clearHandshake = cookies
-    ? [clearCookieHeader(cookies.verifier, secure), clearCookieHeader(cookies.redirectUri, secure)]
+    ? [
+        clearCookieHeader(cookies.verifier, secure),
+        clearCookieHeader(cookies.redirectUri, secure),
+        clearCookieHeader(cookies.returnTo, secure),
+      ]
     : [];
   const withClearedHandshake = (response: Response) => {
     for (const cookie of clearHandshake) response.headers.append('Set-Cookie', cookie);
@@ -116,9 +121,14 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
     };
     const sessionToken = await createEncryptedJWT(pending, getSessionSecret());
 
+    // The return path rides along in the query; the session route checks it again.
+    const sessionUrl = new URL(`${provider.basePath}/session`, new URL(redirectUri).origin);
+    const returnTo = safeReturnPath(getCookie(request, cookies.returnTo), provider.basePath);
+    if (returnTo) sessionUrl.searchParams.set(RETURN_TO_PARAM, returnTo);
+
     log.info({ userId: user.id }, 'Login succeeded, handing over to the session route');
     return withClearedHandshake(
-      redirect(new URL(`${provider.basePath}/session`, new URL(redirectUri).origin), [
+      redirect(sessionUrl, [
         setCookieHeader(pendingSessionCookie(provider).name, sessionToken, {
           maxAge: PENDING_SESSION_MAX_AGE,
           secure,

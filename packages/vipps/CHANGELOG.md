@@ -1,5 +1,17 @@
 # @eventuras/vipps
 
+## 0.3.1
+
+### Patch Changes
+
+- d607b94: Recurring webhooks no longer reject an event because `actor`, `currency`, `chargeType` or `failureReason` has a value outside the documented list, so an agreement stopped with `actor: SYSTEM` now parses. Only `eventType` still has to be a known value. The unused `@eventuras/fides-auth` and `openid-client` dependencies are removed.
+
+## 0.3.0
+
+### Minor Changes
+
+- 52b8fe8: Add the `@eventuras/vipps/recurring-v3` merchant agreement and charge client, Userinfo support in `vipps-core`, and Recurring webhook events and parsing. Make the package public with dist-only npm packaging and include it in the existing release workflow. This minor release advances 0.2.11 to 0.3.0.
+
 ## 0.2.11
 
 ### Patch Changes

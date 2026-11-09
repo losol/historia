@@ -41,10 +41,10 @@ jobs:
   # then tags the new version, and the tag triggers the retag job in
   # historia-docker.yml, which promotes the image to `vX.Y.Z` and `latest`.
   #
-  # The two steps are separate jobs so the version PR does not wait for the
-  # Docker build: while changesets are pending, `version` opens or updates the
-  # PR right away. Once they are released (the version PR is merged), `release`
-  # tags and publishes, after CI and Docker.
+  # The steps are separate jobs so nothing waits longer than it must: while
+  # changesets are pending, `version` opens or updates the PR right away. Once
+  # the version PR is merged, `tag` tags after CI and Docker, and `publish`
+  # publishes the npm packages without waiting for either.
   changesets:
     name: Pending changesets
     if: github.event_name == 'push'
@@ -82,8 +82,8 @@ jobs:
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -93,22 +93,18 @@ jobs:
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           version-script: pnpm changeset:version
-          commit-message: 'chore: version packages'
-          pr-title: 'chore: version packages'
+          commit-message: "chore: version packages"
+          pr-title: "chore: version packages"
 
   # `needs: docker` matters: the tag must not exist before the image it points
   # at has been pushed, or the retag has nothing to promote.
-  release:
-    name: Release
+  tag:
+    name: Tag release
     needs: [changesets, ci, docker]
     if: needs.changesets.outputs.pending == 'false'
     runs-on: ubuntu-latest
-    # Matches the environment in the SDK's trusted publisher on npmjs.com.
-    environment: npm
     permissions:
       contents: write
-      # npm provenance: the published SDK is signed as built by this workflow.
-      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -118,15 +114,40 @@ jobs:
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # `publish` tags every release and publishes @eventuras/historia-sdk to
-      # npm (scripts/release-publish.sh). historia's release artifact is still
-      # the Docker image, promoted by its tag.
+      # Tags every new version. historia's release artifact is the Docker image,
+      # promoted by its tag; the npm packages are the publish job's.
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          publish-script: pnpm changeset:publish
+          publish-script: pnpm changeset:tag
+
+  # Publishes @eventuras/historia-sdk and @eventuras/vipps when their version is
+  # not on npm yet (scripts/release-publish.sh). Needs neither CI nor Docker. A
+  # failed publish fails the job, and the next push to main retries it.
+  publish:
+    name: Publish to npm
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # Matches the environment in each package's trusted publisher on npmjs.com.
+    environment: npm
+    permissions:
+      contents: read
+      # Trusted publishing and provenance: npm accepts this workflow's OIDC token.
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Publish
+        run: pnpm changeset:publish

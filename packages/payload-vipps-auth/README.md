@@ -37,14 +37,14 @@ export { VippsLoginButton } from '@eventuras/payload-vipps-auth/client';
 
 `vippsProvider` takes:
 
-| Option | Default | |
-|---|---|---|
-| `clientId`, `clientSecret` | required | From the Vipps portal |
-| `apiUrl` | `https://apitest.vipps.no` | `https://api.vipps.no` in production |
-| `scope` | `openid name phoneNumber address email` | |
-| `subscriptionKey`, `merchantSerialNumber` | none | Headers Vipps wants on the userinfo call |
-| `mapVippsUser(vippsUser, existingUser)` | standard claims plus phone | The fields to write on the user. A plain update: merge array fields such as addresses through `existingUser`. |
-| `redirectUri`, `basePath`, `allowSignup`, `requireVerifiedEmail` | see the plugin | Passed through to the provider |
+| Option                                                           | Default                                 |                                                                                                               |
+| ---------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `clientId`, `clientSecret`                                       | required                                | From the Vipps portal                                                                                         |
+| `apiUrl`                                                         | `https://apitest.vipps.no`              | `https://api.vipps.no` in production                                                                          |
+| `scope`                                                          | `openid name phoneNumber address email` |                                                                                                               |
+| `subscriptionKey`, `merchantSerialNumber`                        | none                                    | Headers Vipps wants on the userinfo call                                                                      |
+| `mapVippsUser(vippsUser, existingUser)`                          | standard claims plus phone              | The fields to write on the user. A plain update: merge array fields such as addresses through `existingUser`. |
+| `redirectUri`, `basePath`, `allowSignup`, `requireVerifiedEmail` | see the plugin                          | Passed through to the provider                                                                                |
 
 ## Users
 

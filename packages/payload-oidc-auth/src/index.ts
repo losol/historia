@@ -13,6 +13,7 @@ export { createOidcClient } from './oidc-client';
 export { getPublicRequestOrigin } from './origin';
 export { oidcAuthPlugin, oidcEndpoints } from './plugin';
 export { DEFAULT_SCOPE, resolveConfig, resolveProvider, strategyName } from './provider';
+export { RETURN_TO_PARAM, safeReturnPath } from './return-path';
 export { createOidcAuthStrategy } from './strategy';
 export * from './types';
 export { findOrCreateUser, IDENTITIES_FIELD, identitiesField, OidcLoginFailure } from './users';

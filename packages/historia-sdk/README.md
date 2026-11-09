@@ -32,13 +32,13 @@ Historia serves several websites from one deployment and answers each domain wit
 
 ## Options
 
-| Option | Default | |
-|---|---|---|
-| `baseUrl` | required | The website's address |
-| `locale` | `no` | Content language (`no`, `en`) |
-| `fetch` | global `fetch` | Your own fetch, e.g. with caching (`next: { revalidate }` in Next.js via a wrapper) |
-| `headers` | none | Extra headers on every request |
-| `timeoutMs` | `10000` | Give up on a request after this long |
+| Option      | Default        |                                                                                     |
+| ----------- | -------------- | ----------------------------------------------------------------------------------- |
+| `baseUrl`   | required       | The website's address                                                               |
+| `locale`    | `no`           | Content language (`no`, `en`)                                                       |
+| `fetch`     | global `fetch` | Your own fetch, e.g. with caching (`next: { revalidate }` in Next.js via a wrapper) |
+| `headers`   | none           | Extra headers on every request                                                      |
+| `timeoutMs` | `10000`        | Give up on a request after this long                                                |
 
 Every call also takes a `signal` to cancel it.
 
@@ -115,12 +115,11 @@ Calling from another site's browser needs that site's origin in Historia's `CMS_
 
 ## Releasing (maintainers)
 
-Versions go through changesets like the rest of the repo. When a "chore: version packages" PR is merged, the release job tags the release and publishes the SDK to npm if its version is not there yet (`scripts/release-publish.sh`). It uses trusted publishing (OIDC), so no npm token is stored.
+Versions go through changesets like the rest of the repo. When a "chore: version packages" PR is merged, the publish job in `historia.yml` publishes the SDK to npm if its version is not there yet (`scripts/release-publish.sh`). It uses trusted publishing (OIDC), so no npm token is stored.
 
 The first version is published by hand, because npm can only trust a workflow for a package that exists:
 
 1. Check out the "chore: version packages" branch that carries the SDK's first version. Run `pnpm install`, then `pnpm --filter @eventuras/historia-sdk build`.
 2. Run `cd packages/historia-sdk && pnpm publish --access public --no-git-checks`, logged in to npm (`pnpm login`) as an owner of the `@eventuras` scope.
 3. On npmjs.com, under the package's Settings → Trusted publishing, add GitHub Actions with repository `losol/historia` and workflow `historia.yml`.
-4. Merge the version PR. The release job sees the version on npm and skips it; later versions are published by the job.
-
+4. Merge the version PR. The publish job in `historia.yml` sees the version on npm and skips it; later versions are published by the job.

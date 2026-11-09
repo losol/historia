@@ -34,6 +34,7 @@ We will enable **Payload CMS API Keys** on the Users collection.
 ### Implementation
 
 1. **Enable API keys on Users collection:**
+
    ```typescript
    auth: {
      useAPIKey: true,
@@ -54,6 +55,7 @@ We will enable **Payload CMS API Keys** on the Users collection.
    - Non-admin users (including tenant admins and self-updates) cannot access API key fields
 
 4. **Usage:**
+
    ```bash
    # Example: Upload media via API key
    curl -X POST https://historia.example.com/api/media \
@@ -84,11 +86,11 @@ Payload CMS API keys are:
 ### Negative
 
 - **User account required** - Each API integration needs a dedicated user account
-  - *Mitigation:* Create service accounts (e.g., `automation@historia.local`, `media-import@historia.local`)
+  - _Mitigation:_ Create service accounts (e.g., `automation@historia.local`, `media-import@historia.local`)
 - **No fine-grained scoping** - Cannot limit a key to specific collections or operations
-  - *Mitigation:* Use users with restricted roles (e.g., site-editor can't delete, only admins can)
+  - _Mitigation:_ Use users with restricted roles (e.g., site-editor can't delete, only admins can)
 - **Admin overhead** - System admins must manually create service accounts and keys
-  - *Mitigation:* Acceptable given security benefits and infrequent setup
+  - _Mitigation:_ Acceptable given security benefits and infrequent setup
 
 ### Alternative Considered: Collection-Level API Keys
 
@@ -134,7 +136,7 @@ fields: [
     },
   },
   // Similar for 'apiKey' and 'apiKeyIndex' fields
-]
+];
 ```
 
 #### Layer 2: beforeChange Hook Protection

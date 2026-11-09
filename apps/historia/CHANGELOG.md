@@ -1,5 +1,65 @@
 # @eventuras/historia
 
+## 0.32.3
+
+### Patch Changes
+
+- Updated dependencies [d607b94]
+  - @eventuras/vipps@0.3.1
+  - @eventuras/payload-vipps-auth@0.3.4
+
+## 0.32.2
+
+### Patch Changes
+
+- Updated dependencies [52b8fe8]
+  - @eventuras/vipps@0.3.0
+  - @eventuras/payload-vipps-auth@0.3.3
+
+## 0.32.1
+
+### Patch Changes
+
+- f76beae: Forms, form submissions, redirects, imports, exports and the job queue were open to every logged-in user, since their plugins set no access for it and Payload then lets anyone logged in through. With signup on, that is anyone with an OIDC or Vipps account: they could read every form submission, change where a form's emails go, add redirects, and download the exports an admin had made, a users export included. These are not tied to a website, so they are now for system admins only; visitors still read forms and redirects and submit forms. Site admins and editors, who could use them before, no longer can.
+  
+  MCP API keys are now created only by users who can open the admin, and a key stops working once its user cannot.
+  
+  A new test builds the config with every plugin and fails if a logged-in user without a role may do more than a visitor, outside their own documents. CI now runs historia's unit tests.
+- bc64e52: Preview needs a role on the website. `/next/preview` turns on draft mode, which reads past access control, and it let in any logged-in user with the preview secret; now signing up is open, being logged in says little. It now needs a system admin or a role on the website the host serves, and it refuses a path that leads to another site (`//host`). A person who is logged in without a role on any website is now called a signed-in visitor in the docs, so they are not confused with the `member` site role, the admin's read-only reader. ADR 0001's matrix no longer says the site roles read published content only: they read drafts too. The websites field on users no longer says that leaving it empty gives global access.
+
+## 0.32.0
+
+### Minor Changes
+
+- d14bf2c: Logging in no longer opens the admin by itself: only system admins and users with a role on a website can use it. Anyone else who logs in, such as a person who signed up through the identity provider, is a member of the public site. That makes `OIDC_ALLOW_SIGNUP=true` safe to leave on. A login from the admin's button now also comes back to the deep link the person was trying to open. See `docs/OIDC_LOGIN_SETUP.md`.
+
+### Patch Changes
+
+- Updated dependencies [d14bf2c]
+  - @eventuras/payload-oidc-auth@0.2.0
+  - @eventuras/payload-vipps-auth@0.3.2
+
+## 0.31.1
+
+### Patch Changes
+
+- 226ec5f: Only a system admin can add a user to a website or change their site roles. The `tenants` field on users had no field-level access, so a user could join any website as its admin by updating their own document, and a site admin could do the same for the users of their sites.
+
+## 0.31.0
+
+### Minor Changes
+
+- a94812f: A "Happenings" block for pages: the site's upcoming happenings as a compact list, the next ones first, with a heading, a limit and the option to include past ones.
+- 5123449: With `OIDC_SYSTEM_ADMIN_ROLE` set, the OIDC provider (Keycloak) is the source of the global roles: every login through it sets `roles` from its claims, so a user with the named role is a system admin and one without it is not, whatever was granted by hand. The roles of such users are read-only in the admin, and a first user the provider creates no longer becomes a system admin by being first (one created with a password still does). `OIDC_ROLES_CLAIM` says where the roles are in the userinfo (default `realm_access.roles`). See `docs/OIDC_LOGIN_SETUP.md`.
+- 33a49f2: `PASSWORD_LOGIN_ENABLED=false` makes an identity provider the only way into the admin: the login page loses the email and password form, and login, forgot password and reset password answer 403 over REST and GraphQL. Sessions and API keys are unaffected. Ignored, with an error logged, unless OIDC or Vipps login is on. Setting it back to `true` is the break-glass; see `docs/OIDC_LOGIN_SETUP.md`.
+
+### Patch Changes
+
+- 8edae0e: Only a system admin can grant or take away the global `system-admin` role. The field's access let site admins through as well, so a site admin could make any user they may update, themselves included, a system admin. The first user on an empty install still becomes one.
+- Updated dependencies [5123449]
+  - @eventuras/payload-oidc-auth@0.1.1
+  - @eventuras/payload-vipps-auth@0.3.1
+
 ## 0.30.0
 
 ### Minor Changes

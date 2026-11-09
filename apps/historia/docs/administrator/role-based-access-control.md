@@ -23,11 +23,32 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 
 **Important:** As of v3.x, only `system-admin` exists as a global role. All other access must be granted through site-specific roles assigned per website.
 
+### Who can open the admin
+
+Being a user is not enough. The admin opens for system admins and for users with
+a role on at least one website, `member` included. Anyone else who logs in, such
+as a person who signed up through Tessera or Vipps or a customer the Vipps
+checkout made a user, is a **signed-in visitor**: they use the public site, and
+the admin tells them they are not allowed in. Through the API they may do no
+more than a visitor, apart from reading and editing their own user.
+
+The same rule reaches past the admin:
+
+- **Preview** of drafts works for a system admin, and otherwise only on a website
+  the user has a role on.
+- **MCP API keys** are created only by users who can open the admin, and a key
+  stops working once its user cannot.
+
+Some collections are not tied to a website and are for **system admins only**:
+forms, form submissions, redirects, imports, exports and the job queue. Site
+admins and editors see forms and redirects but cannot change them.
+
 ---
 
 ## Site Roles Explained
 
 ### 👑 Admin
+
 **Full control of the website/tenant**
 
 **Can do:**
@@ -46,6 +67,7 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 ---
 
 ### ✍️ Editor
+
 **Content creation and editorial work**
 
 **Can do:**
@@ -67,6 +89,7 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 ---
 
 ### 🛒 Commerce
+
 **E-commerce and store management**
 
 **Can do:**
@@ -86,6 +109,7 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 ---
 
 ### 👥 Member
+
 **Read-only access with draft visibility**
 
 **Can do:**
@@ -100,9 +124,18 @@ Historia uses a **role-based access control (RBAC)** system to manage what users
 
 **Use case:** Reviewers, stakeholders, clients with preview access
 
+**Not for:** people who use the public site, such as course participants or
+customers. A member opens the admin and reads every draft of the website; a
+signed-in visitor needs no role at all.
+
 ---
 
 ## Assigning Roles to Users
+
+Only a **system admin** can add a user to a website or change their site roles.
+A site admin can edit the users of their own websites, but the Tenants field is
+read-only for them, as it is for a user editing their own profile: otherwise
+either could join any website as its admin.
 
 ### In Payload Admin UI
 
@@ -143,34 +176,34 @@ Sarah Johnson
 
 ### Content Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Articles** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Happenings** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Notes** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Cases** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full |
-| **Pages** | Read published | Read published | Read published | ✅ Full | ✅ Full |
-| **Media** | Read | ✅ Upload/Edit<br>❌ Delete | Read | ✅ Full | ✅ Full |
+| Collection     | Member         | Editor                      | Commerce       | Admin   | Global Admin |
+| -------------- | -------------- | --------------------------- | -------------- | ------- | ------------ |
+| **Articles**   | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Happenings** | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Notes**      | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Cases**      | Read published | ✅ Create/Edit<br>❌ Delete | Read published | ✅ Full | ✅ Full      |
+| **Pages**      | Read published | Read published              | Read published | ✅ Full | ✅ Full      |
+| **Media**      | Read           | ✅ Upload/Edit<br>❌ Delete | Read           | ✅ Full | ✅ Full      |
 
 ### E-commerce Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Products** | Read published | Read published | ✅ Create/Edit<br>❌ Delete | ✅ Full | ✅ Full |
-| **Carts** | Own cart only | Own cart only | View all | ✅ Full | ✅ Full |
-| **Orders** | Own orders | Own orders | ✅ View/Update<br>❌ Delete | ✅ Full | ✅ Full |
-| **Shipments** | Own shipments | Own shipments | ✅ Create/Update<br>❌ Delete | ✅ Full | ✅ Full |
-| **Transactions** | ❌ No access | ❌ No access | View only | ✅ Full | ✅ Full |
+| Collection       | Member         | Editor         | Commerce                      | Admin   | Global Admin |
+| ---------------- | -------------- | -------------- | ----------------------------- | ------- | ------------ |
+| **Products**     | Read published | Read published | ✅ Create/Edit<br>❌ Delete   | ✅ Full | ✅ Full      |
+| **Carts**        | Own cart only  | Own cart only  | View all                      | ✅ Full | ✅ Full      |
+| **Orders**       | Own orders     | Own orders     | ✅ View/Update<br>❌ Delete   | ✅ Full | ✅ Full      |
+| **Shipments**    | Own shipments  | Own shipments  | ✅ Create/Update<br>❌ Delete | ✅ Full | ✅ Full      |
+| **Transactions** | ❌ No access   | ❌ No access   | View only                     | ✅ Full | ✅ Full      |
 
 ### Structural Collections
 
-| Collection | Member | Editor | Commerce | Admin | Global Admin |
-|------------|--------|--------|----------|-------|--------------|
-| **Websites** | Read | Read | Read | Update only | ✅ Full |
-| **Organizations** | Read | ✅ Update | Read | ✅ Update | ✅ Full |
-| **Topics** | Read | Read | Read | ✅ Full | ✅ Full |
-| **Places** | Read | Read | Read | ✅ Full | ✅ Full |
-| **Persons** | Read | Read | Read | ✅ Full | ✅ Full |
+| Collection        | Member | Editor    | Commerce | Admin       | Global Admin |
+| ----------------- | ------ | --------- | -------- | ----------- | ------------ |
+| **Websites**      | Read   | Read      | Read     | Update only | ✅ Full      |
+| **Organizations** | Read   | ✅ Update | Read     | ✅ Update   | ✅ Full      |
+| **Topics**        | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
+| **Places**        | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
+| **Persons**       | Read   | Read      | Read     | ✅ Full     | ✅ Full      |
 
 **Legend:**
 - ✅ = Has permission
@@ -184,6 +217,7 @@ Sarah Johnson
 ## Common Use Cases
 
 ### Scenario 1: Blog with Multiple Writers
+
 **Setup:**
 - Website: `company-blog.com`
 - User A: `editor` (writes articles)
@@ -195,6 +229,7 @@ Sarah Johnson
 ---
 
 ### Scenario 2: E-commerce Store with Content Team
+
 **Setup:**
 - Website: `online-store.com`
 - User A: `editor` (writes product descriptions and blog posts)
@@ -207,6 +242,7 @@ Sarah Johnson
 ---
 
 ### Scenario 3: Multi-Site Agency
+
 **Setup:**
 - User (Agency Manager):
   - `client-a.com` → `admin`
@@ -225,24 +261,28 @@ Sarah Johnson
 ## Troubleshooting
 
 ### "User cannot see website in admin UI"
+
 **Cause:** User is not assigned to the website's tenants.
 **Solution:** Add user to website in **Tenants** field with appropriate role.
 
 ---
 
 ### "Editor cannot delete content"
+
 **Cause:** Only admins and global admins can delete.
 **Solution:** This is by design. Assign `admin` role if deletion is required.
 
 ---
 
 ### "User can see drafts from other websites"
+
 **Cause:** User may have global `admin` role.
 **Solution:** This is expected for global admins. Site-specific roles are scoped to their websites.
 
 ---
 
 ### "Commerce user cannot edit articles"
+
 **Cause:** Commerce role is for products/orders, not content.
 **Solution:** Assign both `commerce` and `editor` roles if user needs both permissions.
 

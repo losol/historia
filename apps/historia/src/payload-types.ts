@@ -371,7 +371,7 @@ export interface Page {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ArchiveBlock | ContentBlock | ImageBlock | ProductsBlock)[] | null;
+  story?: (ArchiveBlock | ContentBlock | HappeningsBlock | ImageBlock | ProductsBlock)[] | null;
   slug?: string | null;
   slugLock?: boolean | null;
   resourceId: string;
@@ -938,6 +938,21 @@ export interface ArchiveBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappeningsBlock".
+ */
+export interface HappeningsBlock {
+  /**
+   * Shown above the list, e.g. "Neste kurs". Leave empty for none.
+   */
+  heading?: string | null;
+  limit?: number | null;
+  includePast?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'happenings';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ImageBlock".
  */
 export interface ImageBlock {
@@ -1125,17 +1140,17 @@ export interface User {
       }[]
     | null;
   /**
-   * Global system administrator role. Only system admins can assign this role.
+   * Global system administrator role. Only system admins can assign this role. For users who log in through the OIDC provider it is set by the provider when OIDC_SYSTEM_ADMIN_ROLE is configured.
    */
   roles?: 'system-admin'[] | null;
   /**
-   * Optional: Assign user to specific websites/tenants. Leave empty for global access.
+   * The websites this user has a role on. Without one, the user cannot open the admin, unless they are a system admin.
    */
   tenants?:
     | {
         tenant: string | Website;
         /**
-         * Site-specific roles. Users can have multiple roles on a website.
+         * Site-specific roles. Users can have multiple roles on a website. Only system admins can assign them.
          */
         siteRoles: ('admin' | 'editor' | 'commerce' | 'member')[];
         id?: string | null;
@@ -3347,6 +3362,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         archive?: T | ArchiveBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
+        happenings?: T | HappeningsBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
         products?: T | ProductsBlockSelect<T>;
       };
@@ -3389,6 +3405,17 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   showImages?: T;
   showAllLink?: T;
   limit?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappeningsBlock_select".
+ */
+export interface HappeningsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  limit?: T;
+  includePast?: T;
   id?: T;
   blockName?: T;
 }

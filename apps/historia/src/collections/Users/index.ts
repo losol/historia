@@ -2,21 +2,31 @@ import { identitiesField } from '@eventuras/payload-oidc-auth';
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields';
 import type { CollectionConfig } from 'payload';
 import { adminsFieldLevel } from '../../access/admins';
-import { isSystemAdmin } from '../../access/isSystemAdmin';
+import { isSystemAdmin, systemAdminsFieldLevel } from '../../access/isSystemAdmin';
 import { addressFields } from '../../fields/address';
+import { adminPanelAccess } from './access/adminPanel';
 import { createAccess } from './access/create';
+import { globalRolesCreateAccess, globalRolesUpdateAccess } from './access/globalRoles';
 import { readAccess } from './access/read';
 import { updateAndDeleteAccess } from './access/updateAndDelete';
 import { createVerifiedFieldAccess, verificationFlagAccess } from './access/verifiedFieldAccess';
 import { ensureFirstUserIsAdmin } from './hooks/ensureFirstUserIsAdmin';
 import { protectApiKeyFields } from './hooks/protectApiKeyFields';
+import { refusePasswordLogin } from './hooks/refusePasswordLogin';
 import { setCookieBasedOnDomain } from './hooks/setCookieBasedOnDomain';
 
 const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',
   tenantsArrayTenantFieldName: 'tenant',
   tenantsCollectionSlug: 'websites',
-  arrayFieldAccess: {},
+  // Which sites a user belongs to, and with which roles, is granted by a system
+  // admin only (ADR 0001). A user may update their own document and a site admin
+  // the users of their sites, so an open field would let either of them join any
+  // site as its admin. Read stays open: the admin's site switcher needs it.
+  arrayFieldAccess: {
+    create: systemAdminsFieldLevel,
+    update: systemAdminsFieldLevel,
+  },
   tenantFieldAccess: {},
   rowFields: [
     {
@@ -32,7 +42,8 @@ const defaultTenantArrayField = tenantsArrayField({
       ],
       required: true,
       admin: {
-        description: 'Site-specific roles. Users can have multiple roles on a website.',
+        description:
+          'Site-specific roles. Users can have multiple roles on a website. Only system admins can assign them.',
       },
     },
   ],
@@ -41,6 +52,8 @@ const defaultTenantArrayField = tenantsArrayField({
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
+    // Logging in is not enough to open the admin; see adminPanelAccess.
+    admin: adminPanelAccess,
     create: createAccess,
     delete: () => false,
     read: readAccess,
@@ -210,12 +223,14 @@ export const Users: CollectionConfig = {
         beforeChange: [ensureFirstUserIsAdmin],
       },
       access: {
-        create: adminsFieldLevel,
+        create: globalRolesCreateAccess,
         read: adminsFieldLevel,
-        update: adminsFieldLevel,
+        update: globalRolesUpdateAccess,
       },
       admin: {
-        description: 'Global system administrator role. Only system admins can assign this role.',
+        description:
+          'Global system administrator role. Only system admins can assign this role. ' +
+          'For users who log in through the OIDC provider it is set by the provider when OIDC_SYSTEM_ADMIN_ROLE is configured.',
       },
     },
     {
@@ -225,7 +240,7 @@ export const Users: CollectionConfig = {
         ...defaultTenantArrayField?.admin,
         position: 'sidebar',
         description:
-          'Optional: Assign user to specific websites/tenants. Leave empty for global access.',
+          'The websites this user has a role on. Without one, the user cannot open the admin, unless they are a system admin.',
       },
     },
   ],
@@ -233,6 +248,7 @@ export const Users: CollectionConfig = {
   hooks: {
     afterLogin: [setCookieBasedOnDomain],
     beforeOperation: [
+      refusePasswordLogin,
       ({ args, operation }) => {
         // Bypass tenant filtering for system admins on read operations
         // Check if user is from 'users' collection before passing to isSystemAdmin

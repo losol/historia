@@ -14,8 +14,8 @@ jobs:
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -26,12 +26,12 @@ jobs:
         run: pnpm exec biome ci --error-on-warnings .
 
       # Typecheck covers src, the tests and scripts/ (tsconfig.typecheck.json).
-      # Unit tests only — the vipps integration suites need live Vipps test
-      # credentials and are run locally.
+      # Unit tests only (test:unit) — the vipps integration suites need live
+      # Vipps test credentials and are run locally.
       - name: Typecheck & test (vipps)
         run: |
           pnpm --filter @eventuras/vipps typecheck
-          pnpm --filter @eventuras/vipps exec vitest run src/__tests__/epayment-redaction.test.ts
+          pnpm --filter @eventuras/vipps test:unit
 
       # The demo seed the AppHost runs (apphost/seed). Its own tsconfig, since the
       # AppHost's needs the SDK modules only the Aspire CLI generates.
@@ -47,6 +47,11 @@ jobs:
         run: |
           pnpm --filter @eventuras/historia-sdk typecheck
           pnpm --filter @eventuras/historia-sdk test
+
+      - name: Typecheck & test (event-api-client)
+        run: |
+          pnpm --filter @eventuras/event-api-client typecheck
+          pnpm --filter @eventuras/event-api-client test
 
       # payload-vipps-auth imports payload-oidc-auth and vipps from their dist.
       - name: Typecheck & test (payload-oidc-auth, payload-vipps-auth)
@@ -94,8 +99,8 @@ jobs:
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -107,6 +112,12 @@ jobs:
 
       - name: Typecheck
         run: pnpm --filter @eventuras/historia exec tsc -p tsconfig.json --noEmit
+
+      # Unit tests, among them access/signedInWithoutRole.test.ts: it builds the
+      # config with every plugin and fails if a logged-in user without a role may
+      # do more than a visitor. Needs the workspace packages built above.
+      - name: Test
+        run: pnpm --filter @eventuras/historia test
 
       # Production runs with `push: false` and applies these at startup, so a
       # migration that does not apply cleanly is an outage, not a test failure.

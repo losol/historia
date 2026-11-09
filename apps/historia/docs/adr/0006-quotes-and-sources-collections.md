@@ -1,6 +1,7 @@
 # ADR 0006 — Quotes and Sources Collections
 
 ## Status
+
 Accepted (Implemented with MVP simplifications)
 
 ## Context
@@ -136,8 +137,8 @@ hooks: {
       // Append resourceId
       // Generate: "Einstein - #QUOT-123"
       // Or: "Anonymous - #QUOT-124"
-    }
-  ]
+    },
+  ];
 }
 ```
 
@@ -159,7 +160,7 @@ richText({
   name: 'quote',
   localized: true,
   required: true,
-})
+});
 ```
 
 **Rationale:**
@@ -646,6 +647,7 @@ The **Sources** collection maps to various [`schema.org/CreativeWork`](https://s
 **Additional fields for schema.org alignment:**
 
 1. **Publisher** (for books, articles):
+
    ```typescript
    {
      name: 'publisher',
@@ -653,9 +655,11 @@ The **Sources** collection maps to various [`schema.org/CreativeWork`](https://s
      relationTo: 'organizations',
    }
    ```
+
    Maps to: `schema.org/publisher`
 
 2. **isPartOf** (for articles in journals, chapters in books):
+
    ```typescript
    {
      name: 'isPartOf',
@@ -663,11 +667,13 @@ The **Sources** collection maps to various [`schema.org/CreativeWork`](https://s
      relationTo: 'sources', // Self-reference!
    }
    ```
+
    Maps to: `schema.org/isPartOf`
 
    **Example**: Article "Chapter 5" → isPartOf → Book "Complete Works"
 
 3. **Publication Context** (for scholarly articles):
+
    ```typescript
    {
      name: 'publicationContext',
@@ -681,15 +687,18 @@ The **Sources** collection maps to various [`schema.org/CreativeWork`](https://s
      ]
    }
    ```
+
    Maps to: `schema.org/isPartOf` (Journal), `pageStart`, `pageEnd`, etc.
 
 4. **Edition** (for books):
+
    ```typescript
    {
      name: 'edition',
      type: 'text',
    }
    ```
+
    Maps to: `schema.org/bookEdition`
 
 **Decision for MVP:**

@@ -74,6 +74,7 @@ if (payload.name === 'AUTHORIZED' || payload.name === 'CAPTURED') {
 Polling strategies (in order):
 
 1. **Check business-events** (webhook detection)
+
    ```typescript
    const events = await find({
      collection: 'business-events',
@@ -89,6 +90,7 @@ Polling strategies (in order):
    ```
 
 2. **Check transactions** (normal flow)
+
    ```typescript
    const transactions = await find({
      where: { paymentReference: reference }
@@ -100,6 +102,7 @@ Polling strategies (in order):
    ```
 
 3. **Poll Vipps API directly** (backup)
+
    ```typescript
    const payment = await getPaymentDetails(reference);
 
@@ -133,6 +136,7 @@ const handlePaymentStatusChange = async (status: string) => {
 ### Timing Breakdown
 
 #### Scenario 1: Normal Flow (User Returns First)
+
 ```
 T+0ms:  User returns from Vipps
 T+100ms: SSE connects
@@ -143,6 +147,7 @@ T+2100ms: Client receives "authorized" → creates order
 ```
 
 #### Scenario 2: Webhook Arrives First (Race Condition)
+
 ```
 T+0ms:  Webhook arrives → creates business-event
 T+2000ms: User returns from Vipps
@@ -213,6 +218,7 @@ T+2300ms: Client receives "authorized" → creates order
 ### Manual Test (Webhook-First Scenario)
 
 1. **Trigger webhook manually** (before completing payment):
+
    ```bash
    curl -X POST https://your-app.azurewebsites.net/api/webhooks/vipps \
      -H "Authorization: Bearer WEBHOOK_SECRET" \
@@ -227,6 +233,7 @@ T+2300ms: Client receives "authorized" → creates order
    ```
 
 2. **Check business-events collection**:
+
    ```
    Should see event with:
    - eventType: "payment"
@@ -235,11 +242,13 @@ T+2300ms: Client receives "authorized" → creates order
    ```
 
 3. **Navigate to checkout page**:
+
    ```
    https://your-app.azurewebsites.net/no/checkout/vipps?reference=test-ref-123
    ```
 
 4. **Observe SSE logs**:
+
    ```
    [sse] Found AUTHORIZED payment event from webhook
    [client] Creating order from cart...

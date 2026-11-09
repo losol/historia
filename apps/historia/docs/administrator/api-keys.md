@@ -109,7 +109,7 @@ async function createNote(title: string, content: string) {
   const response = await fetch(`${BASE_URL}/notes`, {
     method: 'POST',
     headers: {
-      'Authorization': `users API-Key ${API_KEY}`,
+      Authorization: `users API-Key ${API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -137,8 +137,8 @@ async function createNote(title: string, content: string) {
 
 // Usage
 createNote('API Test', 'Created via API key')
-  .then(data => console.log('Note created:', data))
-  .catch(error => console.error('Error:', error));
+  .then((data) => console.log('Note created:', data))
+  .catch((error) => console.error('Error:', error));
 ```
 
 ### Example: Upload Media with Python
@@ -185,11 +185,11 @@ print(f"Media uploaded: {result['id']}")
 
 API keys inherit the permissions of their associated user:
 
-| User Role | Media Permissions | Notes Permissions |
-|-----------|------------------|-------------------|
-| **System Admin** | Full CRUD (create, read, update, delete) | Full CRUD |
-| **Site Editor** | Create, read, update (no delete) | Create, read, update (no delete) |
-| **Member** | Read only | Read only |
+| User Role        | Media Permissions                        | Notes Permissions                |
+| ---------------- | ---------------------------------------- | -------------------------------- |
+| **System Admin** | Full CRUD (create, read, update, delete) | Full CRUD                        |
+| **Site Editor**  | Create, read, update (no delete)         | Create, read, update (no delete) |
+| **Member**       | Read only                                | Read only                        |
 
 ### Principle of Least Privilege
 

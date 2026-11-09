@@ -1,6 +1,7 @@
 # ADR 0003 — User Field Access Control
 
 ## Status
+
 Proposed
 
 ## Context
@@ -83,15 +84,15 @@ All three name fields (`given_name`, `middle_name`, `family_name`) are treated a
 
 ### Who Can Do What
 
-| User Role | Read Verified Data | Update Verified Data | Change Verification Flag |
-|-----------|-------------------|---------------------|-------------------------|
-| **Anonymous** | ❌ No | ❌ No | ❌ No |
-| **Self (User)** | ✅ Yes | ❌ No | ❌ No |
-| **Tenant Admin** | ✅ Yes | ❌ No | ❌ No |
-| **System Admin** | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Vipps Webhook** | N/A | ✅ Yes* | ✅ Yes* |
+| User Role         | Read Verified Data | Update Verified Data | Change Verification Flag |
+| ----------------- | ------------------ | -------------------- | ------------------------ |
+| **Anonymous**     | ❌ No              | ❌ No                | ❌ No                    |
+| **Self (User)**   | ✅ Yes             | ❌ No                | ❌ No                    |
+| **Tenant Admin**  | ✅ Yes             | ❌ No                | ❌ No                    |
+| **System Admin**  | ✅ Yes             | ✅ Yes               | ✅ Yes                   |
+| **Vipps Webhook** | N/A                | ✅ Yes*              | ✅ Yes*                  |
 
-\* *Via `overrideAccess: true` in trusted webhook handlers*
+\* _Via `overrideAccess: true` in trusted webhook handlers_
 
 ### Unverified Data
 
@@ -151,7 +152,7 @@ Create a reusable helper for verified field access:
 // collections/Users/access/verifiedFieldAccess.ts
 
 export const createVerifiedFieldAccess = (
-  verificationFlagName: 'name_verified' | 'email_verified' | 'phone_number_verified'
+  verificationFlagName: 'name_verified' | 'email_verified' | 'phone_number_verified',
 ): FieldAccess => ({
   read: () => true,
 
@@ -189,7 +190,7 @@ await payload.update({
     given_name: vippsData.given_name,
     name_verified: true,
   },
-  overrideAccess: true,  // Bypass field-level access control
+  overrideAccess: true, // Bypass field-level access control
 });
 ```
 

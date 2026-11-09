@@ -57,6 +57,7 @@ export function handshakeCookies(providerName: string, state: string) {
   return {
     verifier: `${providerName}_pkce_${state}`,
     redirectUri: `${providerName}_redirect_${state}`,
+    returnTo: `${providerName}_return_${state}`,
   };
 }
 

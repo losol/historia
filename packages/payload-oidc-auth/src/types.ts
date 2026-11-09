@@ -138,7 +138,10 @@ export interface OidcAuthPluginConfig {
    */
   allowedDomains?: string[] | (() => string[] | undefined);
 
-  /** Where to send the person after login. @default '/admin' */
+  /**
+   * Where to send the person after login, unless the login was started with
+   * `?returnTo=<path on this site>`. @default '/admin'
+   */
   successPath?: string;
 
   /**

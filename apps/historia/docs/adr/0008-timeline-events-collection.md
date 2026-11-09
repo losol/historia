@@ -1,6 +1,7 @@
 # ADR 0008 — Timeline Events Collection
 
 ## Status
+
 Accepted
 
 ## Context
@@ -65,6 +66,7 @@ Implement a **Timeline collection** (slug: `timelines`) with flexible date repre
 - **New sources:** Archaeological finds or document discoveries can change established facts
 - **Scholarly integrity:** Researchers can cite specific interpretations
 - **Configuration:**
+
   ```typescript
   versions: {
     drafts: {
@@ -334,9 +336,9 @@ Related Events:
 ```typescript
 {
   participants: [
-    { entity: Person/Organization, role: 'signatory' },
+    { entity: Person / Organization, role: 'signatory' },
     { entity: Person, role: 'witness' },
-  ]
+  ];
 }
 ```
 

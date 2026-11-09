@@ -51,33 +51,44 @@ Declare `identitiesField` on the collection yourself when the plugin can be off 
 
 ## Options
 
-| Option | Default | |
-|---|---|---|
-| `providers` | required | See below |
-| `enabled` | `true` | |
-| `usersCollection` | `'users'` | The auth-enabled collection |
-| `allowedDomains` | none | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
-| `successPath` | `'/admin'` | |
-| `errorPath` | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, … |
+| Option            | Default                        |                                                                                                                                                     |
+| ----------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `providers`       | required                       | See below                                                                                                                                           |
+| `enabled`         | `true`                         |                                                                                                                                                     |
+| `usersCollection` | `'users'`                      | The auth-enabled collection                                                                                                                         |
+| `allowedDomains`  | none                           | The hosts the deployment serves. With a list, `X-Forwarded-Host` is trusted when it names one, so the login returns to the domain the person is on. |
+| `successPath`     | `'/admin'`                     | Where a login ends, unless it was started with `?returnTo=`                                                                                         |
+| `errorPath`       | `'/admin/login?error={error}'` | `{error}` becomes a code: `oauth_failed`, `invalid_state`, `email_not_verified`, `signup_disabled`, …                                               |
+
+### Coming back to the page
+
+Start a login with `?returnTo=<path>` to end it on that page instead of
+`successPath`, for example `/api/auth/oidc/login?returnTo=/courses/intro`. Only
+a path on the same site is accepted, and not one under the provider's own
+routes; anything else is dropped, so the parameter is not an open redirect. The
+path is kept in a handshake cookie during the login and checked again at the
+callback and the session route. `OidcLoginButton` takes a `returnTo` prop and
+otherwise passes on the `?redirect=` that Payload's login page keeps for a deep
+link. `safeReturnPath` is exported for building such links.
 
 A provider:
 
-| Option | Default | |
-|---|---|---|
-| `name` | required | Lowercase; used in the routes, cookies and identity rows |
-| `issuer` | required | Where discovery happens |
-| `clientId`, `clientSecret` | required | |
-| `scope` | `'openid profile email'` | |
-| `redirectUri` | from the request | Set it to pin one callback URL |
-| `basePath` | `/api/auth/{name}` | Must be under Payload's API route |
-| `allowSignup` | `true` | |
-| `requireVerifiedEmail` | `true` | |
-| `mapUser` | standard claims | |
-| `createClient` | plain OIDC | For a provider that needs its own client, e.g. extra headers on userinfo |
+| Option                     | Default                  |                                                                          |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------ |
+| `name`                     | required                 | Lowercase; used in the routes, cookies and identity rows                 |
+| `issuer`                   | required                 | Where discovery happens                                                  |
+| `clientId`, `clientSecret` | required                 |                                                                          |
+| `scope`                    | `'openid profile email'` |                                                                          |
+| `redirectUri`              | from the request         | Set it to pin one callback URL                                           |
+| `basePath`                 | `/api/auth/{name}`       | Must be under Payload's API route                                        |
+| `allowSignup`              | `true`                   |                                                                          |
+| `requireVerifiedEmail`     | `true`                   |                                                                          |
+| `mapUser`                  | standard claims          |                                                                          |
+| `createClient`             | plain OIDC               | For a provider that needs its own client, e.g. extra headers on userinfo |
 
 ## Notes
 
-- **Email and password login stays on.** Payload registers its JWT strategy, the one that reads the session cookie, only while some auth collection keeps the local strategy. With `disableLocalStrategy` on the users collection, nobody could stay logged in after an OIDC login either.
+- **Email and password login stays on.** Payload registers its JWT strategy, the one that reads the session cookie, only while some auth collection keeps the local strategy. With `disableLocalStrategy` on the users collection, nobody could stay logged in after an OIDC login either. To make the provider the only way in, keep the strategy and refuse the `login`, `forgotPassword` and `resetPassword` operations in a `beforeOperation` hook instead, as Historia does.
 - **Custom paths.** `OidcLoginButton` defaults to `/api/auth/{name}/login`; pass `loginPath` when a provider has its own `basePath` or Payload's API route is not `/api`.
 - **The handoff cookie** is scoped to `/api/auth/{name}/session`, carries its own expiry (60 s) and is cleared once used.
 
