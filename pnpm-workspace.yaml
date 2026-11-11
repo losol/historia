@@ -19,6 +19,31 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 
+# Security overrides: patched releases of dependencies that come in through
+# other packages, which pin or cap a vulnerable version. `pnpm audit --prod`
+# lists what is open. Each selector names the vulnerable range, so an override
+# stops applying by itself once its parent asks for a fixed version; delete the
+# line then.
+overrides:
+  # monaco-editor (the code editor in the Payload admin) pins 3.4.8.
+  # GHSA-cg2g-xh64-v4q7 (critical), GHSA-mrv2-3pqr-j5jr (high) and six lesser.
+  "dompurify@<3.4.17": ^3.4.17
+  # @payloadcms/plugin-mcp pins 1.30.0. GHSA-f897-62hf-6gxq, GHSA-6qxp-vccf-f47h,
+  # GHSA-22jm-h49p-29qw, GHSA-46jr-4wx8-v453 (all high) and two moderate.
+  "@modelcontextprotocol/sdk@<1.32.0": ^1.32.0
+  # axios, under aws-crt. GHSA-mrwp-f3q8-3g9p (high).
+  "follow-redirects@<1.16.2": ^1.16.2
+  # @lexical/headless asks for ^20, and the fix is only in 21. Nothing here
+  # loads it: only `@lexical/headless/dom` imports happy-dom, and neither
+  # Payload's lexical package nor Historia imports that entry.
+  # GHSA-c8p4-j97h-3vg8, GHSA-834v-8h66-3h79 (both high).
+  "happy-dom@<21.0.4": ^21.0.4
+  # @eventuras/app-config asks for ^4.3.6. GHSA-mrhx-c7xc-m3w5 (high). Scoped to
+  # that parent: a selector on zod alone also rewrites the `^3.25 || ^4` that the
+  # MCP SDK accepts, and @payloadcms/plugin-mcp hands it zod 3 schemas. That zod
+  # 3 has no fixed release and stays.
+  "@eventuras/app-config>zod": ^4.6.6
+
 # Supply-chain protection: do not resolve packages published less than
 # 10 days ago. Mirrors the eventuras monorepo posture.
 minimumReleaseAge: 14400
