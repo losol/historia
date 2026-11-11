@@ -42,32 +42,32 @@ courses.
 
 ### `courses`
 
-| Field | What it is |
-| --- | --- |
-| `title`, `lead`, `image` | As on other content. |
-| `story` | The course itself in a small course; the front page of a larger one. |
-| `syllabus` | Sections in order. Empty in a small course. |
-| `access` | `public` (default) or `enrolled`. Stored now, enforced with enrolment. |
-| `durationMinutes` | Optional. Empty means the sum of the lessons. |
-| `contributors`, `topics` | Instructors and subjects. |
-| `externalEvent` | The Eventuras `onlineCourse` event, by uuid. |
-| slug, `publishedAt`, `resourceId`, `config`, SEO | As on other content. |
+| Field                                            | What it is                                                             |
+| ------------------------------------------------ | ---------------------------------------------------------------------- |
+| `title`, `lead`, `image`                         | As on other content.                                                   |
+| `story`                                          | The course itself in a small course; the front page of a larger one.   |
+| `syllabus`                                       | Sections in order. Empty in a small course.                            |
+| `access`                                         | `public` (default) or `enrolled`. Stored now, enforced with enrolment. |
+| `durationMinutes`                                | Optional. Empty means the sum of the lessons.                          |
+| `contributors`, `topics`                         | Instructors and subjects.                                              |
+| `externalEvent`                                  | The Eventuras `onlineCourse` event, by uuid.                           |
+| slug, `publishedAt`, `resourceId`, `config`, SEO | As on other content.                                                   |
 
 ### `syllabus` (an array on the course)
 
-| Field | What it is |
-| --- | --- |
-| `title` | Optional. One section without a title is a course without parts. |
+| Field   | What it is                                                                                                |
+| ------- | --------------------------------------------------------------------------------------------------------- |
+| `title` | Optional. One section without a title is a course without parts.                                          |
 | `items` | The steps of the section, in order: a polymorphic `hasMany` relationship. Today it allows `lessons` only. |
 
 ### `lessons`
 
-| Field | What it is |
-| --- | --- |
-| `title`, `lead`, `image`, `story` | As on other content. A video is a lesson with a video block in its story. |
-| `durationMinutes` | About how long it takes. |
-| `courses` | A join: the courses whose syllabus holds this lesson. Read-only. |
-| slug, `publishedAt`, `resourceId`, `config`, SEO | As on other content. |
+| Field                                            | What it is                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------- |
+| `title`, `lead`, `image`, `story`                | As on other content. A video is a lesson with a video block in its story. |
+| `durationMinutes`                                | About how long it takes.                                                  |
+| `courses`                                        | A join: the courses whose syllabus holds this lesson. Read-only.          |
+| slug, `publishedAt`, `resourceId`, `config`, SEO | As on other content.                                                      |
 
 ### Why it is shaped this way
 
