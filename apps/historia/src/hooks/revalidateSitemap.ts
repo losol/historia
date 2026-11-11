@@ -13,13 +13,20 @@ const tagsFor = (collection: string): string[] => {
 const listed = (doc?: { _status?: string | null } | null): boolean =>
   Boolean(doc) && (doc?._status === undefined || doc?._status === 'published');
 
+// On create there is no document before this one. Payload passes `{}` as
+// `previousDoc` then, which has no `_status` and would read as listed: every new
+// draft expired the caches. That is more than waste. With autosave, Payload
+// creates the draft while it renders the admin's create view, and Next refuses
+// revalidateTag during render, so the view came up without a form.
 export const revalidateSitemap: CollectionAfterChangeHook = ({
   doc,
   previousDoc,
+  operation,
   collection,
   req: { context },
 }) => {
-  if (!context.disableRevalidate && (listed(doc) || listed(previousDoc))) {
+  const wasListed = operation === 'update' && listed(previousDoc);
+  if (!context.disableRevalidate && (listed(doc) || wasListed)) {
     for (const tag of tagsFor(collection.slug)) revalidateTag(tag, { expire: 0 });
   }
   return doc;
