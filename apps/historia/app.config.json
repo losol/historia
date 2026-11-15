@@ -40,7 +40,7 @@
       "required": false,
       "client": false,
       "type": "string",
-      "description": "Secret for live preview functionality"
+      "description": "Optional secret the admin's preview links must carry. Previews need a signed-in user with a role on the website either way"
     },
     "VIPPS_API_URL": {
       "required": false,

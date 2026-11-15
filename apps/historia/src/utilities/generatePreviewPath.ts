@@ -69,8 +69,12 @@ export const generatePreviewPath = ({
   const params: Record<string, string> = {
     collection,
     path,
-    previewSecret: process.env.PREVIEW_SECRET || '',
   };
+
+  // Optional: the preview route only asks for the secret where one is set.
+  if (process.env.PREVIEW_SECRET) {
+    params.previewSecret = process.env.PREVIEW_SECRET;
+  }
 
   // Only add slug if it exists (not required for resourceId-only routes)
   if (slug) {
