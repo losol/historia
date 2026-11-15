@@ -1,5 +1,21 @@
 # @eventuras/historia
 
+## 0.33.0
+
+### Minor Changes
+
+- 47fee81: A poster front page, built on ratio-ui 2.40.
+  
+  - Pages: "Top of the page" can be "Poster": the title very large and light on a full-width field of the brand colour, with a cropped disc and the lead under it (`Hero surface="primary" disc`, `Hero.Title display`). A soft hyphen in a one-word title breaks it there and sets the second half in italic.
+  - Archive block: three layouts. "Poster" is the first story on a large card that slides up over the field (`Teaser variant="feature"`); "Numbered" a very large heading over numbered titles (`Section.Title display`, `Teaser variant="numbered"`); "Band" one story on a full-width accent band (`Hero surface="accent"`). "Skip" leaves out the stories a block above already shows.
+  - Website appearance: "Footer" can be "Display", a dark block with the site title very large (`Footer.Brand display`). "Classic" stays the default.
+  - The teaser is now ratio-ui's `Teaser`; the local copy is gone.
+
+### Patch Changes
+
+- 74f5aa7: When the Vipps webhook and the return page create the order for a payment at the same time, the one that loses now uses the other's order instead of reporting a critical "payment may be authorized but order not created". The check for a lost race used `instanceof ValidationError`, which fails when Payload is bundled per route.
+- 0a67f7a: The admin's live preview opens on a deployment without `PREVIEW_SECRET`. The secret is optional, but a link without it was refused all the same, so the preview never opened there. A refused preview now says why, on a page that can be read: the plain-text answer was white on the white preview frame in dark mode, which looked like an empty frame. The reason is also logged.
+
 ## 0.32.4
 
 ### Patch Changes
