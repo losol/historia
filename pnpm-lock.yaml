@@ -68,11 +68,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/payload-vipps-auth
       '@eventuras/ratio-ui':
-        specifier: ^2.36.0
-        version: 2.36.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^2.40.0
+        version: 2.40.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@eventuras/ratio-ui-next':
         specifier: ^1.0.2
-        version: 1.0.2(@eventuras/ratio-ui@2.36.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))
+        version: 1.0.2(@eventuras/ratio-ui@2.40.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))
       '@eventuras/vipps':
         specifier: workspace:*
         version: link:../../packages/vipps
@@ -1295,8 +1295,8 @@ packages:
       '@opentelemetry/sdk-logs':
         optional: true
 
-  '@eventuras/ratio-ui-core@0.5.0':
-    resolution: {integrity: sha512-pajL3eEFIGQHpHzrAnGONPmv5+V6JH4xKfBSeGS1VZIn/Q5o1b79a9D86AB5fiya010M03cQJLQz9bAp3La5rQ==}
+  '@eventuras/ratio-ui-core@0.9.0':
+    resolution: {integrity: sha512-7g7imXYKcC3bbv0zJCNGm+63dkk4MmGUdJ45irMpC2b4c7wskAWWFaUup6BA99x1DTvm639tMg3ZjLE/VfO5fA==}
     engines: {node: '>=22'}
 
   '@eventuras/ratio-ui-next@1.0.2':
@@ -1306,8 +1306,8 @@ packages:
       '@eventuras/ratio-ui': ^2.8.0
       next: ^16.0.0
 
-  '@eventuras/ratio-ui@2.36.0':
-    resolution: {integrity: sha512-9GeF/9QVYtRR2Ilx3B1Sez1pzG7hO+mI1jnD47aGG1YGZjTU4uYr68tZftLEx+aavPSMuxt8AE4GGYXL+vkn+g==}
+  '@eventuras/ratio-ui@2.40.0':
+    resolution: {integrity: sha512-c7+s+2rHGUV5BYCj3r8Z3y11xHZ8ftWEO52pi4q+OQ7WLjToAwgRaV7pKmqcZ7mae1MsLeF5afGwuWB3bGqGFQ==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
@@ -4457,8 +4457,8 @@ packages:
     resolution: {integrity: sha512-U4N8FgzmWxc8k1VH8Kr6lQg18U7Fjvby6wXHVRX/ZZ7IwWbRMgrRbP0Wrb5q5NVinryp4SQampHKdvtecItxUg==}
     engines: {node: 20 || >=22}
 
-  lucide-react@1.61.0:
-    resolution: {integrity: sha512-v2SQPPPNjnr+BlhL9Spuzmo5yR+hLkftfuE4E3jaxdNPgSH0hJKPcLJBP7yAta87jQNPsSERS59PJjCJ/CorBA==}
+  lucide-react@1.69.0:
+    resolution: {integrity: sha512-UTFECm4yEgkgMN0kfLuxWcmlk+4u02Jrqehgk3ZXRx/Ud68OpP7hjkp67bvkBHmIpMaZCIveF1QDYeupO7XmYQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -6582,22 +6582,20 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/sdk-logs': 3.0.0(@opentelemetry/api@1.10.0)
 
-  '@eventuras/ratio-ui-core@0.5.0': {}
+  '@eventuras/ratio-ui-core@0.9.0': {}
 
-  '@eventuras/ratio-ui-next@1.0.2(@eventuras/ratio-ui@2.36.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))':
+  '@eventuras/ratio-ui-next@1.0.2(@eventuras/ratio-ui@2.40.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))':
     dependencies:
-      '@eventuras/ratio-ui': 2.36.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@eventuras/ratio-ui': 2.40.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next: 16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4)
 
-  '@eventuras/ratio-ui@2.36.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@eventuras/ratio-ui@2.40.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@eventuras/ratio-ui-core': 0.5.0
-      clsx: 2.1.1
-      lucide-react: 1.61.0(@types/react@19.3.0)(react@19.3.1)
+      '@eventuras/ratio-ui-core': 0.9.0
+      lucide-react: 1.69.0(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
       react-aria-components: 1.22.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-dom: 19.3.1(react@19.3.1)
-      react-stately: 3.51.0(react@19.3.1)
       tailwind-merge: 3.7.0
     transitivePeerDependencies:
       - '@types/react'
@@ -9788,7 +9786,7 @@ snapshots:
 
   lru-cache@11.5.3: {}
 
-  lucide-react@1.61.0(@types/react@19.3.0)(react@19.3.1):
+  lucide-react@1.69.0(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
     optionalDependencies:

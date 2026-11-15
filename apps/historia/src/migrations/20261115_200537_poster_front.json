@@ -27080,6 +27080,14 @@
           "notNull": false,
           "default": "'both'"
         },
+        "site_settings_appearance_footer": {
+          "name": "site_settings_appearance_footer",
+          "type": "enum_websites_site_settings_appearance_footer",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'classic'"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -34159,6 +34167,14 @@
         "both"
       ]
     },
+    "public.enum_websites_site_settings_appearance_footer": {
+      "name": "enum_websites_site_settings_appearance_footer",
+      "schema": "public",
+      "values": [
+        "classic",
+        "display"
+      ]
+    },
     "public.enum_exports_format": {
       "name": "enum_exports_format",
       "schema": "public",
@@ -34264,6 +34280,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "642fcd8a-8a75-41db-b6ec-ef0377c2a5ee",
+  "id": "7beb0141-e0d1-4bb4-bb16-e51a30d5ed4a",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

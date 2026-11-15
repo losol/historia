@@ -332,6 +332,10 @@ export interface Website {
        * Light, dark, or both with a toggle for the visitor.
        */
       colorScheme?: ('light' | 'dark' | 'both') | null;
+      /**
+       * A soft hyphen in the site title breaks it there and sets the rest in italic.
+       */
+      footer?: ('classic' | 'display') | null;
     };
     header?: {
       /**
@@ -3826,6 +3830,7 @@ export interface WebsitesSelect<T extends boolean = true> {
           | {
               theme?: T;
               colorScheme?: T;
+              footer?: T;
             };
         header?:
           | T

@@ -1,16 +1,21 @@
 import type React from 'react';
+import { Hero } from '@eventuras/ratio-ui/blocks/Hero';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
 import { Link } from '@eventuras/ratio-ui-next';
 import configPromise from '@payload-config';
 import { getPayload, type Where } from 'payload';
 import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import RichText from '@/components/RichText';
-import { DocTeaser, type TeaserCollection, type TeaserDocument } from '@/components/Teaser';
+import {
+  DocTeaser,
+  type TeaserCollection,
+  type TeaserDocument,
+  teaserFields,
+} from '@/components/Teaser';
 import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types';
 import styles from './ArchiveBlock.module.css';
-import { BandStory, NumberedList, PosterStory } from './Poster';
 
 /** The newest articles first; happenings from the next one on. */
 function orderFor(relationTo: TeaserCollection): { sort: string; where?: Where } {
@@ -87,22 +92,54 @@ export const ArchiveBlock: React.FC<
 
   // The poster layouts draw their own heading, so they skip the section header.
   if (relationTo && layout === 'band') {
-    return lead ? <BandStory doc={lead} relationTo={relationTo} locale={locale} /> : null;
+    const story = lead && teaserFields(lead, relationTo, locale);
+    if (!story) return null;
+    return (
+      <div className={styles.band} data-archive-layout="band">
+        <Hero surface="accent">
+          <Hero.Main>
+            {story.eyebrow && <Hero.Eyebrow>{story.eyebrow}</Hero.Eyebrow>}
+            <Hero.Title as="h2" display className={styles.bandTitle}>
+              {story.title}
+            </Hero.Title>
+            {story.lead && <Hero.Lead>{story.lead}</Hero.Lead>}
+            <Hero.Actions>
+              <Link href={story.href} variant="button-primary">
+                {locale === 'en' ? 'Read it' : 'Les saken'}
+              </Link>
+            </Hero.Actions>
+          </Hero.Main>
+        </Hero>
+      </div>
+    );
   }
 
   if (relationTo && layout === 'numbered') {
     return (
-      <NumberedList
-        id={`block-${id}`}
-        title={title || listName}
-        description={
-          description && <RichText className="m-0" data={description} enableGutter={false} />
-        }
-        allLink={showAllLink ? { href: allHref, label: allLabel } : undefined}
-        docs={docs}
-        relationTo={relationTo}
-        locale={locale}
-      />
+      <Section id={`block-${id}`}>
+        <Section.Header>
+          <Section.Title display>
+            <em>{title || listName}</em>
+          </Section.Title>
+          {showAllLink && (
+            <Section.Link as={Link} href={allHref}>
+              {allLabel}
+            </Section.Link>
+          )}
+        </Section.Header>
+        {description && (
+          <RichText className="ml-0 max-w-[48rem]" data={description} enableGutter={false} />
+        )}
+        {docs.length > 0 && (
+          <ol className={styles.numbered}>
+            {docs.map((doc) => (
+              <li key={doc.id}>
+                <DocTeaser doc={doc} relationTo={relationTo} locale={locale} variant="numbered" />
+              </li>
+            ))}
+          </ol>
+        )}
+      </Section>
     );
   }
 
@@ -110,7 +147,15 @@ export const ArchiveBlock: React.FC<
     if (!lead) return null;
     return (
       <section id={`block-${id}`} data-archive-layout="poster">
-        <PosterStory doc={lead} kicker={title} relationTo={relationTo} locale={locale} />
+        <DocTeaser
+          doc={lead}
+          relationTo={relationTo}
+          locale={locale}
+          variant="feature"
+          titleAs="h2"
+          kicker={title}
+          showImage={showImages ?? false}
+        />
         {rest.length > 0 && (
           <div className={`${styles.list} ${styles.posterRest}`}>
             {rest.map((doc) => (

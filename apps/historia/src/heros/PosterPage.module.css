@@ -1,0 +1,39 @@
+/* The poster front page: what ratio-ui's parts need from the page around them. */
+
+.page {
+  /* The band bleeds to the window's edge; clip what the scrollbar would add. */
+  overflow-x: clip;
+}
+
+/* A tall field with the title low in it, under the disc. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(30rem, 58vw, 54rem);
+}
+
+.heroOverlap {
+  padding-bottom: clamp(6.5rem, 13vw, 12rem);
+}
+
+/* The blocks under the hero: more air between them than on an ordinary page. */
+.blocks > div {
+  margin-block: clamp(4.5rem, 10vw, 9rem);
+}
+
+.blocks > div:last-child {
+  margin-bottom: 0;
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+/* A closing band meets the footer. */
+.blocks > div:last-child:has([data-archive-layout="band"]) {
+  padding-bottom: 0;
+}
+
+/* A poster card as the first block slides up over the field. */
+.blocksOverlap > div:first-child {
+  position: relative;
+  margin-top: clamp(-7.5rem, -8vw, -3.5rem);
+}
