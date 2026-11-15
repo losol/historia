@@ -5,7 +5,7 @@ const SOFT_HYPHEN = String.fromCodePoint(0xad);
 /**
  * A title for ratio-ui's `display` type, with its last part in an `<em>` for the
  * accent italic: the last word, or what follows the last soft hyphen of a single
- * long word, where the word then breaks ("Kunnskaps" + "kollektivet").
+ * long word, where the word then breaks.
  */
 export function accentuate(title: string): ReactNode {
   const words = title.trim().split(/\s+/);
