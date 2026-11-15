@@ -30,6 +30,7 @@ import * as migration_20261022_203410_magazine_front from './20261022_203410_mag
 import * as migration_20261023_180502_happening_external_event from './20261023_180502_happening_external_event';
 import * as migration_20261027_185355_happenings_block from './20261027_185355_happenings_block';
 import * as migration_20261031_195645_payload_3_91 from './20261031_195645_payload_3_91';
+import * as migration_20261115_200537_poster_front from './20261115_200537_poster_front';
 
 export const migrations = [
   {
@@ -190,6 +191,11 @@ export const migrations = [
   {
     up: migration_20261031_195645_payload_3_91.up,
     down: migration_20261031_195645_payload_3_91.down,
-    name: '20261031_195645_payload_3_91'
+    name: '20261031_195645_payload_3_91',
+  },
+  {
+    up: migration_20261115_200537_poster_front.up,
+    down: migration_20261115_200537_poster_front.down,
+    name: '20261115_200537_poster_front'
   },
 ];

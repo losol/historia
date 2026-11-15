@@ -15,14 +15,23 @@ export type SiteTheme = (typeof themes)[number];
 export const colorSchemes = ['light', 'dark', 'both'] as const;
 export type SiteColorScheme = (typeof colorSchemes)[number];
 
+/**
+ * The footer: `classic` is the site title and publisher on the page's surface;
+ * `display` a dark block with the site title very large across it.
+ */
+export const footerStyles = ['classic', 'display'] as const;
+export type SiteFooterStyle = (typeof footerStyles)[number];
+
 export type Appearance = {
   theme: SiteTheme;
   colorScheme: SiteColorScheme;
+  footer: SiteFooterStyle;
 };
 
 export const defaultAppearance: Appearance = {
   theme: 'default',
   colorScheme: 'both',
+  footer: 'classic',
 };
 
 const isOneOf = <T extends string>(values: readonly T[], value: unknown): value is T =>
@@ -36,6 +45,9 @@ export function getAppearance(website: Pick<Website, 'siteSettings'> | null): Ap
     colorScheme: isOneOf(colorSchemes, appearance?.colorScheme)
       ? appearance.colorScheme
       : defaultAppearance.colorScheme,
+    footer: isOneOf(footerStyles, appearance?.footer)
+      ? appearance.footer
+      : defaultAppearance.footer,
   };
 }
 
@@ -44,7 +56,10 @@ export function getAppearance(website: Pick<Website, 'siteSettings'> | null): Ap
  * `data-color-scheme` for light or dark. For `both`, the color scheme is left to
  * the InitTheme script, which knows the visitor's preference.
  */
-export function htmlThemeAttributes({ theme, colorScheme }: Appearance) {
+export function htmlThemeAttributes({
+  theme,
+  colorScheme,
+}: Pick<Appearance, 'theme' | 'colorScheme'>) {
   return {
     'data-theme': theme === 'default' ? undefined : theme,
     'data-color-scheme': colorScheme === 'both' ? undefined : colorScheme,

@@ -18,3 +18,19 @@ export function canPreviewWebsite(
   if (websiteId == null) return false;
   return getUserTenantIDs(user).some((id) => String(id) === String(websiteId));
 }
+
+/**
+ * Whether a preview link carries the secret this deployment asks for.
+ * `PREVIEW_SECRET` is optional: where it is not set there is nothing to compare,
+ * and the link is accepted. It used to be refused then, since a missing
+ * parameter never equals a missing variable, so no preview ever opened on a
+ * deployment without the secret. The secret is an extra; what keeps drafts to a
+ * site's own people is `canPreviewWebsite`.
+ */
+export function previewSecretAccepted(
+  given: string | null | undefined,
+  configured: string | undefined,
+): boolean {
+  if (!configured) return true;
+  return given === configured;
+}

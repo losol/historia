@@ -77,6 +77,23 @@ export const Pages: CollectionConfig<'pages'> = {
             name,
             title,
             lead,
+            {
+              name: 'heroStyle',
+              type: 'select',
+              defaultValue: 'standard',
+              label: 'Top of the page',
+              options: [
+                { label: 'Standard: the title beside the image', value: 'standard' },
+                {
+                  label: 'Poster: the title very large on a full-width coloured field',
+                  value: 'poster',
+                },
+              ],
+              admin: {
+                description:
+                  'Poster suits a front page. It shows the title and the lead, not the image.',
+              },
+            },
             image,
             storyField([Archive, Content, Happenings, Image, Product]),
           ],

@@ -21,3 +21,31 @@
   flex-direction: column;
   border-top: 1px solid var(--border-1);
 }
+
+/* The rest of the stories under a poster card. */
+.posterRest {
+  margin-top: 2.5rem;
+}
+
+/* Numbered titles in two columns; each teaser takes its number from its <li>. */
+.numbered {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+/* Out to the window's edges; the hero inside keeps its text on the page's column. */
+.band {
+  margin-inline: calc(50% - 50vw);
+}
+
+/* A story's title is a sentence, not a name: smaller than the page's own. */
+.bandTitle {
+  --hero-display-size: 6.2vw;
+  max-width: 14em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
