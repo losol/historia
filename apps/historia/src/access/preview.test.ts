@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canPreviewWebsite } from './preview';
+import { canPreviewWebsite, previewSecretAccepted } from './preview';
 
 const systemAdmin = { id: 1, email: 'root@example.com', roles: ['system-admin'], tenants: [] };
 const reader = {
@@ -38,5 +38,23 @@ describe('canPreviewWebsite', () => {
     expect(canPreviewWebsite(user(reader), null)).toBe(false);
     expect(canPreviewWebsite(user(visitor), 'site-a')).toBe(false);
     expect(canPreviewWebsite(null, 'site-a')).toBe(false);
+  });
+});
+
+describe('previewSecretAccepted', () => {
+  // The link was refused here before: a missing parameter is null, a missing
+  // variable undefined, and the two were compared with `!==`.
+  it('accepts any link where no secret is configured', () => {
+    expect(previewSecretAccepted(null, undefined)).toBe(true);
+    expect(previewSecretAccepted('', undefined)).toBe(true);
+    expect(previewSecretAccepted(null, '')).toBe(true);
+    expect(previewSecretAccepted('anything', undefined)).toBe(true);
+  });
+
+  it('asks for the configured secret', () => {
+    expect(previewSecretAccepted('s3cret', 's3cret')).toBe(true);
+    expect(previewSecretAccepted('wrong', 's3cret')).toBe(false);
+    expect(previewSecretAccepted('', 's3cret')).toBe(false);
+    expect(previewSecretAccepted(null, 's3cret')).toBe(false);
   });
 });
