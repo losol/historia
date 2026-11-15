@@ -19,8 +19,9 @@ import { title } from '@/fields/title';
  * One lesson. The content is the `story`; a video is a lesson whose story holds
  * a video block. A lesson does not point at a course: a course's `syllabus`
  * places it in a section and orders it, so the same lesson can be used in more
- * than one course. The slug is unique per website, as for the other content;
- * the course route finds the lesson through the course in the URL.
+ * than one course. The slug is not unique, here as on the other content: two
+ * lessons on a website can share one. The course route has to find a lesson
+ * through the course in the URL, among the lessons of its syllabus.
  *
  * Lessons are not readable through the API by visitors. Who may read a lesson
  * is the course's decision (`access` on the course), and a lesson can be in
@@ -28,7 +29,10 @@ import { title } from '@/fields/title';
  * and then reads the lesson itself. People with a role on the website read
  * them in the admin as they do other content.
  *
- * Not registered in the Payload config yet; see `Courses`.
+ * `courses` ("Used in") is right in the admin, which lists the courses with a
+ * query of its own. Read through the API, the join repeats a course once for
+ * every section of its syllabus (Payload 3.92, Postgres): to find the courses of
+ * a lesson in code, query courses where `syllabus.items.value` is the lesson.
  */
 export const Lessons: CollectionConfig = {
   slug: 'lessons',
@@ -73,7 +77,6 @@ export const Lessons: CollectionConfig = {
               name: 'courses',
               label: 'Courses',
               type: 'join',
-              // @ts-expect-error - not a CollectionSlug until Courses is registered in the config
               collection: 'courses',
               on: 'syllabus.items',
               admin: {

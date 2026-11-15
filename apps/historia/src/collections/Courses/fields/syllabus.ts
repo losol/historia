@@ -1,5 +1,34 @@
 import type { Field } from 'payload';
 
+type Step = { relationTo?: string; value?: unknown } | null | undefined;
+type Section = { items?: Step[] | null } | null | undefined;
+
+const stepKey = (step: Step): string | null => {
+  if (!step?.relationTo || step.value == null) return null;
+  const value = step.value;
+  const id = typeof value === 'object' ? (value as { id?: unknown }).id : value;
+  return id == null ? null : `${step.relationTo}:${String(id)}`;
+};
+
+/**
+ * How many steps are in the syllabus more than once, in one section or across
+ * several. A lesson is finished once and has one address in a course, so a
+ * second copy has no "next" of its own and nothing to complete.
+ */
+export function repeatedSteps(sections: Section[] | null | undefined): number {
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+  for (const section of sections ?? []) {
+    for (const step of section?.items ?? []) {
+      const key = stepKey(step);
+      if (!key) continue;
+      if (seen.has(key)) repeated.add(key);
+      seen.add(key);
+    }
+  }
+  return repeated.size;
+}
+
 /**
  * The syllabus of a course: its sections, in order, each with the steps
  * participants take and an optional heading over them.
@@ -26,6 +55,13 @@ export const syllabus: Field = {
     description:
       'The lessons of the course, in the order participants take them. Leave empty for a short course where the story above is the whole course.',
   },
+  validate: (value) => {
+    const repeated = repeatedSteps(value as Section[] | null | undefined);
+    if (repeated === 0) return true;
+    return repeated === 1
+      ? 'A lesson is in the syllabus twice. A course can hold each lesson once.'
+      : `${repeated} lessons are in the syllabus more than once. A course can hold each lesson once.`;
+  },
   fields: [
     {
       name: 'title',
@@ -39,7 +75,6 @@ export const syllabus: Field = {
       name: 'items',
       label: 'Steps',
       type: 'relationship',
-      // @ts-expect-error - not a CollectionSlug until Lessons is registered in the config
       relationTo: ['lessons'],
       hasMany: true,
       admin: {

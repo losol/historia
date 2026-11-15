@@ -2,8 +2,10 @@
 
 ## Status
 
-Proposed. The data model below is in the code but not registered in the Payload
-config; everything after "The road from here" is a plan, not a decision.
+Accepted for the data model: the two collections are registered in the Payload
+config, with the migration `20261115_202548_courses_and_lessons`. They are in
+the admin and the API, and have no pages on the site yet. Everything after "The
+road from here" is a plan, not a decision.
 
 ## Context
 
@@ -102,10 +104,26 @@ With the collections registered locally (SQLite, not committed):
 - A visitor on the site's own domain gets published courses from the API, with
   the lessons as ids only, and 403 from `/api/lessons`.
 
+### Verified on Postgres
+
+With the migration applied to an empty Postgres database, through the API:
+
+- Sections and the lessons in them keep their order, also after the sections
+  are swapped and the lessons of one are reversed.
+- A lesson in two courses is in both; the section title is per locale and the
+  lessons are the same in every locale.
+- A visitor gets published courses only, with the lessons as ids, and 403 from
+  `/api/lessons`. So does a signed-in user without a role, who gets 403 from
+  `/api/courses` as well, as from the other content.
+- A lesson of one website cannot be put in a course of another: the syllabus
+  refuses it, for a system admin too.
+- A course cannot be published with the same lesson in its syllabus twice.
+- In the admin: a course with a section, a lesson made from the **+** in a
+  drawer, published.
+
 ## What is not easy yet
 
-Found in the same run, and the first things to fix when the collections are
-registered:
+Found in those runs, and the first things to fix:
 
 1. **Publishing a course does not publish its lessons.** Each lesson is its own
    draft, so a course with ten lessons takes eleven publishes, and a published
@@ -121,6 +139,22 @@ registered:
    pattern on Instructions.
 5. **Authors need the `editor` role**, which opens all content on the website.
    Whether courses want a narrower role is an open question below.
+6. **"Used in" is right in the admin only.** Read through the API, the `courses`
+   join on a lesson repeats a course once for every section of its syllabus
+   (Payload 3.92, Postgres), and its count is wrong with it. The admin lists the
+   courses with a query of its own and shows each once. Code that needs the
+   courses of a lesson queries courses where `syllabus.items.value` is the
+   lesson.
+7. **Deleting a lesson takes it out of every course, without a word.** The
+   syllabus of a published course loses the step, and so do the course's stored
+   versions. Only admins can delete, but nothing warns them.
+8. **A lesson in a published course can be unpublished.** The course route has
+   to leave out the steps a reader cannot see, as for lessons never published.
+9. **Slugs are not unique.** Two lessons on a website can have the same slug, as
+   two articles can. The course route cannot look a lesson up by slug alone: it
+   finds it among the lessons of the course in the URL, where two with one slug
+   are still possible, or the URL carries the `resourceId` as the other content
+   does.
 
 ## The road from here
 
@@ -128,9 +162,9 @@ Each step can ship by itself.
 
 ### 1. Open courses
 
-Register the two collections (and add them to the multi-tenant plugin's
-`collections`, or publishing fails on "Assigned Tenant"), with the migration.
-Routes `courses/[course]` and `courses/[course]/[lesson]`, with a rewrite from
+The two collections are registered, and in the multi-tenant plugin's
+`collections` (without that, publishing fails on "Assigned Tenant"). What is
+left: routes `courses/[course]` and `courses/[course]/[lesson]`, with a rewrite from
 `/no/kurs`. The course page shows the story, then the syllabus with durations; a
 lesson page shows the story with previous and next from the syllabus. A course
 without a syllabus is one page. A video block. The publishing help above.

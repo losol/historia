@@ -29,10 +29,10 @@ import { syllabus } from './fields/syllabus';
  * one to the other is adding a section, not changing kind. Lessons are their
  * own documents and can be used in more than one course.
  *
- * Not registered in the Payload config yet: the model first, the migration
- * when the frontend and access come. Enrolment and progress are separate
- * collections later; `access` is stored now so they need no schema change on
- * the course. See docs/adr/0012-courses-and-lessons.md.
+ * In the admin and the API, but with no pages on the site yet: the frontend
+ * routes come next. Enrolment and progress are separate collections later;
+ * `access` is stored now so they need no schema change on the course. See
+ * docs/adr/0012-courses-and-lessons.md.
  */
 export const Courses: CollectionConfig = {
   slug: 'courses',

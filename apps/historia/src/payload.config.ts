@@ -15,8 +15,10 @@ import { Articles } from './collections/Articles';
 import { BusinessEvents } from './collections/BusinessEvents';
 import { Carts } from './collections/Carts';
 import { Cases } from './collections/Cases';
+import { Courses } from './collections/Courses';
 import { Happenings } from './collections/Happenings';
 import { Instructions } from './collections/Instructions';
+import { Lessons } from './collections/Lessons';
 import { Licenses } from './collections/Licenses';
 import { Media } from './collections/Media';
 import { MediaCollections } from './collections/MediaCollections';
@@ -188,8 +190,10 @@ export default buildConfig({
     BusinessEvents,
     Carts,
     Cases,
+    Courses,
     Happenings,
     Instructions,
+    Lessons,
     Licenses,
     Media,
     MediaCollections,

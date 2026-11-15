@@ -18,6 +18,30 @@ export type Contributors =
     }[]
   | null;
 /**
+ * The lessons of the course, in the order participants take them. Leave empty for a short course where the story above is the whole course.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CourseSyllabus".
+ */
+export type CourseSyllabus =
+  | {
+      /**
+       * Leave empty in a course without parts.
+       */
+      title?: string | null;
+      /**
+       * The lessons in this section, in order. Pick existing ones, or make a new one with the +.
+       */
+      items?:
+        | {
+            relationTo: 'lessons';
+            value: string | Lesson;
+          }[]
+        | null;
+      id?: string | null;
+    }[]
+  | null;
+/**
  * Supported timezones in IANA format.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -83,8 +107,10 @@ export interface Config {
     'business-events': BusinessEvent;
     carts: Cart;
     cases: Case;
+    courses: Course;
     happenings: Happening;
     instructions: Instruction;
+    lessons: Lesson;
     licenses: License;
     media: Media;
     'media-collections': MediaCollection;
@@ -118,6 +144,9 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    lessons: {
+      courses: 'courses';
+    };
     orders: {
       shipments: 'shipments';
       transactions: 'transactions';
@@ -128,8 +157,10 @@ export interface Config {
     'business-events': BusinessEventsSelect<false> | BusinessEventsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     cases: CasesSelect<false> | CasesSelect<true>;
+    courses: CoursesSelect<false> | CoursesSelect<true>;
     happenings: HappeningsSelect<false> | HappeningsSelect<true>;
     instructions: InstructionsSelect<false> | InstructionsSelect<true>;
+    lessons: LessonsSelect<false> | LessonsSelect<true>;
     licenses: LicensesSelect<false> | LicensesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'media-collections': MediaCollectionsSelect<false> | MediaCollectionsSelect<true>;
@@ -1552,6 +1583,114 @@ export interface Cart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses".
+ */
+export interface Course {
+  id: string;
+  tenant?: (string | null) | Website;
+  /**
+   * The title of the entry.
+   */
+  title: string;
+  lead?: string | null;
+  image?: Image;
+  story?: (ContentBlock | ImageBlock)[] | null;
+  syllabus?: CourseSyllabus;
+  /**
+   * Who can read the lessons. Enrolment is not enforced yet; the value is kept so it will be.
+   */
+  access?: ('public' | 'enrolled') | null;
+  /**
+   * About how long the course takes, in minutes. Leave empty to use the sum of the lessons.
+   */
+  durationMinutes?: number | null;
+  contributors?: Contributors;
+  /**
+   * What is this about?
+   */
+  topics?: (string | Topic)[] | null;
+  /**
+   * The same event in another system, such as Eventuras.
+   */
+  externalEvent?: {
+    system?: 'eventuras' | null;
+    uuid?: string | null;
+  };
+  publishedAt?: string | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  resourceId: string;
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons".
+ */
+export interface Lesson {
+  id: string;
+  tenant?: (string | null) | Website;
+  /**
+   * About how long the lesson takes, in minutes.
+   */
+  durationMinutes?: number | null;
+  /**
+   * The title of the entry.
+   */
+  title: string;
+  lead?: string | null;
+  image?: Image;
+  story?: (ContentBlock | ImageBlock)[] | null;
+  courses?: {
+    docs?: (string | Course)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  publishedAt?: string | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  resourceId: string;
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "happenings".
  */
 export interface Happening {
@@ -2688,12 +2827,20 @@ export interface PayloadLockedDocument {
         value: string | Case;
       } | null)
     | ({
+        relationTo: 'courses';
+        value: string | Course;
+      } | null)
+    | ({
         relationTo: 'happenings';
         value: string | Happening;
       } | null)
     | ({
         relationTo: 'instructions';
         value: string | Instruction;
+      } | null)
+    | ({
+        relationTo: 'lessons';
+        value: string | Lesson;
       } | null)
     | ({
         relationTo: 'licenses';
@@ -3003,6 +3150,57 @@ export interface CasesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses_select".
+ */
+export interface CoursesSelect<T extends boolean = true> {
+  tenant?: T;
+  title?: T;
+  lead?: T;
+  image?: T | ImageSelect<T>;
+  story?:
+    | T
+    | {
+        content?: T | ContentBlockSelect<T>;
+        image?: T | ImageBlockSelect<T>;
+      };
+  syllabus?: T | CourseSyllabusSelect<T>;
+  access?: T;
+  durationMinutes?: T;
+  contributors?: T | ContributorsSelect<T>;
+  topics?: T;
+  externalEvent?:
+    | T
+    | {
+        system?: T;
+        uuid?: T;
+      };
+  publishedAt?: T;
+  slug?: T;
+  slugLock?: T;
+  resourceId?: T;
+  config?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CourseSyllabus_select".
+ */
+export interface CourseSyllabusSelect<T extends boolean = true> {
+  title?: T;
+  items?: T;
+  id?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "happenings_select".
  */
 export interface HappeningsSelect<T extends boolean = true> {
@@ -3149,6 +3347,39 @@ export interface InstructionSectionBlockSelect<T extends boolean = true> {
       };
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons_select".
+ */
+export interface LessonsSelect<T extends boolean = true> {
+  tenant?: T;
+  durationMinutes?: T;
+  title?: T;
+  lead?: T;
+  image?: T | ImageSelect<T>;
+  story?:
+    | T
+    | {
+        content?: T | ContentBlockSelect<T>;
+        image?: T | ImageBlockSelect<T>;
+      };
+  courses?: T;
+  publishedAt?: T;
+  slug?: T;
+  slugLock?: T;
+  resourceId?: T;
+  config?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4323,8 +4554,10 @@ export interface TaskCreateCollectionExport {
       | 'business-events'
       | 'carts'
       | 'cases'
+      | 'courses'
       | 'happenings'
       | 'instructions'
+      | 'lessons'
       | 'licenses'
       | 'media'
       | 'media-collections'
