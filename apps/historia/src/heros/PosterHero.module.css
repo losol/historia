@@ -1,0 +1,114 @@
+/* The poster front page: a full-width coloured field with a cropped sun and two fine rings. */
+
+.page {
+  /* The band layout bleeds to the viewport edge; clip what the scrollbar would add. */
+  overflow-x: clip;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(30rem, 58vw, 54rem);
+  padding-block: clamp(2rem, 5vw, 4.5rem);
+  /* The same field in light and dark: it is the page's poster, not a surface. */
+  background: var(--color-primary-800);
+  color: var(--color-secondary-200);
+}
+
+.hero.overlap {
+  padding-bottom: clamp(6.5rem, 13vw, 12rem);
+}
+
+.sun,
+.ring {
+  position: absolute;
+  width: 40vw;
+  height: 40vw;
+  border-radius: 9999px;
+}
+
+.sun {
+  top: -12vw;
+  right: -6vw;
+  background: var(--color-accent-400);
+}
+
+.ring {
+  border: 1px solid currentColor;
+}
+
+.ringNear {
+  top: -2vw;
+  right: 12vw;
+  opacity: 0.35;
+}
+
+.ringFar {
+  top: 8vw;
+  right: 30vw;
+  opacity: 0.16;
+}
+
+/* The page's column: wide, with gutters that grow with the window. */
+.column {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 4.5rem);
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: min(var(--poster-size, 13.6vw), 12.75rem);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: inherit;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--color-accent-300);
+}
+
+.lead {
+  margin: 0 0 0.6em;
+  max-width: 22ch;
+  font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* The blocks under the hero: more air between them than on an ordinary page. */
+.blocks > div {
+  margin-block: clamp(4.5rem, 10vw, 9rem);
+}
+
+.blocks > div:last-child {
+  margin-bottom: 0;
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+/* A closing band meets the footer. */
+.blocks > div:last-child:has([data-archive-layout="band"]) {
+  padding-bottom: 0;
+}
+
+.blocks.overlap > div:first-child {
+  position: relative;
+  margin-top: clamp(-7.5rem, -8vw, -3.5rem);
+}

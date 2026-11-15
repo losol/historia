@@ -12,6 +12,8 @@ import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { PayloadRedirects } from '@/components/PayloadRedirects';
 import { Hero } from '@/heros/Hero';
+import { PosterHero } from '@/heros/PosterHero';
+import posterStyles from '@/heros/PosterHero.module.css';
 import { generateMeta } from '@/lib/seo';
 import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
@@ -176,7 +178,27 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
     return <PayloadRedirects permanent url={`/${locale}${fullPath ?? ''}`} />;
   }
 
-  const { title, image, breadcrumbs, story } = page;
+  const { title, lead, heroStyle, image, breadcrumbs, story } = page;
+
+  if (heroStyle === 'poster') {
+    // The first block slides up over the field when it is a poster card.
+    const first = story?.[0];
+    const overlap = first?.blockType === 'archive' && first.layout === 'poster';
+
+    return (
+      <div className={posterStyles.page}>
+        <LivePreviewListener />
+        <PosterHero title={title} lead={lead} overlap={overlap} />
+        {story && story.length > 0 && (
+          <div
+            className={`${posterStyles.column} ${posterStyles.blocks} ${overlap ? posterStyles.overlap : ''}`}
+          >
+            <RenderBlocks blocks={story} locale={locale} />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -359,6 +381,8 @@ const queryPageByBreadcrumbsUrl = cache(
 // Fields to select when querying pages
 const contentSelection: PagesSelect = {
   title: true,
+  lead: true,
+  heroStyle: true,
   slug: true,
   image: true,
   contributors: true,
@@ -376,6 +400,7 @@ const contentSelection: PagesSelect = {
       showImages: true,
       showAllLink: true,
       limit: true,
+      skip: true,
     },
     content: true,
     image: {

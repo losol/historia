@@ -10,6 +10,7 @@ import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types';
 import styles from './ArchiveBlock.module.css';
+import { BandStory, NumberedList, PosterStory } from './Poster';
 
 /** The newest articles first; happenings from the next one on. */
 function orderFor(relationTo: TeaserCollection): { sort: string; where?: Where } {
@@ -36,10 +37,12 @@ export const ArchiveBlock: React.FC<
     relationTo,
     showAllLink,
     showImages,
+    skip: skipFromProps,
     topics,
   } = props;
 
   const limit = limitFromProps || 5;
+  const skip = Math.max(0, skipFromProps ?? 0);
 
   let docs: TeaserDocument[] = [];
 
@@ -56,7 +59,8 @@ export const ArchiveBlock: React.FC<
     const fetchedDocs = await payload.find({
       collection: relationTo,
       depth: 1,
-      limit,
+      // The first `skip` are fetched too and left out below; find has no offset.
+      limit: limit + skip,
       sort: order.sort,
       // Titles and slugs are localized; without this the default locale's are listed.
       // @ts-expect-error - Payload's locale parameter type doesn't match our string type
@@ -70,7 +74,7 @@ export const ArchiveBlock: React.FC<
       },
     });
 
-    docs = fetchedDocs.docs;
+    docs = fetchedDocs.docs.slice(skip);
   }
 
   if (docs.length === 0 && !description) return null;
@@ -79,13 +83,59 @@ export const ArchiveBlock: React.FC<
   const allLabel = locale === 'en' ? `All ${listName}` : `Alle ${listName}`;
   const [lead, ...rest] = docs;
 
+  const allHref = `/${locale}/c/${listName}`;
+
+  // The poster layouts draw their own heading, so they skip the section header.
+  if (relationTo && layout === 'band') {
+    return lead ? <BandStory doc={lead} relationTo={relationTo} locale={locale} /> : null;
+  }
+
+  if (relationTo && layout === 'numbered') {
+    return (
+      <NumberedList
+        id={`block-${id}`}
+        title={title || listName}
+        description={
+          description && <RichText className="m-0" data={description} enableGutter={false} />
+        }
+        allLink={showAllLink ? { href: allHref, label: allLabel } : undefined}
+        docs={docs}
+        relationTo={relationTo}
+        locale={locale}
+      />
+    );
+  }
+
+  if (relationTo && layout === 'poster') {
+    if (!lead) return null;
+    return (
+      <section id={`block-${id}`} data-archive-layout="poster">
+        <PosterStory doc={lead} kicker={title} relationTo={relationTo} locale={locale} />
+        {rest.length > 0 && (
+          <div className={`${styles.list} ${styles.posterRest}`}>
+            {rest.map((doc) => (
+              <DocTeaser
+                key={doc.id}
+                doc={doc}
+                relationTo={relationTo}
+                locale={locale}
+                variant="row"
+                showImage={showImages ?? false}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   return (
     <Section id={`block-${id}`}>
       {(title || (showAllLink && relationTo)) && (
         <Section.Header>
           {title && <Section.Title>{title}</Section.Title>}
           {showAllLink && relationTo && (
-            <Section.Link as={Link} href={`/${locale}/c/${listName}`}>
+            <Section.Link as={Link} href={allHref}>
               {allLabel}
             </Section.Link>
           )}

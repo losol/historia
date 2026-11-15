@@ -370,6 +370,10 @@ export interface Page {
    */
   title: string;
   lead?: string | null;
+  /**
+   * Poster suits a front page. It shows the title and the lead, not the image.
+   */
+  heroStyle?: ('standard' | 'poster') | null;
   image?: Image;
   story?: (ArchiveBlock | ContentBlock | HappeningsBlock | ImageBlock | ProductsBlock)[] | null;
   slug?: string | null;
@@ -928,10 +932,14 @@ export interface ArchiveBlock {
   } | null;
   relationTo?: ('articles' | 'happenings' | 'notes' | 'cases') | null;
   topics?: (string | Topic)[] | null;
-  layout?: ('grid' | 'featured' | 'list') | null;
+  layout?: ('grid' | 'featured' | 'list' | 'poster' | 'numbered' | 'band') | null;
   showImages?: boolean | null;
   showAllLink?: boolean | null;
   limit?: number | null;
+  /**
+   * Leave out the first ones, e.g. 1 when a block above shows the newest.
+   */
+  skip?: number | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
@@ -3356,6 +3364,7 @@ export interface PagesSelect<T extends boolean = true> {
   name?: T;
   title?: T;
   lead?: T;
+  heroStyle?: T;
   image?: T | ImageSelect<T>;
   story?:
     | T
@@ -3405,6 +3414,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   showImages?: T;
   showAllLink?: T;
   limit?: T;
+  skip?: T;
   id?: T;
   blockName?: T;
 }

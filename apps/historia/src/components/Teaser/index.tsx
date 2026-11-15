@@ -52,6 +52,22 @@ const imageSizes: Record<TeaserVariant, string> = {
   row: '6rem',
 };
 
+/** What a teaser shows of a document, for layouts that draw it themselves. */
+export function teaserFields(doc: TeaserDocument, relationTo: TeaserCollection, locale: string) {
+  if (!doc.slug) return null;
+  return {
+    href: getDocUrl({
+      locale,
+      collection: relationTo,
+      resourceId: doc.resourceId,
+      slug: doc.slug,
+    }),
+    title: doc.title,
+    eyebrow: eyebrowFor(doc, locale),
+    lead: 'lead' in doc ? doc.lead : undefined,
+  };
+}
+
 /** A Teaser for a document of one of the listed collections. */
 export function DocTeaser({
   doc,
@@ -60,29 +76,14 @@ export function DocTeaser({
   variant = 'md',
   showImage = true,
 }: DocTeaserProps) {
-  if (!doc.slug) return null;
+  const fields = teaserFields(doc, relationTo, locale);
+  if (!fields) return null;
 
-  const href = getDocUrl({
-    locale,
-    collection: relationTo,
-    resourceId: doc.resourceId,
-    slug: doc.slug,
-  });
   const media = doc.image && typeof doc.image === 'object' ? doc.image.media : null;
   const image =
     showImage && media && typeof media === 'object' ? (
       <Media resource={media} size={imageSizes[variant]} priority={variant === 'lg'} />
     ) : undefined;
 
-  return (
-    <Teaser
-      href={href}
-      title={doc.title}
-      eyebrow={eyebrowFor(doc, locale)}
-      lead={'lead' in doc ? doc.lead : undefined}
-      image={image}
-      variant={variant}
-      LinkComponent={Link}
-    />
-  );
+  return <Teaser {...fields} image={image} variant={variant} LinkComponent={Link} />;
 }

@@ -21,3 +21,8 @@
   flex-direction: column;
   border-top: 1px solid var(--border-1);
 }
+
+/* The rest of the stories under a poster card. */
+.posterRest {
+  margin-top: 2.5rem;
+}
