@@ -1,5 +1,12 @@
 # @eventuras/historia
 
+## 0.32.4
+
+### Patch Changes
+
+- f298fe8: "Create New" works again for articles, cases, pages and timelines in the admin. The view came up without a form: the sitemap hook treated every new draft as something the sitemaps list, and Next refuses to expire a cache while a page is rendering, which is when Payload creates the autosave draft.
+- 5f7135f: Patched releases of five dependencies that come in through other packages: `dompurify`, `@modelcontextprotocol/sdk` (the MCP endpoint), `follow-redirects`, `happy-dom` and `zod` 4. `pnpm audit --prod` goes from 23 findings, one of them critical and nine high, to 6.
+
 ## 0.32.3
 
 ### Patch Changes
