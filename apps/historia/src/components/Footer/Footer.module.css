@@ -1,0 +1,10 @@
+/* The display footer: publisher and navigation under a rule below the large title. */
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem clamp(2rem, 7vw, 7rem);
+  margin-top: clamp(2.25rem, 5vw, 4.5rem);
+  padding-top: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-top: 1px solid var(--border-2);
+}

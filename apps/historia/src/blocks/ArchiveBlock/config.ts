@@ -75,6 +75,9 @@ export const Archive: Block = {
         { label: 'Grid of cards', value: 'grid' },
         { label: 'Featured: the first story large, the rest beside it', value: 'featured' },
         { label: 'List of compact rows', value: 'list' },
+        { label: 'Poster: the first story on a large card, its lead beside it', value: 'poster' },
+        { label: 'Numbered: a very large heading over numbered titles', value: 'numbered' },
+        { label: 'Band: the first story on a full-width coloured band', value: 'band' },
       ],
     },
     {
@@ -95,13 +98,29 @@ export const Archive: Block = {
       ],
     },
     {
-      name: 'limit',
-      type: 'number',
-      admin: {
-        step: 1,
-      },
-      defaultValue: 10,
-      label: 'Limit',
+      type: 'row',
+      fields: [
+        {
+          name: 'limit',
+          type: 'number',
+          admin: {
+            step: 1,
+          },
+          defaultValue: 10,
+          label: 'Limit',
+        },
+        {
+          name: 'skip',
+          type: 'number',
+          min: 0,
+          admin: {
+            step: 1,
+            description: 'Leave out the first ones, e.g. 1 when a block above shows the newest.',
+          },
+          defaultValue: 0,
+          label: 'Skip',
+        },
+      ],
     },
   ],
   labels: {

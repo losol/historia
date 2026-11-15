@@ -1,11 +1,17 @@
 import type React from 'react';
+import { Hero } from '@eventuras/ratio-ui/blocks/Hero';
 import { Section } from '@eventuras/ratio-ui/layout/Section';
 import { Link } from '@eventuras/ratio-ui-next';
 import configPromise from '@payload-config';
 import { getPayload, type Where } from 'payload';
 import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collection]/pageCollections';
 import RichText from '@/components/RichText';
-import { DocTeaser, type TeaserCollection, type TeaserDocument } from '@/components/Teaser';
+import {
+  DocTeaser,
+  type TeaserCollection,
+  type TeaserDocument,
+  teaserFields,
+} from '@/components/Teaser';
 import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types';
@@ -36,10 +42,12 @@ export const ArchiveBlock: React.FC<
     relationTo,
     showAllLink,
     showImages,
+    skip: skipFromProps,
     topics,
   } = props;
 
   const limit = limitFromProps || 5;
+  const skip = Math.max(0, skipFromProps ?? 0);
 
   let docs: TeaserDocument[] = [];
 
@@ -56,7 +64,8 @@ export const ArchiveBlock: React.FC<
     const fetchedDocs = await payload.find({
       collection: relationTo,
       depth: 1,
-      limit,
+      // The first `skip` are fetched too and left out below; find has no offset.
+      limit: limit + skip,
       sort: order.sort,
       // Titles and slugs are localized; without this the default locale's are listed.
       // @ts-expect-error - Payload's locale parameter type doesn't match our string type
@@ -70,7 +79,7 @@ export const ArchiveBlock: React.FC<
       },
     });
 
-    docs = fetchedDocs.docs;
+    docs = fetchedDocs.docs.slice(skip);
   }
 
   if (docs.length === 0 && !description) return null;
@@ -79,13 +88,99 @@ export const ArchiveBlock: React.FC<
   const allLabel = locale === 'en' ? `All ${listName}` : `Alle ${listName}`;
   const [lead, ...rest] = docs;
 
+  const allHref = `/${locale}/c/${listName}`;
+
+  // The poster layouts draw their own heading, so they skip the section header.
+  if (relationTo && layout === 'band') {
+    const story = lead && teaserFields(lead, relationTo, locale);
+    if (!story) return null;
+    return (
+      <div className={styles.band} data-archive-layout="band">
+        <Hero surface="accent">
+          <Hero.Main>
+            {story.eyebrow && <Hero.Eyebrow>{story.eyebrow}</Hero.Eyebrow>}
+            <Hero.Title as="h2" display className={styles.bandTitle}>
+              {story.title}
+            </Hero.Title>
+            {story.lead && <Hero.Lead>{story.lead}</Hero.Lead>}
+            <Hero.Actions>
+              <Link href={story.href} variant="button-primary">
+                {locale === 'en' ? 'Read it' : 'Les saken'}
+              </Link>
+            </Hero.Actions>
+          </Hero.Main>
+        </Hero>
+      </div>
+    );
+  }
+
+  if (relationTo && layout === 'numbered') {
+    return (
+      <Section id={`block-${id}`}>
+        <Section.Header>
+          <Section.Title display>
+            <em>{title || listName}</em>
+          </Section.Title>
+          {showAllLink && (
+            <Section.Link as={Link} href={allHref}>
+              {allLabel}
+            </Section.Link>
+          )}
+        </Section.Header>
+        {description && (
+          <RichText className="ml-0 max-w-[48rem]" data={description} enableGutter={false} />
+        )}
+        {docs.length > 0 && (
+          <ol className={styles.numbered}>
+            {docs.map((doc) => (
+              <li key={doc.id}>
+                <DocTeaser doc={doc} relationTo={relationTo} locale={locale} variant="numbered" />
+              </li>
+            ))}
+          </ol>
+        )}
+      </Section>
+    );
+  }
+
+  if (relationTo && layout === 'poster') {
+    if (!lead) return null;
+    return (
+      <section id={`block-${id}`} data-archive-layout="poster">
+        <DocTeaser
+          doc={lead}
+          relationTo={relationTo}
+          locale={locale}
+          variant="feature"
+          titleAs="h2"
+          kicker={title}
+          showImage={showImages ?? false}
+        />
+        {rest.length > 0 && (
+          <div className={`${styles.list} ${styles.posterRest}`}>
+            {rest.map((doc) => (
+              <DocTeaser
+                key={doc.id}
+                doc={doc}
+                relationTo={relationTo}
+                locale={locale}
+                variant="row"
+                showImage={showImages ?? false}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   return (
     <Section id={`block-${id}`}>
       {(title || (showAllLink && relationTo)) && (
         <Section.Header>
           {title && <Section.Title>{title}</Section.Title>}
           {showAllLink && relationTo && (
-            <Section.Link as={Link} href={`/${locale}/c/${listName}`}>
+            <Section.Link as={Link} href={allHref}>
               {allLabel}
             </Section.Link>
           )}
