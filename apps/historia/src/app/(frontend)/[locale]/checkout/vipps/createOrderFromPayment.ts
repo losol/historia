@@ -7,12 +7,13 @@ import {
 import { Logger } from '@eventuras/logger';
 import type { PaymentDetails } from '@eventuras/vipps/epayment-v1';
 import configPromise from '@payload-config';
-import { getPayload, ValidationError } from 'payload';
+import { getPayload } from 'payload';
 import type { Cart } from '@/lib/cart/types';
 import { canTransitionTransaction } from '@/lib/commerce/orderStatusRules';
 import { maskEmail } from '@/lib/observability/maskEmail';
 import { reportCritical } from '@/lib/observability/reportCritical';
 import { getSessionContext } from '@/lib/session/sessionId';
+import { isUniqueViolation } from '@/lib/utils/isUniqueViolation';
 import { getCurrentWebsiteId } from '@/lib/website';
 import type { Order, Product, Transaction, User } from '@/payload-types';
 import { createOrderAutoCreatedEvent } from './orderEvents';
@@ -59,19 +60,6 @@ function generateSecurePassword(): string {
   // Generate 32 random bytes and convert to base64
   // This creates a strong password that users won't need (guest checkout)
   return crypto.randomBytes(32).toString('base64');
-}
-
-/**
- * Whether `error` is Payload's report of a unique index rejecting `field`: what a
- * concurrent request for the same payment causes. Anything else must not be taken
- * for a lost race.
- */
-function isUniqueViolation(error: unknown, field: string): boolean {
-  if (!(error instanceof ValidationError)) return false;
-  const normalize = (value: string) => value.replaceAll('_', '').toLowerCase();
-  return error.data.errors.some(
-    (fieldError) => fieldError.path && normalize(fieldError.path) === normalize(field),
-  );
 }
 
 /** The order created for a payment, if there is one. */
@@ -1299,6 +1287,35 @@ export async function createOrderFromPayment({
     });
   } catch (error) {
     const totalTime = Date.now() - startTime;
+
+    // An order for the payment means it is not lost, whatever failed here: a concurrent
+    // request (webhook or return page) created it. Not critical then.
+    const existingOrder = await getPayload({ config: configPromise })
+      .then(async (payload) => {
+        const order = await findOrderByPaymentReference(payload, paymentReference);
+        return (
+          order && {
+            orderId: order.id,
+            transactionId: await findTransactionIdByPaymentReference(payload, paymentReference),
+          }
+        );
+      })
+      .catch(() => undefined);
+    if (existingOrder) {
+      logger.warn(
+        {
+          ...sessionContext,
+          paymentReference,
+          orderId: existingOrder.orderId,
+          errorName: error instanceof Error ? error.name : 'Unknown',
+          errorMessage: error instanceof Error ? error.message : String(error),
+          totalTimeMs: totalTime,
+        },
+        'Order creation failed, but an order for this payment exists - using it',
+      );
+      return actionSuccess(existingOrder);
+    }
+
     reportCritical(
       logger,
       'Error creating order from payment - payment may be authorized but order not created',
