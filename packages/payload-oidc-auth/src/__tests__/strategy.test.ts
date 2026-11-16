@@ -12,7 +12,7 @@ beforeAll(() => {
 const headersWith = (cookie: string) => new Headers({ cookie });
 
 const pendingCookie = async (provider: string, userId: string, expiresAt = Date.now() + 60_000) =>
-  `__${provider}_session_pending=${await seal({ provider, user: { id: userId }, expiresAt })}`;
+  `__${provider}_session_pending=${await seal({ provider, user: { id: userId }, expiresAt }, 60)}`;
 
 describe('createOidcAuthStrategy', () => {
   const strategy = createOidcAuthStrategy({ name: 'idp', basePath: '/api/auth/idp' });

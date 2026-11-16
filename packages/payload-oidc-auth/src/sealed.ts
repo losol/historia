@@ -18,14 +18,16 @@ function secretKey(): Uint8Array {
   return Uint8Array.from(secret.match(/../g) ?? [], (byte) => Number.parseInt(byte, 16));
 }
 
-export async function seal(payload: JWTPayload): Promise<string> {
+/** Seals a value that opens for `maxAgeSeconds` and not after. */
+export async function seal(payload: JWTPayload, maxAgeSeconds: number): Promise<string> {
   return new EncryptJWT(payload)
     .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
     .setIssuedAt()
+    .setExpirationTime(`${maxAgeSeconds}s`)
     .encrypt(secretKey());
 }
 
-/** The payload, or null when the token was not sealed with this secret. */
+/** The payload, or null when the token has expired or was not sealed with this secret. */
 export async function unseal(token: string): Promise<JWTPayload | null> {
   const key = secretKey();
   try {

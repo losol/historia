@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import type { SessionData } from '@/lib/cart/types';
-import { sealSession, unsealSession } from './sealedSession';
+import { sealSession, unsealSession, VISITOR_SESSION_MAX_AGE } from './sealedSession';
 
 /**
  * The visitor's session: an encrypted cookie that holds the cart and what else
@@ -17,8 +17,6 @@ export interface VisitorSession {
 }
 
 export const VISITOR_SESSION_COOKIE = 'session';
-
-const THIRTY_DAYS = 30 * 24 * 60 * 60;
 
 /** Browsers drop a cookie whose name and value reach this size, without a word. */
 const COOKIE_MAX_BYTES = 4096;
@@ -39,7 +37,7 @@ export async function writeVisitorSession(session: VisitorSession): Promise<void
   }
   (await cookies()).set(VISITOR_SESSION_COOKIE, token, {
     path: '/',
-    maxAge: THIRTY_DAYS,
+    maxAge: VISITOR_SESSION_MAX_AGE,
     sameSite: 'lax',
     httpOnly: true,
     secure: true,

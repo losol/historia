@@ -6,7 +6,6 @@
 
 import { createOidcClient as createFidesOidcClient } from '@eventuras/fides-auth/oidc';
 import { Logger } from '@eventuras/logger';
-import * as openid from 'openid-client';
 import { createLogger } from './logger';
 import type { OidcClient, OidcUserInfo, ResolvedOidcProvider } from './types';
 
@@ -58,21 +57,14 @@ export function createOidcClient<TUser extends OidcUserInfo>(
       if (!tokens.access_token) {
         throw new Error('The token response has no access token');
       }
-      // fides-auth has no userinfo call of its own, so this one goes through
-      // openid-client with the metadata fides-auth discovered.
-      const config = new openid.Configuration(
-        await oidc.metadata(),
-        provider.clientId,
-        provider.clientSecret,
-      );
-      if (allowInsecureRequests) openid.allowInsecureRequests(config);
-      // The ID token names the subject; the userinfo answer must be about the same one.
+      // The ID token names the subject; the userinfo answer must be about the
+      // same one, and fides-auth refuses to ask without it. With `openid` in
+      // the scope a provider always sends an ID token.
       const sub = subjectOf(tokens.id_token);
-      const userInfo = await openid.fetchUserInfo(
-        config,
-        tokens.access_token,
-        sub ?? openid.skipSubjectCheck,
-      );
+      if (!sub) {
+        throw new Error('The token response has no ID token to name the user');
+      }
+      const userInfo = await oidc.userInfo(tokens.access_token, { expectedSubject: sub });
       logger.debug(
         { provider: provider.name, sub: userInfo.sub, hasEmail: !!userInfo.email },
         'Fetched user info',

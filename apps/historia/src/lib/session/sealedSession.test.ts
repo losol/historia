@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { sealSession, unsealSession } from './sealedSession';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { sealSession, unsealSession, VISITOR_SESSION_MAX_AGE } from './sealedSession';
 
 const SECRET = 'c'.repeat(64);
 
@@ -9,6 +9,10 @@ const SEALED_BY_FIDES_AUTH_0_14 =
   'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..o4LeRa8xeM63Mw-X.N1T3Qwarlodar5YJPg6ZJOAyQoR6VvmdRGhkmPUoFcXH1lVwzhQpXrxrBrp3_tc3ccXkTKCpHCRXFYgXdiB6gmiZVBbCa6wrqJ1Q57ytL9YwVV5aET8TsuOonGaINNeKLLKqb8sT_N0_o2N7bChsY15SCkNp4ZMEY3tndyvl0dgJtqwE-mFAwhq5rBOV.0TKOFGai9d7vkz1HW0ufsw';
 
 describe('the sealed visitor session', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('opens a cookie fides-auth 0.x wrote, so carts survive the upgrade', async () => {
     expect(await unsealSession(SEALED_BY_FIDES_AUTH_0_14, SECRET)).toMatchObject({
       data: {
@@ -25,6 +29,21 @@ describe('the sealed visitor session', () => {
     expect(token.split('.')[1]).toBe('');
     expect(token.split('.')[0]).toBe(SEALED_BY_FIDES_AUTH_0_14.split('.')[0]);
     expect(await unsealSession(token, SECRET)).toMatchObject({ data: { cartId: 'c1' } });
+  });
+
+  // 0.x put no expiry in the token, so the old cookie above opens whenever.
+  it('seals a session that opens for as long as its cookie lives, and not after', async () => {
+    vi.useFakeTimers({ now: new Date('2026-01-01T00:00:00Z') });
+    const token = await sealSession({ data: { cartId: 'c1' } }, SECRET);
+
+    vi.setSystemTime(
+      new Date(Date.parse('2026-01-01T00:00:00Z') + (VISITOR_SESSION_MAX_AGE - 5) * 1000),
+    );
+    expect(await unsealSession(token, SECRET)).toMatchObject({ data: { cartId: 'c1' } });
+    vi.setSystemTime(
+      new Date(Date.parse('2026-01-01T00:00:00Z') + (VISITOR_SESSION_MAX_AGE + 5) * 1000),
+    );
+    expect(await unsealSession(token, SECRET)).toBeNull();
   });
 
   it('answers null for a cookie sealed with another secret, or one that is not a token', async () => {

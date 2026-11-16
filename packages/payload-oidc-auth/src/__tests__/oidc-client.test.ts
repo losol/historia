@@ -173,6 +173,15 @@ describe('the default OIDC client, against a provider', () => {
   });
 });
 
+describe('the default OIDC client, without an ID token', () => {
+  it('does not ask for userinfo when no ID token names the user', async () => {
+    const client = createOidcClient(provider(), REDIRECT_URI);
+    await expect(
+      client.getUserInfo({ access_token: 'the-access-token', token_type: 'bearer' } as never),
+    ).rejects.toThrow('no ID token');
+  });
+});
+
 describe('clientFor', () => {
   it('keeps one client per redirect URI, so the provider is discovered once', async () => {
     const idp = provider();

@@ -120,7 +120,7 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
       user: { id: user.id, email: user.email },
       expiresAt: Date.now() + PENDING_SESSION_MAX_AGE * 1000,
     };
-    const sessionToken = await seal({ ...pending });
+    const sessionToken = await seal({ ...pending }, PENDING_SESSION_MAX_AGE);
 
     // The return path rides along in the query; the session route checks it again.
     const sessionUrl = new URL(`${provider.basePath}/session`, new URL(redirectUri).origin);
