@@ -531,7 +531,6 @@ export interface Media {
           }
       )[]
     | null;
-  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -3406,7 +3405,6 @@ export interface MediaSelect<T extends boolean = true> {
   attributionUrl?: T;
   collection?: T;
   relatedContent?: T;
-  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
