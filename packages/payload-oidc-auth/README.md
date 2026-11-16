@@ -94,6 +94,6 @@ A provider:
 
 ## Environment
 
-`SESSION_SECRET`: 64 hex characters, used to encrypt the cookie between the callback and the session route (through `@eventuras/fides-auth`).
+`SESSION_SECRET`: 64 hex characters, used to encrypt the cookie between the callback and the session route.
 
 The provider must have `{origin}/api/auth/{name}/callback` registered as a redirect URI for every domain the deployment serves.

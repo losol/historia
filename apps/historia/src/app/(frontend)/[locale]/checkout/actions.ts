@@ -5,7 +5,6 @@ import {
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import {
   type CreatePaymentRequest,
@@ -21,6 +20,7 @@ import { isSiteLocale } from '@/app/(frontend)/[locale]/c/[collection]/pageColle
 import { setCartPaymentReference } from '@/lib/cart/paymentReference';
 import { saveCartToDatabase } from '@/lib/cart/saveCartToDatabase';
 import { findPurchasableProducts, isValidQuantity } from '@/lib/commerce/cartValidation';
+import { readVisitorSession } from '@/lib/session/visitorSession';
 import { SHIPPING_OPTIONS } from '@/lib/shipping/options';
 import { getVippsConfig } from '@/lib/vipps/config';
 import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
@@ -408,7 +408,7 @@ export async function createVippsPayment({
  */
 export async function checkPendingPayment(): Promise<ServerActionResult<PaymentDetails | null>> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const cart = session?.data?.cart;
 
     if (!cart?.paymentReference) {

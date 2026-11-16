@@ -10,6 +10,7 @@ export default defineVanillaLibConfig({
     /^@payloadcms\//,
     'payload',
     'openid-client',
+    'jose',
     'uuid',
     'react',
     'react/jsx-runtime',

@@ -4,13 +4,8 @@
  * one that needs extra headers brings its own `OidcClient`.
  */
 
-import {
-  buildAuthorizationUrl,
-  buildPKCEOptions,
-  exchangeAuthorizationCode,
-  type OAuthConfig,
-} from '@eventuras/fides-auth/oauth';
-import { discoverConfiguration } from '@eventuras/fides-auth/oidc-discovery';
+import { createOidcClient as createFidesOidcClient } from '@eventuras/fides-auth/oidc';
+import { Logger } from '@eventuras/logger';
 import * as openid from 'openid-client';
 import { createLogger } from './logger';
 import type { OidcClient, OidcUserInfo, ResolvedOidcProvider } from './types';
@@ -33,30 +28,44 @@ export function createOidcClient<TUser extends OidcUserInfo>(
   provider: ResolvedOidcProvider<TUser>,
   redirectUri: string,
 ): OidcClient<TUser> {
-  const oauthConfig: OAuthConfig = {
-    issuer: provider.issuer,
-    clientId: provider.clientId,
-    clientSecret: provider.clientSecret,
-    redirect_uri: redirectUri,
-    scope: provider.scope,
-  };
+  // fides-auth only lets http through to a loopback address, so this opens a
+  // provider on localhost in development and nothing else.
+  const allowInsecureRequests = provider.issuer.startsWith('http://');
+
+  // The client keeps the provider's discovery document, so it is made once per
+  // redirect URI (see `clientFor`) and not for every request.
+  const oidc = createFidesOidcClient(
+    {
+      issuer: provider.issuer,
+      clientId: provider.clientId,
+      clientSecret: provider.clientSecret,
+      redirectUri,
+      scope: provider.scope,
+      allowInsecureRequests,
+    },
+    // Without a logger fides-auth writes its own JSON lines to the console.
+    { logger: Logger },
+  );
 
   return {
-    buildPKCEOptions: () => buildPKCEOptions(oauthConfig),
+    createAuthorizationRequest: () => oidc.createAuthorizationRequest(),
 
-    async buildAuthorizationUrl(pkce) {
-      const config = await discoverConfiguration(oauthConfig);
-      return buildAuthorizationUrl(config, pkce);
-    },
+    authorizationUrl: (request) => oidc.authorizationUrl(request),
 
-    exchangeCodeForTokens: (callbackUrl, codeVerifier, expectedState) =>
-      exchangeAuthorizationCode(oauthConfig, callbackUrl, codeVerifier, expectedState),
+    exchangeCode: (callbackUrl, request) => oidc.exchangeCode(callbackUrl, request),
 
     async getUserInfo(tokens) {
       if (!tokens.access_token) {
         throw new Error('The token response has no access token');
       }
-      const config = await discoverConfiguration(oauthConfig);
+      // fides-auth has no userinfo call of its own, so this one goes through
+      // openid-client with the metadata fides-auth discovered.
+      const config = new openid.Configuration(
+        await oidc.metadata(),
+        provider.clientId,
+        provider.clientSecret,
+      );
+      if (allowInsecureRequests) openid.allowInsecureRequests(config);
       // The ID token names the subject; the userinfo answer must be about the same one.
       const sub = subjectOf(tokens.id_token);
       const userInfo = await openid.fetchUserInfo(
@@ -71,4 +80,28 @@ export function createOidcClient<TUser extends OidcUserInfo>(
       return userInfo as unknown as TUser;
     },
   };
+}
+
+const clients = new WeakMap<object, Map<string, OidcClient<never>>>();
+
+/**
+ * The provider's client for one redirect URI, made once and kept. A site served
+ * on several hosts has a redirect URI for each, and each gets its own client:
+ * the redirect URI is part of a fides-auth client's configuration.
+ */
+export function clientFor<TUser extends OidcUserInfo>(
+  provider: ResolvedOidcProvider<TUser>,
+  redirectUri: string,
+): OidcClient<TUser> {
+  let byRedirectUri = clients.get(provider);
+  if (!byRedirectUri) {
+    byRedirectUri = new Map();
+    clients.set(provider, byRedirectUri);
+  }
+  let client = byRedirectUri.get(redirectUri) as OidcClient<TUser> | undefined;
+  if (!client) {
+    client = provider.createClient(provider, redirectUri);
+    byRedirectUri.set(redirectUri, client as OidcClient<never>);
+  }
+  return client;
 }

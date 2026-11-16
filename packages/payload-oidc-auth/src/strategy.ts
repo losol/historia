@@ -6,14 +6,13 @@
  * @see https://payloadcms.com/docs/authentication/custom-strategies
  */
 
-import { validateSessionJwt } from '@eventuras/fides-auth/session-validation';
-import { getSessionSecret } from '@eventuras/fides-auth/utils';
 import type { AuthStrategy, AuthStrategyResult } from 'payload';
 import { v4 as uuidv4 } from 'uuid';
 import { clearCookieHeader, parseCookies, pendingSessionCookie } from './cookies';
 import type { PendingSession } from './handlers/callback';
 import { createLogger } from './logger';
 import { strategyName } from './provider';
+import { unseal } from './sealed';
 import type { ResolvedOidcProvider } from './types';
 
 /** A row in the collection's `sessions` array, as Payload stores it. */
@@ -36,12 +35,12 @@ export function createOidcAuthStrategy(
 
       let pending: PendingSession;
       try {
-        const { status, session } = await validateSessionJwt(token, getSessionSecret());
-        if (status !== 'VALID' || !session) {
-          log.warn({ status }, 'Invalid pending session');
+        const payload = await unseal(token);
+        if (!payload) {
+          log.warn('Invalid pending session');
           return { user: null };
         }
-        pending = session as unknown as PendingSession;
+        pending = payload as unknown as PendingSession;
       } catch (error) {
         log.error({ error }, 'Failed to decrypt the pending session');
         return { user: null };

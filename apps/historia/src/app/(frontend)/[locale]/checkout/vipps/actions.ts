@@ -5,13 +5,13 @@ import {
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
 import { sessionOwnsPayment } from '@/lib/cart/paymentReference';
 import type { SessionData } from '@/lib/cart/types';
 import { getSessionContext } from '@/lib/session/sessionId';
+import { readVisitorSession } from '@/lib/session/visitorSession';
 import { createOrderFromPayment } from './createOrderFromPayment';
 
 // The actions the return page calls. Creating the order itself lives in
@@ -71,7 +71,7 @@ async function validatePaymentOwnership(
     }
 
     // FALLBACK VALIDATION: Check session (optional, for performance)
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const sessionData = session?.data as SessionData | undefined;
     const paymentReferences = sessionData?.paymentReferences || [];
 

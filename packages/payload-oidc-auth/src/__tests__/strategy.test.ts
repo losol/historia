@@ -1,5 +1,5 @@
-import { createEncryptedJWT } from '@eventuras/fides-auth/utils';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { seal } from '../sealed';
 import { createOidcAuthStrategy } from '../strategy';
 import { fakePayload } from './fake-payload';
 
@@ -12,7 +12,7 @@ beforeAll(() => {
 const headersWith = (cookie: string) => new Headers({ cookie });
 
 const pendingCookie = async (provider: string, userId: string, expiresAt = Date.now() + 60_000) =>
-  `__${provider}_session_pending=${await createEncryptedJWT({ provider, user: { id: userId }, expiresAt }, SECRET)}`;
+  `__${provider}_session_pending=${await seal({ provider, user: { id: userId }, expiresAt })}`;
 
 describe('createOidcAuthStrategy', () => {
   const strategy = createOidcAuthStrategy({ name: 'idp', basePath: '/api/auth/idp' });

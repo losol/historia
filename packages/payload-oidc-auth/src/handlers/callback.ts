@@ -4,7 +4,6 @@
  * encrypted cookie.
  */
 
-import { createEncryptedJWT, getSessionSecret } from '@eventuras/fides-auth/utils';
 import type { Payload } from 'payload';
 import {
   clearCookieHeader,
@@ -16,8 +15,10 @@ import {
   setCookieHeader,
 } from '../cookies';
 import { createLogger } from '../logger';
+import { clientFor } from '../oidc-client';
 import { getPublicRequestOrigin, requestUrl } from '../origin';
 import { RETURN_TO_PARAM, safeReturnPath } from '../return-path';
+import { seal } from '../sealed';
 import type { IncomingRequest, OidcLoginError, OidcUserInfo, ResolvedOidcProvider } from '../types';
 import { findOrCreateUser, OidcLoginFailure } from '../users';
 import { redirectUriFor } from './login';
@@ -96,11 +97,11 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
     // The redirect URI from the login, so the token exchange matches it exactly
     // even when the callback is reached on an internal address.
     const redirectUri = getCookie(request, cookies.redirectUri) ?? redirectUriFor(provider, origin);
-    const client = provider.createClient(provider, redirectUri);
+    const client = clientFor(provider, redirectUri);
 
     const callbackUrl = new URL(redirectUri);
     callbackUrl.search = url.search;
-    const tokens = await client.exchangeCodeForTokens(callbackUrl, codeVerifier, state);
+    const tokens = await client.exchangeCode(callbackUrl, { codeVerifier, state });
     if (!tokens.access_token) {
       log.error('The token response has no access token');
       return withClearedHandshake(fail('token_failed'));
@@ -119,7 +120,7 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
       user: { id: user.id, email: user.email },
       expiresAt: Date.now() + PENDING_SESSION_MAX_AGE * 1000,
     };
-    const sessionToken = await createEncryptedJWT(pending, getSessionSecret());
+    const sessionToken = await seal({ ...pending });
 
     // The return path rides along in the query; the session route checks it again.
     const sessionUrl = new URL(`${provider.basePath}/session`, new URL(redirectUri).origin);

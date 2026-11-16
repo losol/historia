@@ -3,9 +3,12 @@ import {
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import type { Session } from '@eventuras/fides-auth-next';
-import { createSession, getCurrentSession, setSessionCookie } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
+import {
+  readVisitorSession,
+  type VisitorSession,
+  writeVisitorSession,
+} from '@/lib/session/visitorSession';
 import type { Cart, SessionData } from './types';
 
 // Not server actions. A payment reference in the session is what lets a visitor see
@@ -28,7 +31,7 @@ export async function setCartPaymentReference(
   try {
     logger.info({ reference }, 'Setting payment reference in cart');
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const existingCart = session?.data?.cart;
 
     if (!existingCart?.items || existingCart.items.length === 0) {
@@ -48,7 +51,7 @@ export async function setCartPaymentReference(
       paymentReference: reference,
     };
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
@@ -57,8 +60,7 @@ export async function setCartPaymentReference(
       },
     };
 
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
+    await writeVisitorSession(updatedSession);
 
     logger.info(
       { reference, totalReferences: paymentReferences.length },
@@ -80,7 +82,7 @@ export async function setCartPaymentReference(
  */
 export async function sessionOwnsPayment(paymentReference: string): Promise<boolean> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const sessionData = session?.data as SessionData | undefined;
     return (
       sessionData?.cart?.paymentReference === paymentReference ||

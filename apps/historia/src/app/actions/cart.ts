@@ -5,18 +5,21 @@ import {
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import type { Session } from '@eventuras/fides-auth-next';
-import { createSession, getCurrentSession, setSessionCookie } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
-import type { Cart, CartItem, SessionData } from '@/lib/cart/types';
+import type { Cart, CartItem } from '@/lib/cart/types';
 import {
   findPurchasableProducts,
   isValidProductId,
   isValidQuantity,
   MAX_ITEM_QUANTITY,
 } from '@/lib/commerce/cartValidation';
+import {
+  readVisitorSession,
+  type VisitorSession,
+  writeVisitorSession,
+} from '@/lib/session/visitorSession';
 import { getCurrentWebsiteId } from '@/lib/website';
 
 const logger = Logger.create({
@@ -31,7 +34,7 @@ const CART_EXPIRY_HOURS = 24;
  */
 export async function getCart(): Promise<Cart | null> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
 
     if (!session?.data?.cart) {
       logger.debug('No cart in session');
@@ -39,8 +42,8 @@ export async function getCart(): Promise<Cart | null> {
     }
 
     // Check if cart has expired
-    const expiresAt = new Date(session.data.cart.expiresAt);
-    if (expiresAt < new Date()) {
+    const { expiresAt } = session.data.cart;
+    if (expiresAt && new Date(expiresAt) < new Date()) {
       logger.info('Cart expired, clearing');
       await clearCart();
       return null;
@@ -94,17 +97,17 @@ export async function getValidatedCart(): Promise<
       return actionSuccess({ cart, removedProductIds });
     }
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const updatedCart: Cart = {
       ...cart,
       items: cart.items.filter((item) => !removedProductIds.includes(item.productId)),
       paymentReference: undefined,
     };
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: { ...session?.data, cart: updatedCart },
     };
-    await setSessionCookie(await createSession(updatedSession));
+    await writeVisitorSession(updatedSession);
 
     logger.info(
       { removedProductIds, remainingItems: updatedCart.items.length },
@@ -144,7 +147,7 @@ export async function addToCart(
       return actionError('This product is not available');
     }
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const existingCart = session?.data?.cart;
 
     const now = new Date();
@@ -187,7 +190,7 @@ export async function addToCart(
       paymentReference: undefined,
     };
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
@@ -196,8 +199,7 @@ export async function addToCart(
     };
 
     try {
-      const jwt = await createSession(updatedSession);
-      await setSessionCookie(jwt);
+      await writeVisitorSession(updatedSession);
     } catch (sessionError) {
       logger.error({ error: sessionError, updatedCart }, 'Failed to create session');
       throw sessionError;
@@ -227,7 +229,7 @@ export async function updateCartItem(
       return actionError('Invalid product or quantity');
     }
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const existingCart = session?.data?.cart;
 
     if (!existingCart?.items) {
@@ -250,7 +252,7 @@ export async function updateCartItem(
       paymentReference: undefined,
     };
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
@@ -258,8 +260,7 @@ export async function updateCartItem(
       },
     };
 
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
+    await writeVisitorSession(updatedSession);
 
     logger.info({ productId, quantity }, 'Cart item updated successfully');
     return actionSuccess(updatedCart);
@@ -276,7 +277,7 @@ export async function removeFromCart(productId: string): Promise<ServerActionRes
   try {
     logger.info({ productId }, 'Removing item from cart');
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const existingCart = session?.data?.cart;
 
     if (!existingCart?.items) {
@@ -294,7 +295,7 @@ export async function removeFromCart(productId: string): Promise<ServerActionRes
       paymentReference: undefined,
     };
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
@@ -302,8 +303,7 @@ export async function removeFromCart(productId: string): Promise<ServerActionRes
       },
     };
 
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
+    await writeVisitorSession(updatedSession);
 
     logger.info({ productId, remainingItems: updatedItems.length }, 'Item removed from cart');
     return actionSuccess(updatedCart);
@@ -320,9 +320,9 @@ export async function clearCart(): Promise<ServerActionResult<void>> {
   try {
     logger.info('Clearing cart');
 
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
@@ -331,8 +331,7 @@ export async function clearCart(): Promise<ServerActionResult<void>> {
       },
     };
 
-    const jwt = await createSession(updatedSession);
-    await setSessionCookie(jwt);
+    await writeVisitorSession(updatedSession);
 
     logger.info('Cart and payment references cleared successfully');
     return actionSuccess(undefined);
@@ -354,7 +353,7 @@ export async function clearCartAfterPayment(
   reference: string,
 ): Promise<ServerActionResult<{ cleared: boolean }>> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
     const cart = session?.data?.cart;
 
     if (!cart || cart.paymentReference !== reference) {
@@ -365,14 +364,14 @@ export async function clearCartAfterPayment(
       return actionSuccess({ cleared: false });
     }
 
-    const updatedSession: Session<SessionData> = {
+    const updatedSession: VisitorSession = {
       ...session,
       data: {
         ...session?.data,
         cart: undefined,
       },
     };
-    await setSessionCookie(await createSession(updatedSession));
+    await writeVisitorSession(updatedSession);
 
     logger.info({ reference }, 'Cart cleared after payment');
     return actionSuccess({ cleared: true });
