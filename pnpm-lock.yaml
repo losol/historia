@@ -50,11 +50,8 @@ importers:
         specifier: ^0.1.4
         version: 0.1.4(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(react@19.3.1)
       '@eventuras/fides-auth':
-        specifier: ^0.14.1
-        version: 0.14.1
-      '@eventuras/fides-auth-next':
-        specifier: ^0.7.2
-        version: 0.7.2(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))(@xstate/store-react@2.0.0(react@19.3.1))(@xstate/store@4.2.3)(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(react@19.3.1)
+        specifier: 1.0.0-beta.6
+        version: 1.0.0-beta.6
       '@eventuras/logger':
         specifier: ^0.9.2
         version: 0.9.2(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))
@@ -151,6 +148,9 @@ importers:
       import-in-the-middle:
         specifier: ^3.5.3
         version: 3.5.3
+      jose:
+        specifier: ^6.2.15
+        version: 6.2.15
       nanoid:
         specifier: ^6.0.2
         version: 6.0.2
@@ -300,11 +300,14 @@ importers:
   packages/payload-oidc-auth:
     dependencies:
       '@eventuras/fides-auth':
-        specifier: ^0.14.1
-        version: 0.14.1
+        specifier: 1.0.0-beta.6
+        version: 1.0.0-beta.6
       '@eventuras/logger':
         specifier: ^0.9.2
         version: 0.9.2(@opentelemetry/sdk-logs@0.223.0(@opentelemetry/api@1.10.0))
+      jose:
+        specifier: ^6.2.15
+        version: 6.2.15
       openid-client:
         specifier: ^6.8.8
         version: 6.8.8
@@ -349,8 +352,11 @@ importers:
   packages/payload-vipps-auth:
     dependencies:
       '@eventuras/fides-auth':
-        specifier: ^0.14.1
-        version: 0.14.1
+        specifier: 1.0.0-beta.6
+        version: 1.0.0-beta.6
+      '@eventuras/logger':
+        specifier: ^0.9.2
+        version: 0.9.2(@opentelemetry/sdk-logs@0.223.0(@opentelemetry/api@1.10.0))
       '@eventuras/payload-oidc-auth':
         specifier: workspace:*
         version: link:../payload-oidc-auth
@@ -1246,45 +1252,9 @@ packages:
   '@eventuras/core@0.4.1':
     resolution: {integrity: sha512-+4QkasakfnELZ7KzTQUuKFA5lKRFYAcUrbOnBLolPMbQV//E+D4Lg0fm1SvJwINwVq6qQpChc4F8TLB4B27oog==}
 
-  '@eventuras/fides-auth-next@0.7.2':
-    resolution: {integrity: sha512-vmgFh7TB/SSVYayzqVMbleE46tgErBldz5nW2hRQhTede9k56M/reT4pmhDOySacRfuYcfB22m7EDbXGc/KNqA==}
-    peerDependencies:
-      next: ^16.0.0
-      react: ^19.0.0
-
-  '@eventuras/fides-auth-react@0.1.7':
-    resolution: {integrity: sha512-GlI7yfRTaSxepwLEoBkIVR79AcbGwTJsfBOcYIz2K4blPNIJpQHbgdNLkgIn8BWmyz+KKDijlyq4KXIruwMBtA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@xstate/store': ^4.2.3
-      '@xstate/store-react': ^2.0.0
-      react: ^19.0.0
-
-  '@eventuras/fides-auth-store@0.2.3':
-    resolution: {integrity: sha512-O4EKwl1xL87t21gFzQEmg/qKkhVXOvOeaEApED6TVrdTGV2pxLVLh6OV0XxgUHHHd8FlJXYhVFC3zNLHRUD1pg==}
-    engines: {node: '>=18'}
-
-  '@eventuras/fides-auth@0.14.1':
-    resolution: {integrity: sha512-chHOe5VtCRPg/xlD2BS29ilCyJuA+DLHYs2b7jsxvBUIalG47G1H2PyFokeuZ6NDr1lc1nu7GOb8jdnqoujaTw==}
-    engines: {node: '>=18'}
-
-  '@eventuras/logger@0.8.1':
-    resolution: {integrity: sha512-gleM4HZLXepXMit4/mj8QSePgzivm/LN2/YW6u0wmsHZ3W+Wn5dT2rCZFB1AxDXiErRwOC+FNcuYsw6lwOF6Pg==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      '@opentelemetry/api': ^1.9.0
-      '@opentelemetry/api-logs': '>=0.200.0 <1.0.0'
-      '@opentelemetry/instrumentation-pino': '>=0.50.0 <1.0.0'
-      '@opentelemetry/sdk-logs': '>=0.200.0 <1.0.0'
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      '@opentelemetry/api-logs':
-        optional: true
-      '@opentelemetry/instrumentation-pino':
-        optional: true
-      '@opentelemetry/sdk-logs':
-        optional: true
+  '@eventuras/fides-auth@1.0.0-beta.6':
+    resolution: {integrity: sha512-gvFItPCUQ75aKNJpuicxrTnsqLlnN5pi3dmPprBDV6G+Isk2uuihVPlIzg6HqsyQpaLixaZdA1ZTkK3Y6jWQJw==}
+    engines: {node: '>=22'}
 
   '@eventuras/logger@0.9.2':
     resolution: {integrity: sha512-KTkQ9eKviChduHh36KuA7GcCC2HB3CRxrok5pvyt6gspTz7YCv/0c3U8ZdWIo8dCbQkzoEs98NayDaTMNITu6A==}
@@ -1976,10 +1946,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@opentelemetry/api-logs@0.222.0':
-    resolution: {integrity: sha512-9mb1If+IF6u0ZVXkHQ6ogEae5HwA6ajIVUgpSDQyRASxft6BSXHvBvPooRle3yFN/fKnCdSOnuu0OC3PLcF6+g==}
-    engines: {node: '>=8.0.0'}
 
   '@opentelemetry/api-logs@0.223.0':
     resolution: {integrity: sha512-Oepm6etVPFCn0VWB1t833iOTgz1eYBDUPxcrOR/XvwzD1+Ag9VzSPSrrKAFNJ/haatj+8CXbG47pZXvdNQKDJw==}
@@ -3240,14 +3206,6 @@ packages:
   '@webassemblyjs/wast-printer@1.14.1':
     resolution: {integrity: sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw==}
 
-  '@xstate/store-react@2.0.0':
-    resolution: {integrity: sha512-i8rXkUHfZqHUijgA/IORXDESAuHwO939jHIsEtf3nitJkOy1AcZ73DMaAlLqH03nVS082PJkUZFRAu5nwb9Fxg==}
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
-
-  '@xstate/store@4.2.3':
-    resolution: {integrity: sha512-vV/s0kpk0i3Mmo2AsDMUB5h4xTu/b3fRvXeYhnnz8ODY5ueQXMOlGI8Fn1fY0RXOmCKCmaNOeM6d2hWCrfuMtA==}
-
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
 
@@ -4214,11 +4172,8 @@ packages:
   jose@5.10.0:
     resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
 
-  jose@6.2.12:
-    resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
-
-  jose@6.2.13:
-    resolution: {integrity: sha512-7TIg10ZE1x82YediN+lcrPNvGMKge9yFHQD+Qho/b8y2adfugU3AsvvHfxV0fzyFllT6l9xCjf4RWY9g/Z9PJQ==}
+  jose@6.2.15:
+    resolution: {integrity: sha512-qdF6ewcZARtef63fJ9AKKZPgxw+t7USH6HLXYcD4CrdmSvDp79rpJSPFEKc90QBeGS63u1KQtN2MZQHC0yDIzA==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -4981,9 +4936,6 @@ packages:
 
   process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
-
-  process-warning@5.1.0:
-    resolution: {integrity: sha512-jQSaVHsPgtyw60e1rQ/A+/ArPEj/S8pS/vFnyGa/gYFXrKk/6RuDkoqVDQ5NI5MmS01698ltlAk0NoDBNLujRw==}
 
   process-warning@5.1.1:
     resolution: {integrity: sha512-oCkNVj4OKnKEcocVBcDfiIugN1/cE6rgfT3nCtzeqZPA8+rIxMaQ0xXzIkGP8Gj2qUaP1UR7uhJ1VD8lUCpzCg==}
@@ -6530,69 +6482,21 @@ snapshots:
 
   '@eventuras/core@0.4.1': {}
 
-  '@eventuras/fides-auth-next@0.7.2(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))(@xstate/store-react@2.0.0(react@19.3.1))(@xstate/store@4.2.3)(next@16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(react@19.3.1)':
+  '@eventuras/fides-auth@1.0.0-beta.6':
     dependencies:
-      '@eventuras/fides-auth': 0.14.1
-      '@eventuras/fides-auth-react': 0.1.7(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))(@xstate/store-react@2.0.0(react@19.3.1))(@xstate/store@4.2.3)(react@19.3.1)
-      '@eventuras/fides-auth-store': 0.2.3(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))
-      next: 16.4.3(@opentelemetry/api@1.10.0)(@types/node@24.13.3)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4)
-      react: 19.3.1
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/api-logs'
-      - '@opentelemetry/instrumentation-pino'
-      - '@opentelemetry/sdk-logs'
-      - '@xstate/store'
-      - '@xstate/store-react'
-
-  '@eventuras/fides-auth-react@0.1.7(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))(@xstate/store-react@2.0.0(react@19.3.1))(@xstate/store@4.2.3)(react@19.3.1)':
-    dependencies:
-      '@eventuras/fides-auth': 0.14.1
-      '@eventuras/fides-auth-store': 0.2.3(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))
-      '@eventuras/logger': 0.8.1(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))
-      '@xstate/store': 4.2.3
-      '@xstate/store-react': 2.0.0(react@19.3.1)
-      react: 19.3.1
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/api-logs'
-      - '@opentelemetry/instrumentation-pino'
-      - '@opentelemetry/sdk-logs'
-
-  '@eventuras/fides-auth-store@0.2.3(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))':
-    dependencies:
-      '@eventuras/fides-auth': 0.14.1
-      '@eventuras/logger': 0.8.1(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))
-      '@xstate/store': 4.2.3
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/api-logs'
-      - '@opentelemetry/instrumentation-pino'
-      - '@opentelemetry/sdk-logs'
-
-  '@eventuras/fides-auth@0.14.1':
-    dependencies:
-      jose: 6.2.12
+      jose: 6.2.15
       openid-client: 6.8.8
-
-  '@eventuras/logger@0.8.1(@opentelemetry/api-logs@0.223.0)(@opentelemetry/api@1.10.0)(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))':
-    dependencies:
-      pino: 10.4.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.10.0
-      '@opentelemetry/api-logs': 0.223.0
-      '@opentelemetry/sdk-logs': 3.0.0(@opentelemetry/api@1.10.0)
 
   '@eventuras/logger@0.9.2(@opentelemetry/sdk-logs@0.223.0(@opentelemetry/api@1.10.0))':
     dependencies:
-      '@opentelemetry/api-logs': 0.222.0
+      '@opentelemetry/api-logs': 0.223.0
       pino: 10.4.0
     optionalDependencies:
       '@opentelemetry/sdk-logs': 0.223.0(@opentelemetry/api@1.10.0)
 
   '@eventuras/logger@0.9.2(@opentelemetry/sdk-logs@3.0.0(@opentelemetry/api@1.10.0))':
     dependencies:
-      '@opentelemetry/api-logs': 0.222.0
+      '@opentelemetry/api-logs': 0.223.0
       pino: 10.4.0
     optionalDependencies:
       '@opentelemetry/sdk-logs': 3.0.0(@opentelemetry/api@1.10.0)
@@ -7223,7 +7127,7 @@ snapshots:
       express: 5.3.0
       express-rate-limit: 8.7.1(express@5.3.0)
       hono: 4.13.14
-      jose: 6.2.13
+      jose: 6.2.15
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
@@ -7290,14 +7194,9 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@opentelemetry/api-logs@0.222.0':
-    dependencies:
-      '@opentelemetry/api': 1.10.0
-
   '@opentelemetry/api-logs@0.223.0':
     dependencies:
       '@opentelemetry/api': 1.10.0
-    optional: true
 
   '@opentelemetry/api@1.10.0': {}
 
@@ -8660,13 +8559,6 @@ snapshots:
       '@xtuc/long': 4.2.2
     optional: true
 
-  '@xstate/store-react@2.0.0(react@19.3.1)':
-    dependencies:
-      '@xstate/store': 4.2.3
-      react: 19.3.1
-
-  '@xstate/store@4.2.3': {}
-
   '@xtuc/ieee754@1.2.0':
     optional: true
 
@@ -9607,9 +9499,7 @@ snapshots:
 
   jose@5.10.0: {}
 
-  jose@6.2.12: {}
-
-  jose@6.2.13: {}
+  jose@6.2.15: {}
 
   joycon@3.1.1: {}
 
@@ -10213,7 +10103,7 @@ snapshots:
 
   openid-client@6.8.8:
     dependencies:
-      jose: 6.2.12
+      jose: 6.2.15
       oauth4webapi: 3.8.8
 
   oxc-parser@0.152.0:
@@ -10404,7 +10294,7 @@ snapshots:
       on-exit-leak-free: 2.1.2
       pino-abstract-transport: 3.0.0
       pino-std-serializers: 7.1.0
-      process-warning: 5.1.0
+      process-warning: 5.1.1
       quick-format-unescaped: 4.0.4
       real-require: 1.0.0
       safe-stable-stringify: 2.5.0
@@ -10456,8 +10346,6 @@ snapshots:
   prettier@3.9.10: {}
 
   process-nextick-args@2.0.1: {}
-
-  process-warning@5.1.0: {}
 
   process-warning@5.1.1: {}
 

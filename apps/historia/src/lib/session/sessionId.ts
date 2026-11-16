@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
-import { getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
+import { readVisitorSession } from '@/lib/session/visitorSession';
 
 // Not a server action: helpers for server code that logs with the session id.
 
@@ -14,7 +14,7 @@ interface SessionData {
   [key: string]: unknown;
 }
 
-/** Identifier fields some auth providers put on the session user beyond what fides-auth types. */
+/** Identifier fields a session cookie written by an earlier version may carry on its user. */
 interface SessionUserIds {
   sub?: string;
   id?: string;
@@ -40,7 +40,7 @@ interface SessionUserIds {
  */
 export async function getOrCreateSessionId(): Promise<string | null> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
 
     // If no session exists at all, we can't create one here
     // (session creation happens via authentication or explicit session setup)
@@ -99,7 +99,7 @@ export async function getSessionContext(): Promise<{
   userId?: string;
 }> {
   try {
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
 
     if (!session) {
       return {};
@@ -109,8 +109,7 @@ export async function getSessionContext(): Promise<{
 
     // Extract userId from user object - it may be stored as 'sub' in some auth systems
     // or as a custom field in session.data
-    // fides-auth types the user as { name, email, roles }, but the object can carry more.
-    const user = session.user as (NonNullable<typeof session.user> & SessionUserIds) | undefined;
+    const user = session.user as SessionUserIds | undefined;
     const userId =
       user?.sub ||
       user?.id ||

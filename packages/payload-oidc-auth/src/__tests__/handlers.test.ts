@@ -15,18 +15,18 @@ function fakeClient(userInfo: Partial<OidcUserInfo> = {}): OidcClient & { calls:
   const calls: unknown[] = [];
   return {
     calls,
-    async buildPKCEOptions() {
+    async createAuthorizationRequest() {
       return {
-        code_verifier: 'verifier',
-        code_challenge: 'challenge',
+        codeVerifier: 'verifier',
+        codeChallenge: 'challenge',
         state: 'st4te',
         parameters: {},
       };
     },
-    async buildAuthorizationUrl() {
+    async authorizationUrl() {
       return new URL('https://idp.example.com/authorize?state=st4te');
     },
-    async exchangeCodeForTokens(callbackUrl, codeVerifier, state) {
+    async exchangeCode(callbackUrl, { codeVerifier, state }) {
       calls.push({ callbackUrl: callbackUrl.toString(), codeVerifier, state });
       return { access_token: 'at', token_type: 'bearer' } as never;
     },

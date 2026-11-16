@@ -5,6 +5,7 @@
 
 import { handshakeCookies, redirect, setCookieHeader } from '../cookies';
 import { createLogger } from '../logger';
+import { clientFor } from '../oidc-client';
 import { getPublicRequestOrigin, requestUrl } from '../origin';
 import { RETURN_TO_PARAM, safeReturnPath } from '../return-path';
 import type { IncomingRequest, OidcUserInfo, ResolvedOidcProvider } from '../types';
@@ -29,20 +30,23 @@ export async function handleOidcLogin<TUser extends OidcUserInfo>(
   try {
     const origin = getPublicRequestOrigin(request, options.allowedDomains);
     const redirectUri = redirectUriFor(provider, origin);
-    const client = provider.createClient(provider, redirectUri);
+    const client = clientFor(provider, redirectUri);
 
-    const pkce = await client.buildPKCEOptions();
-    const authUrl = await client.buildAuthorizationUrl(pkce);
-    log.info({ state: pkce.state, redirectUri }, 'Redirecting to the provider');
+    const authorization = await client.createAuthorizationRequest();
+    const authUrl = await client.authorizationUrl(authorization);
+    log.info({ state: authorization.state, redirectUri }, 'Redirecting to the provider');
 
     // The verifier is kept in a cookie, not in memory, so it survives a restart
     // and works with several instances. The redirect URI goes along so the
     // callback uses the very same one, whatever host it is reached on.
     const url = requestUrl(request);
     const secure = url.protocol === 'https:' || origin.startsWith('https:');
-    const cookies = handshakeCookies(provider.name, pkce.state);
+    const cookies = handshakeCookies(provider.name, authorization.state);
     const handshake = [
-      setCookieHeader(cookies.verifier, pkce.code_verifier, { maxAge: HANDSHAKE_MAX_AGE, secure }),
+      setCookieHeader(cookies.verifier, authorization.codeVerifier, {
+        maxAge: HANDSHAKE_MAX_AGE,
+        secure,
+      }),
       setCookieHeader(cookies.redirectUri, redirectUri, { maxAge: HANDSHAKE_MAX_AGE, secure }),
     ];
     // Where the page that started the login wants the person back, if anywhere.

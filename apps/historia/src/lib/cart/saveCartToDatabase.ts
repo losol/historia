@@ -3,10 +3,10 @@ import {
   actionSuccess,
   type ServerActionResult,
 } from '@eventuras/core-nextjs/actions';
-import { createAndPersistSession, getCurrentSession } from '@eventuras/fides-auth-next';
 import { Logger } from '@eventuras/logger';
 import configPromise from '@payload-config';
 import { getPayload } from 'payload';
+import { readVisitorSession, writeVisitorSession } from '@/lib/session/visitorSession';
 import { getCurrentWebsiteId } from '../website';
 import type { CartItem } from './types';
 
@@ -35,7 +35,7 @@ export async function saveCartToDatabase(): Promise<
     logger.info('Saving cart to database');
 
     // Get current session
-    const session = await getCurrentSession();
+    const session = await readVisitorSession();
 
     if (!session?.data?.cart) {
       logger.warn('No cart in session');
@@ -81,7 +81,7 @@ export async function saveCartToDatabase(): Promise<
       sessionId = crypto.randomUUID();
       sessionData = { ...sessionData, sessionId };
       // Persist the session ID for future requests
-      await createAndPersistSession({ ...session, data: sessionData });
+      await writeVisitorSession({ ...session, data: sessionData });
     }
 
     // Create cart in database
@@ -117,7 +117,7 @@ export async function saveCartToDatabase(): Promise<
     );
 
     // Update session with cart ID and secret
-    await createAndPersistSession({
+    await writeVisitorSession({
       ...session,
       data: {
         ...sessionData,

@@ -2,7 +2,7 @@
  * Types for the OpenID Connect login plugin.
  */
 
-import type { PKCEOptions } from '@eventuras/fides-auth/oauth';
+import type { AuthorizationRequest } from '@eventuras/fides-auth/oidc';
 import type { TokenEndpointResponse } from 'openid-client';
 
 /** What the handlers read from a request: a `Request`, or Payload's `PayloadRequest`. */
@@ -30,12 +30,13 @@ export interface OidcUserInfo {
  * supplies its own through `OidcProvider.createClient`.
  */
 export interface OidcClient<TUser extends OidcUserInfo = OidcUserInfo> {
-  buildPKCEOptions(): Promise<PKCEOptions>;
-  buildAuthorizationUrl(pkce: PKCEOptions): Promise<URL>;
-  exchangeCodeForTokens(
+  /** The PKCE pair and state of one login attempt. */
+  createAuthorizationRequest(): Promise<AuthorizationRequest>;
+  authorizationUrl(request: AuthorizationRequest): Promise<URL>;
+  /** Trades the code for tokens, checking the state and the verifier of the attempt. */
+  exchangeCode(
     callbackUrl: URL,
-    codeVerifier: string,
-    expectedState: string,
+    request: Pick<AuthorizationRequest, 'codeVerifier' | 'state'>,
   ): Promise<TokenEndpointResponse>;
   getUserInfo(tokens: TokenEndpointResponse): Promise<TUser>;
 }
