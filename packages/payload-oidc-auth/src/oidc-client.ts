@@ -11,8 +11,13 @@ import type { OidcClient, OidcUserInfo, ResolvedOidcProvider } from './types';
 
 const logger = createLogger('OidcClient');
 
-/** The subject the ID token names, without verifying it again: openid-client already did. */
-function subjectOf(idToken: string | undefined): string | undefined {
+/**
+ * The subject the ID token of a token response names. It is not verified again:
+ * the token response came straight from the provider's token endpoint, and
+ * openid-client checked its ID token there. For a provider's own client, to
+ * check its userinfo answer against.
+ */
+export function idTokenSubject(idToken: string | undefined): string | undefined {
   const payload = idToken?.split('.')[1];
   if (!payload) return undefined;
   try {
@@ -60,7 +65,7 @@ export function createOidcClient<TUser extends OidcUserInfo>(
       // The ID token names the subject; the userinfo answer must be about the
       // same one, and fides-auth refuses to ask without it. With `openid` in
       // the scope a provider always sends an ID token.
-      const sub = subjectOf(tokens.id_token);
+      const sub = idTokenSubject(tokens.id_token);
       if (!sub) {
         throw new Error('The token response has no ID token to name the user');
       }

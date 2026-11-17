@@ -12,7 +12,7 @@ import {
   type VippsUserInfo,
 } from '@eventuras/fides-auth/providers/vipps';
 import { Logger } from '@eventuras/logger';
-import type { OidcClient, OidcProvider } from '@eventuras/payload-oidc-auth';
+import { idTokenSubject, type OidcClient, type OidcProvider } from '@eventuras/payload-oidc-auth';
 import { resolveApiUrl } from '@eventuras/vipps/vipps-core';
 import type { VippsProviderConfig } from './types';
 
@@ -70,9 +70,13 @@ export function vippsProvider(config: VippsProviderConfig): OidcProvider<VippsUs
         createAuthorizationRequest: () => client.createAuthorizationRequest(),
         authorizationUrl: (request) => client.authorizationUrl(request),
         exchangeCode: (callbackUrl, request) => client.exchangeCode(callbackUrl, request),
-        getUserInfo(tokens) {
+        async getUserInfo(tokens) {
           if (!tokens.access_token) throw new Error('The token response has no access token');
-          return client.getUserInfo(tokens.access_token);
+          // Vipps answers for whoever the access token belongs to; the answer
+          // must be about the person the ID token names.
+          const sub = idTokenSubject(tokens.id_token);
+          if (!sub) throw new Error('The token response has no ID token to name the user');
+          return client.getUserInfo(tokens.access_token, { expectedSubject: sub });
         },
       };
     },

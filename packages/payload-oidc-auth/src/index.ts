@@ -9,7 +9,7 @@
  */
 
 export * from './handlers';
-export { createOidcClient } from './oidc-client';
+export { createOidcClient, idTokenSubject } from './oidc-client';
 export { getPublicRequestOrigin } from './origin';
 export { oidcAuthPlugin, oidcEndpoints } from './plugin';
 export { DEFAULT_SCOPE, resolveConfig, resolveProvider, strategyName } from './provider';
