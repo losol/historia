@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
+import { en } from '@payloadcms/translations/languages/en';
+import { nb } from '@payloadcms/translations/languages/nb';
 import * as Sentry from '@sentry/nextjs';
 import type { APIError, PayloadRequest } from 'payload';
 import { buildConfig } from 'payload';
@@ -111,6 +113,14 @@ const emailAdapter = smtpEnabled
 
 export default buildConfig({
   admin: {
+    // Chrome must not translate the admin. Translation swaps the page's text for
+    // elements of its own, and React, which still holds the old text, crashes with
+    // "Failed to execute 'removeChild'" at its next render: a new article lost its
+    // form as soon as a title was typed. Editors who read Norwegian get the admin in
+    // Norwegian instead (`i18n` below).
+    meta: {
+      other: { google: 'notranslate' },
+    },
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       views: {
@@ -223,7 +233,10 @@ export default buildConfig({
     defaultLocale: defaultLocale,
     fallback: true,
   },
+  // Payload picks the admin's language from the browser's, so a Norwegian browser
+  // gets Norwegian, and each user can change it in their account.
   i18n: {
+    supportedLanguages: { en, nb },
     fallbackLanguage: 'en',
   },
   hooks: {
