@@ -12,6 +12,7 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { type CollectionSlug, getPayload } from 'payload';
 import { RenderBlocks } from '@/blocks/RenderBlocks';
 import { Byline } from '@/components/Byline';
+import { CourseIntro, CourseSyllabus } from '@/components/Course';
 import { LivePreviewListener } from '@/components/LivePreviewListener';
 import { PayloadRedirects } from '@/components/PayloadRedirects';
 import { ProductActions } from '@/components/ProductActions';
@@ -19,13 +20,14 @@ import RichText from '@/components/RichText';
 import { generateMeta } from '@/lib/seo';
 import { siteWhere } from '@/lib/siteWhere';
 import { getCurrentWebsite, getCurrentWebsiteId } from '@/lib/website';
-import type { Product } from '@/payload-types';
+import type { Course, Product } from '@/payload-types';
 import { getImageProps } from '@/utilities/image';
 import {
   getDocUrl,
   getLocalizedCollectionName,
   type PageCollectionsType,
   pageCollections,
+  parseSlugWithResourceId,
   resolvePageCollection,
 } from '../pageCollections';
 
@@ -33,29 +35,6 @@ const logger = Logger.create({
   namespace: 'historia:pages',
   context: { module: 'CollectionDocumentRoute' },
 });
-
-/**
- * Parse slug in format: {human-readable-slug}--{resourceId}
- */
-function parseSlugWithResourceId(
-  combinedSlug: string,
-): { slug: string; resourceId: string } | null {
-  const lastDashDashIndex = combinedSlug.lastIndexOf('--');
-
-  if (lastDashDashIndex === -1 || lastDashDashIndex === combinedSlug.length - 2) {
-    // No '--' separator found, or it's at the end
-    return null;
-  }
-
-  const slug = combinedSlug.substring(0, lastDashDashIndex);
-  const resourceId = combinedSlug.substring(lastDashDashIndex + 2);
-
-  if (!slug || !resourceId) {
-    return null;
-  }
-
-  return { slug, resourceId };
-}
 
 export async function generateStaticParams() {
   // Skip static generation during build to avoid database queries
@@ -167,6 +146,8 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
 
   const titleToUse = 'title' in document ? document.title : document.name;
   const isProduct = originalCollectionName === 'products';
+  // A course is its story with the syllabus; its lessons have their own route below it.
+  const course = originalCollectionName === 'courses' ? (document as Course) : null;
   const hasLead = 'lead' in document && document.lead;
   const hasImage = 'image' in document && document.image;
   const imageFormat = isProduct ? 'square' : 'landscape';
@@ -204,6 +185,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
           {'contributors' in document && (
             <Byline contributors={document.contributors} locale={locale} />
           )}
+          {course && <CourseIntro course={course} locale={locale} draft={draft} />}
         </StoryHeader>
 
         <StoryBody>
@@ -213,6 +195,7 @@ export default async function Page({ params: paramsPromise }: Readonly<Args>) {
           {'story' in document && document.story ? (
             <RenderBlocks blocks={document.story} locale={locale} />
           ) : null}
+          {course && <CourseSyllabus course={course} locale={locale} draft={draft} />}
         </StoryBody>
       </Story>
     </Container>

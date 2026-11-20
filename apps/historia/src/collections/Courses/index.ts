@@ -18,6 +18,8 @@ import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
 import { topics } from '@/fields/topics';
+import { revalidateSitemap, revalidateSitemapAfterDelete } from '@/hooks/revalidateSitemap';
+import { generatePreviewPath } from '@/utilities/generatePreviewPath';
 import { syllabus } from './fields/syllabus';
 
 /**
@@ -29,9 +31,11 @@ import { syllabus } from './fields/syllabus';
  * one to the other is adding a section, not changing kind. Lessons are their
  * own documents and can be used in more than one course.
  *
- * In the admin and the API, but with no pages on the site yet: the frontend
- * routes come next. Enrolment and progress are separate collections later;
- * `access` is stored now so they need no schema change on the course. See
+ * On the site at `/{locale}/c/kurs/{slug}--{resourceId}` (`courses` in
+ * English), with its lessons below it. Enrolment and progress are separate
+ * collections later; `access` is stored now so they need no schema change on
+ * the course. Until then a course for enrolled participants shows its page
+ * and syllabus, and keeps its lessons closed. See
  * docs/adr/0012-courses-and-lessons.md.
  */
 export const Courses: CollectionConfig = {
@@ -46,6 +50,22 @@ export const Courses: CollectionConfig = {
   admin: {
     defaultColumns: ['title', 'slug', 'access', 'updatedAt'],
     group: 'Courses',
+    livePreview: {
+      url: ({ data, req }) =>
+        generatePreviewPath({
+          slug: typeof data?.slug === 'string' ? data.slug : '',
+          resourceId: typeof data?.resourceId === 'string' ? data.resourceId : undefined,
+          collection: 'courses',
+          req,
+        }),
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        slug: typeof data?.slug === 'string' ? data.slug : '',
+        resourceId: typeof data?.resourceId === 'string' ? data.resourceId : undefined,
+        collection: 'courses',
+        req,
+      }),
     useAsTitle: 'title',
   },
   fields: [
@@ -69,7 +89,7 @@ export const Courses: CollectionConfig = {
               ],
               admin: {
                 description:
-                  'Who can read the lessons. Enrolment is not enforced yet; the value is kept so it will be.',
+                  'Who can read the lessons. The course page and its list of lessons are public either way. Enrolment does not exist yet, so the lessons of an enrolled course are closed to everyone on the site until it does.',
               },
             },
             {
@@ -95,6 +115,10 @@ export const Courses: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [revalidateSitemap],
+    afterDelete: [revalidateSitemapAfterDelete],
+  },
   versions: {
     drafts: {
       autosave: {
