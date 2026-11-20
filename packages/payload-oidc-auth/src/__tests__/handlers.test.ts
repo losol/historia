@@ -20,14 +20,15 @@ function fakeClient(userInfo: Partial<OidcUserInfo> = {}): OidcClient & { calls:
         codeVerifier: 'verifier',
         codeChallenge: 'challenge',
         state: 'st4te',
+        nonce: 'n0nce',
         parameters: {},
       };
     },
     async authorizationUrl() {
       return new URL('https://idp.example.com/authorize?state=st4te');
     },
-    async exchangeCode(callbackUrl, { codeVerifier, state }) {
-      calls.push({ callbackUrl: callbackUrl.toString(), codeVerifier, state });
+    async exchangeCode(callbackUrl, { codeVerifier, state, nonce }) {
+      calls.push({ callbackUrl: callbackUrl.toString(), codeVerifier, state, nonce });
       return { access_token: 'at', token_type: 'bearer' } as never;
     },
     async getUserInfo() {
@@ -87,10 +88,22 @@ describe('handleOidcLogin', () => {
     expect(setCookies(response)).toEqual([
       'idp_pkce_st4te=verifier',
       'idp_redirect_st4te=https%3A%2F%2Fshop.example.com%2Fapi%2Fauth%2Fidp%2Fcallback',
+      'idp_nonce_st4te=n0nce',
     ]);
     expect(response.headers.getSetCookie()[0]).toContain(
       'HttpOnly; SameSite=Lax; Max-Age=600; Secure',
     );
+  });
+
+  it('leaves the nonce out when the request has none, as without openid in the scope', async () => {
+    const client = fakeClient();
+    const withNonce = client.createAuthorizationRequest;
+    client.createAuthorizationRequest = async () => ({ ...(await withNonce()), nonce: undefined });
+    const response = await handleOidcLogin(
+      { url: 'https://shop.example.com/api/auth/idp/login', headers: new Headers() },
+      provider(client),
+    );
+    expect(setCookies(response).some((c) => c.startsWith('idp_nonce_'))).toBe(false);
   });
 });
 
@@ -127,7 +140,7 @@ describe('handleOidcCallback', () => {
       headers: new Headers({
         cookie:
           cookie ??
-          `${cookies.verifier}=verifier; ${cookies.redirectUri}=${encodeURIComponent('https://shop.example.com/api/auth/idp/callback')}`,
+          `${cookies.verifier}=verifier; ${cookies.nonce}=n0nce; ${cookies.redirectUri}=${encodeURIComponent('https://shop.example.com/api/auth/idp/callback')}`,
       }),
     };
     return {
@@ -149,6 +162,7 @@ describe('handleOidcCallback', () => {
         callbackUrl: 'https://shop.example.com/api/auth/idp/callback?code=c0de&state=st4te',
         codeVerifier: 'verifier',
         state: 'st4te',
+        nonce: 'n0nce',
       },
     ]);
     expect(docs.size).toBe(1);
@@ -157,6 +171,7 @@ describe('handleOidcCallback', () => {
     const set = parseCookies(new Headers({ cookie: setCookies(response).join('; ') }));
     expect(set.get('__idp_session_pending')).toBeTruthy();
     expect(set.get(cookies.verifier)).toBe('');
+    expect(set.get(cookies.nonce)).toBe('');
     expect(set.get(cookies.redirectUri)).toBe('');
     expect(set.get(cookies.returnTo)).toBe('');
 
@@ -205,6 +220,7 @@ describe('handleOidcCallback', () => {
     expect(response.headers.get('location')).toContain('error=invalid_callback');
     expect(setCookies(response)).toEqual([
       `${cookies.verifier}=`,
+      `${cookies.nonce}=`,
       `${cookies.redirectUri}=`,
       `${cookies.returnTo}=`,
     ]);

@@ -1,6 +1,6 @@
 /**
- * Starts a login: makes the PKCE pair, keeps the verifier in a cookie, and sends
- * the person to the provider.
+ * Starts a login: makes the PKCE pair and nonce, keeps them in cookies, and
+ * sends the person to the provider.
  */
 
 import { handshakeCookies, redirect, setCookieHeader } from '../cookies';
@@ -49,6 +49,13 @@ export async function handleOidcLogin<TUser extends OidcUserInfo>(
       }),
       setCookieHeader(cookies.redirectUri, redirectUri, { maxAge: HANDSHAKE_MAX_AGE, secure }),
     ];
+    // fides-auth sends a nonce when the scope has `openid`, and the callback
+    // must hand it back: the ID token has to carry it, or the login fails.
+    if (authorization.nonce) {
+      handshake.push(
+        setCookieHeader(cookies.nonce, authorization.nonce, { maxAge: HANDSHAKE_MAX_AGE, secure }),
+      );
+    }
     // Where the page that started the login wants the person back, if anywhere.
     const returnTo = safeReturnPath(url.searchParams.get(RETURN_TO_PARAM), provider.basePath);
     if (returnTo) {

@@ -9,7 +9,8 @@ import { resolveProvider } from '../provider';
 /**
  * A provider on a loopback port: discovery, token, keys and userinfo. It checks
  * what a real one checks at the token endpoint (the client, the code and the
- * PKCE verifier), so the default client is run through a whole login.
+ * PKCE verifier), and puts the login's nonce in the ID token, so the default
+ * client is run through a whole login.
  */
 const CLIENT_ID = 'historia';
 const CLIENT_SECRET = 's3cret';
@@ -20,6 +21,7 @@ let issuer: string;
 let discoveries = 0;
 /** What the "browser" sent to the authorization endpoint, kept for the token call. */
 let challenge: string | undefined;
+let nonce: string | undefined;
 let userinfoSub = 'user-1';
 
 const body = async (request: IncomingMessage) => {
@@ -76,7 +78,7 @@ beforeAll(async () => {
       ) {
         return json(400, { error: 'invalid_grant' });
       }
-      const idToken = await new SignJWT({ email: 'kari@example.com' })
+      const idToken = await new SignJWT({ email: 'kari@example.com', ...(nonce && { nonce }) })
         .setProtectedHeader({ alg: 'RS256', kid: 'k1' })
         .setIssuer(issuer)
         .setAudience(CLIENT_ID)
@@ -127,6 +129,9 @@ describe('the default OIDC client, against a provider', () => {
     expect(authUrl.searchParams.get('code_challenge_method')).toBe('S256');
     challenge = authUrl.searchParams.get('code_challenge') ?? undefined;
     expect(challenge).toBe(request.codeChallenge);
+    nonce = authUrl.searchParams.get('nonce') ?? undefined;
+    expect(nonce).toBeTruthy();
+    expect(nonce).toBe(request.nonce);
 
     const callbackUrl = new URL(`${REDIRECT_URI}?code=the-code&state=${request.state}`);
     const tokens = await client.exchangeCode(callbackUrl, request);
@@ -144,6 +149,7 @@ describe('the default OIDC client, against a provider', () => {
     const client = createOidcClient(provider(), REDIRECT_URI);
     const request = await client.createAuthorizationRequest();
     challenge = request.codeChallenge;
+    nonce = request.nonce;
 
     const callbackUrl = new URL(`${REDIRECT_URI}?code=the-code&state=someone-elses`);
     await expect(client.exchangeCode(callbackUrl, request)).rejects.toThrow();
@@ -153,6 +159,7 @@ describe('the default OIDC client, against a provider', () => {
     const client = createOidcClient(provider(), REDIRECT_URI);
     const request = await client.createAuthorizationRequest();
     challenge = request.codeChallenge;
+    nonce = request.nonce;
 
     const callbackUrl = new URL(`${REDIRECT_URI}?code=the-code&state=${request.state}`);
     await expect(
@@ -160,10 +167,35 @@ describe('the default OIDC client, against a provider', () => {
     ).rejects.toThrow();
   });
 
+  it('refuses an ID token that does not carry the nonce of the login', async () => {
+    const client = createOidcClient(provider(), REDIRECT_URI);
+    const request = await client.createAuthorizationRequest();
+    challenge = request.codeChallenge;
+    const callbackUrl = new URL(`${REDIRECT_URI}?code=the-code&state=${request.state}`);
+
+    // The nonce cookie was lost: an ID token that carries a nonce is refused.
+    nonce = request.nonce;
+    await expect(
+      client.exchangeCode(callbackUrl, {
+        state: request.state,
+        codeVerifier: request.codeVerifier,
+      }),
+    ).rejects.toThrow();
+
+    // The ID token carries no nonce at all.
+    nonce = undefined;
+    await expect(client.exchangeCode(callbackUrl, request)).rejects.toThrow();
+
+    // The provider answers with the ID token of another login.
+    nonce = 'someone-elses';
+    await expect(client.exchangeCode(callbackUrl, request)).rejects.toThrow();
+  });
+
   it('refuses userinfo about another subject than the ID token names', async () => {
     const client = createOidcClient(provider(), REDIRECT_URI);
     const request = await client.createAuthorizationRequest();
     challenge = request.codeChallenge;
+    nonce = request.nonce;
     const callbackUrl = new URL(`${REDIRECT_URI}?code=the-code&state=${request.state}`);
     const tokens = await client.exchangeCode(callbackUrl, request);
 

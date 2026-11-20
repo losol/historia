@@ -30,13 +30,16 @@ export interface OidcUserInfo {
  * supplies its own through `OidcProvider.createClient`.
  */
 export interface OidcClient<TUser extends OidcUserInfo = OidcUserInfo> {
-  /** The PKCE pair and state of one login attempt. */
+  /** The PKCE pair, state and nonce of one login attempt. */
   createAuthorizationRequest(): Promise<AuthorizationRequest>;
   authorizationUrl(request: AuthorizationRequest): Promise<URL>;
-  /** Trades the code for tokens, checking the state and the verifier of the attempt. */
+  /**
+   * Trades the code for tokens, checking the state and the verifier of the
+   * attempt, and the nonce of its ID token.
+   */
   exchangeCode(
     callbackUrl: URL,
-    request: Pick<AuthorizationRequest, 'codeVerifier' | 'state'>,
+    request: Pick<AuthorizationRequest, 'codeVerifier' | 'state' | 'nonce'>,
   ): Promise<TokenEndpointResponse>;
   getUserInfo(tokens: TokenEndpointResponse): Promise<TUser>;
 }

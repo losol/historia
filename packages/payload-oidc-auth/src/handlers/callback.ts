@@ -63,6 +63,7 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
   const clearHandshake = cookies
     ? [
         clearCookieHeader(cookies.verifier, secure),
+        clearCookieHeader(cookies.nonce, secure),
         clearCookieHeader(cookies.redirectUri, secure),
         clearCookieHeader(cookies.returnTo, secure),
       ]
@@ -101,7 +102,10 @@ export async function handleOidcCallback<TUser extends OidcUserInfo>(
 
     const callbackUrl = new URL(redirectUri);
     callbackUrl.search = url.search;
-    const tokens = await client.exchangeCode(callbackUrl, { codeVerifier, state });
+    // Without the cookie there is no nonce to expect, and an ID token that
+    // carries one is refused: a login started here always has the cookie.
+    const nonce = getCookie(request, cookies.nonce);
+    const tokens = await client.exchangeCode(callbackUrl, { codeVerifier, state, nonce });
     if (!tokens.access_token) {
       log.error('The token response has no access token');
       return withClearedHandshake(fail('token_failed'));
