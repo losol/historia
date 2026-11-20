@@ -3,6 +3,7 @@ import { getLocalizedCollectionName } from '@/app/(frontend)/[locale]/c/[collect
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   articles: 'c',
+  courses: 'c',
   instructions: 'c',
   notes: 'c',
   products: 'c',
@@ -66,6 +67,25 @@ export const generatePreviewPath = ({
     path = `/${locale}`;
   }
 
+  return previewUrl({ path, collection, slug, req });
+};
+
+/**
+ * The preview route's URL for a path on the site: it turns on draft mode for a
+ * signed-in editor, then opens the path. For documents whose path the
+ * function above cannot build, such as a lesson, which is read under a course.
+ */
+export const previewUrl = ({
+  path,
+  collection,
+  slug,
+  req,
+}: {
+  path: string;
+  collection: CollectionSlug;
+  slug?: string;
+  req: PayloadRequest;
+}): string => {
   const params: Record<string, string> = {
     collection,
     path,
@@ -91,7 +111,5 @@ export const generatePreviewPath = ({
     process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL_PROJECT_PRODUCTION_URL);
   const protocol = isProduction ? 'https:' : req.protocol;
 
-  const url = `${protocol}//${req.host}/next/preview?${encodedParams.toString()}`;
-
-  return url;
+  return `${protocol}//${req.host}/next/preview?${encodedParams.toString()}`;
 };

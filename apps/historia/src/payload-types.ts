@@ -1597,7 +1597,7 @@ export interface Course {
   story?: (ContentBlock | ImageBlock)[] | null;
   syllabus?: CourseSyllabus;
   /**
-   * Who can read the lessons. Enrolment is not enforced yet; the value is kept so it will be.
+   * Who can read the lessons. The course page and its list of lessons are public either way. Enrolment does not exist yet, so the lessons of an enrolled course are closed to everyone on the site until it does.
    */
   access?: ('public' | 'enrolled') | null;
   /**
@@ -2497,6 +2497,10 @@ export interface Search {
     | {
         relationTo: 'articles';
         value: string | Article;
+      }
+    | {
+        relationTo: 'courses';
+        value: string | Course;
       }
     | {
         relationTo: 'notes';

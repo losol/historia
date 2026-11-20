@@ -4,8 +4,9 @@
 
 Accepted for the data model: the two collections are registered in the Payload
 config, with the migration `20261115_202548_courses_and_lessons`. They are in
-the admin and the API, and have no pages on the site yet. Everything after "The
-road from here" is a plan, not a decision.
+the admin and the API, and on the site under `/{locale}/c/kurs` (see "1. Open
+courses"). Everything after "The road from here" is a plan, not a decision,
+except what that step records as done.
 
 ## Context
 
@@ -24,8 +25,8 @@ What is already here:
   `externalEvent`, which ties a document here to an event there by uuid.
 - Commerce: products, orders and Vipps.
 
-What is not here: enrolment, progress, tests, certificates, and any frontend for
-courses.
+What is not here: enrolment, progress, tests and certificates. When this was
+written there was no frontend for courses either; step 1 below added it.
 
 ## Principles
 
@@ -135,8 +136,9 @@ Found in those runs, and the first things to fix:
 2. **A section's row reads "Section 01".** A row label that shows the title and
    the number of lessons needs a small client component.
 3. **There is no video block.** It is the first block doctors will ask for.
-4. **No preview.** The frontend routes come first; live preview follows the
-   pattern on Instructions.
+4. ~~**No preview.**~~ Done with the routes: courses preview as other content
+   does, and a lesson previews under the oldest course whose syllabus holds it.
+   A lesson in no course has no page, and so no preview.
 5. **Authors need the `editor` role**, which opens all content on the website.
    Whether courses want a narrower role is an open question below.
 6. **"Used in" is right in the admin only.** Read through the API, the `courses`
@@ -148,13 +150,14 @@ Found in those runs, and the first things to fix:
 7. **Deleting a lesson takes it out of every course, without a word.** The
    syllabus of a published course loses the step, and so do the course's stored
    versions. Only admins can delete, but nothing warns them.
-8. **A lesson in a published course can be unpublished.** The course route has
-   to leave out the steps a reader cannot see, as for lessons never published.
+8. **A lesson in a published course can be unpublished.** The course route
+   leaves out the steps a reader cannot see, as for lessons never published:
+   they are not in the syllabus, not in previous and next, and their URL is a
+   404. A section left empty is left out.
 9. **Slugs are not unique.** Two lessons on a website can have the same slug, as
-   two articles can. The course route cannot look a lesson up by slug alone: it
-   finds it among the lessons of the course in the URL, where two with one slug
-   are still possible, or the URL carries the `resourceId` as the other content
-   does.
+   two articles can. The lesson's URL carries its `resourceId`, as the other
+   content does, and the route finds it by that among the lessons of the course
+   in the URL. A wrong or old slug redirects to the right one.
 
 ## The road from here
 
@@ -163,12 +166,37 @@ Each step can ship by itself.
 ### 1. Open courses
 
 The two collections are registered, and in the multi-tenant plugin's
-`collections` (without that, publishing fails on "Assigned Tenant"). What is
-left: routes `courses/[course]` and `courses/[course]/[lesson]`, with a rewrite from
-`/no/kurs`. The course page shows the story, then the syllabus with durations; a
-lesson page shows the story with previous and next from the syllabus. A course
-without a syllabus is one page. A video block. The publishing help above.
-Courses go in the search index; lessons do not.
+`collections` (without that, publishing fails on "Assigned Tenant").
+
+Done:
+
+- **The routes are under `/c/`, as the other content's.** A course is
+  `/no/c/kurs/{slug}--{resourceId}` (`/en/c/courses/…`), and a lesson is below
+  it: `/no/c/kurs/{course}--{id}/{lesson}--{id}`. The plan was `courses/[course]`
+  with a rewrite from `/no/kurs`, but a top-level `kurs` would hide a page with
+  that slug on every website, and a website about courses is likely to have
+  one. Under `/c/` the list (`/no/c/kurs`), the sitemap, the redirects between
+  the languages' names and the preview come with the collection.
+- **The course page** shows the story, then the syllabus: the sections with
+  their titles, the lessons numbered through the whole course, with their
+  durations. Above the story: the number of lessons, the duration (the
+  course's own, or the sum of the lessons') and "Start kurset", to the first
+  lesson. A course without a syllabus is its story alone.
+- **The lesson page** shows where it is ("Leksjon 2 av 5 · section"), the
+  story, and previous and next from the syllabus; after the last lesson, back
+  to the course. It is found as described under item 9 above, and read with
+  the Local API past access control: only lessons of that course's syllabus,
+  on this website, published (or their drafts in a preview).
+- **`access: enrolled` closes the lessons now.** The course page and its
+  syllabus are public, without links, and a lesson's URL is a 404 for
+  everyone but an editor's preview. Serving them publicly until enrolment
+  exists would open what the author meant to keep closed.
+- **Courses are in the search index**, with the migration
+  `20261120_175713_courses_in_search` (a column on `search_rels`). Lessons are
+  not, and not in the sitemap either: they are reached through the course.
+
+Left from this step: a video block, which waits for open question 4, and the
+publishing help (item 1 above), which waits for open question 1.
 
 ### 2. Members and progress
 
@@ -235,6 +263,7 @@ back so the certificate can be issued where registrations live.
 - Lessons are reusable, at the cost of one more thing to think about when
   editing a shared lesson; the "Used in" tab is there for that.
 - Lessons are not available through the public API or the SDK. Anything that
-  wants lesson content goes through the course route.
+  wants lesson content goes through the course route, which reads them with
+  `lib/courses/queries`.
 - Nothing here needs a schema change on courses or lessons when enrolment comes:
   `access` and `externalEvent` are already stored.

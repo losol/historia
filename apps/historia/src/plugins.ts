@@ -266,7 +266,8 @@ export const plugins: Plugin[] = [
     },
   }),
   searchPlugin({
-    collections: ['articles', 'notes', 'pages'],
+    // Not lessons: a lesson is reached through its course, and may be closed to readers.
+    collections: ['articles', 'courses', 'notes', 'pages'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
       // Visitors search the site they are on; the multi-tenant plugin scopes members.

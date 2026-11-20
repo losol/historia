@@ -1,0 +1,123 @@
+/* "6 leksjoner · 1 t 30 min" under the course's title. */
+.facts {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.syllabus {
+  margin-top: 3rem;
+}
+
+.section {
+  margin-top: 1.5rem;
+}
+
+.section + .section {
+  margin-top: 2.5rem;
+}
+
+.steps {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--border-1);
+}
+
+.step {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border-1);
+}
+
+/* The list carries the order for screen readers; this is the visible number. */
+.number {
+  flex: none;
+  min-width: 1.75rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-accent-500);
+}
+
+.stepTitle {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+a.stepTitle {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.stepTitle:hover,
+a.stepTitle:focus-visible {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.duration {
+  flex: none;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Previous and next under a lesson: one on each side, stacked on a phone. */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-1);
+}
+
+.pagerLink {
+  display: flex;
+  flex: 0 1 22rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md, 0.5rem);
+  color: inherit;
+  text-decoration: none;
+}
+
+.pagerLink:hover,
+.pagerLink:focus-visible {
+  border-color: var(--primary);
+}
+
+.pagerNext {
+  margin-left: auto;
+  text-align: right;
+}
+
+.pagerLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.pagerTitle {
+  font-weight: 500;
+}
+
+.pagerLink:hover .pagerTitle {
+  color: var(--primary);
+}

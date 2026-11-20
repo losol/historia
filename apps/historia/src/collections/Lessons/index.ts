@@ -14,6 +14,7 @@ import { seoTab } from '@/fields/seo';
 import { slugField } from '@/fields/slug';
 import { storyField } from '@/fields/story';
 import { title } from '@/fields/title';
+import { lessonPreviewUrl } from './previewUrl';
 
 /**
  * One lesson. The content is the `story`; a video is a lesson whose story holds
@@ -26,7 +27,8 @@ import { title } from '@/fields/title';
  * Lessons are not readable through the API by visitors. Who may read a lesson
  * is the course's decision (`access` on the course), and a lesson can be in
  * several courses, so the course route is the one door: it checks the course
- * and then reads the lesson itself. People with a role on the website read
+ * and then reads the lesson itself (`c/[collection]/[slug]/[lesson]`, through
+ * lib/courses/queries). People with a role on the website read
  * them in the admin as they do other content.
  *
  * `courses` ("Used in") is right in the admin, which lists the courses with a
@@ -48,6 +50,11 @@ export const Lessons: CollectionConfig = {
   admin: {
     defaultColumns: ['title', 'durationMinutes', 'updatedAt'],
     group: 'Courses',
+    // Under the oldest course that holds the lesson; none when it is in no course.
+    livePreview: {
+      url: ({ data, req }) => lessonPreviewUrl(data, req),
+    },
+    preview: (data, { req }) => lessonPreviewUrl(data, req),
     useAsTitle: 'title',
   },
   fields: [

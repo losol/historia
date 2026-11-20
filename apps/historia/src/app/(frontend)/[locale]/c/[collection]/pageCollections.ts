@@ -9,6 +9,7 @@ export const pageCollections = [
   'products',
   'cases',
   'timelines',
+  'courses',
 ] as const;
 export type ValidCollection = (typeof pageCollections)[number];
 type Collections = Config['collections'];
@@ -31,6 +32,7 @@ export const collectionTranslations: Record<string, Record<string, string>> = {
     products: 'products',
     cases: 'cases',
     timelines: 'timelines',
+    courses: 'courses',
   },
   no: {
     articles: 'artikler',
@@ -41,6 +43,7 @@ export const collectionTranslations: Record<string, Record<string, string>> = {
     products: 'produkter',
     cases: 'spor',
     timelines: 'tidslinjer',
+    courses: 'kurs',
   },
 };
 
@@ -81,6 +84,30 @@ export const resolvePageCollection = (
   const found = candidates.find((name) => (pageCollections as readonly string[]).includes(name));
   return (found as ValidCollection | undefined) ?? null;
 };
+
+/**
+ * Parses the last segment of a document's URL, `{slug}--{resourceId}`. Null
+ * when it has no `--`, or nothing on one side of it.
+ */
+export function parseSlugWithResourceId(
+  combinedSlug: string,
+): { slug: string; resourceId: string } | null {
+  const lastDashDashIndex = combinedSlug.lastIndexOf('--');
+
+  if (lastDashDashIndex === -1 || lastDashDashIndex === combinedSlug.length - 2) {
+    // No '--' separator found, or it's at the end
+    return null;
+  }
+
+  const slug = combinedSlug.substring(0, lastDashDashIndex);
+  const resourceId = combinedSlug.substring(lastDashDashIndex + 2);
+
+  if (!slug || !resourceId) {
+    return null;
+  }
+
+  return { slug, resourceId };
+}
 
 /**
  * Generates a localized URL for a given collection, resourceId, and slug.
