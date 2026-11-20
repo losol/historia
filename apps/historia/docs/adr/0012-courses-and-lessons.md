@@ -135,7 +135,8 @@ Found in those runs, and the first things to fix:
    pushed out silently, since the lesson may be in someone else's course.
 2. **A section's row reads "Section 01".** A row label that shows the title and
    the number of lessons needs a small client component.
-3. **There is no video block.** It is the first block doctors will ask for.
+3. ~~**There is no video block.**~~ There is one, for videos on YouTube or
+   Vimeo; see open question 4 for what comes after it.
 4. ~~**No preview.**~~ Done with the routes: courses preview as other content
    does, and a lesson previews under the oldest course whose syllabus holds it.
    A lesson in no course has no page, and so no preview.
@@ -195,8 +196,12 @@ Done:
   `20261120_175713_courses_in_search` (a column on `search_rels`). Lessons are
   not, and not in the sitemap either: they are reached through the course.
 
-Left from this step: a video block, which waits for open question 4, and the
-publishing help (item 1 above), which waits for open question 1.
+- **A video block** (`blocks/Video`), in the story of lessons and courses. The
+  author pastes the link to a video on YouTube or Vimeo; the block stores the
+  link, and a title for the video. See open question 4.
+
+Left from this step: the publishing help (item 1 above), which waits for open
+question 1.
 
 ### 2. Members and progress
 
@@ -249,8 +254,38 @@ back so the certificate can be issued where registrations live.
 3. **How Historia learns of an Eventuras registration.** Asking Eventuras when a
    member opens a closed course (by the identity both share), or Eventuras
    telling Historia when someone registers.
-4. **Where videos live.** Uploaded to the media library, or embedded from a
-   video host. It decides what the video block stores.
+4. **Where videos live.** Decided for now: embedded from YouTube or Vimeo,
+   and later a European or open-source service.
+   - **Not the media library.** Media are readable by everyone, so a video
+     there cannot be closed with its course. A file played as it is uploaded
+     has no versions for slow connections, and a doctor's phone video is
+     gigabytes that go through the Next server.
+   - **YouTube or Vimeo first.** Nothing to run, and authors know them. The
+     block stores the link the author copies, which keeps everything in it:
+     Vimeo's key for a video that is not listed, a start time. The link is
+     checked when the lesson is published.
+   - **Nothing is sent before play.** The page shows a button with the
+     video's title and where it plays from; the player is loaded when it is
+     pressed, already playing, so it is still one press. YouTube plays from
+     `youtube-nocookie.com` without other channels' suggestions, Vimeo with
+     Do Not Track.
+   - **What it does not do.** A link has no access control: anyone who has it
+     can watch. That is acceptable while every lesson with a video is in a
+     public course, as courses for enrolled participants keep their lessons
+     closed. Authors also have to upload elsewhere and paste the link.
+   - **Later: a European or open-source service**, for uploads from the
+     admin, versions for slow connections, signed playback for closed
+     courses and captions. The candidates discussed: PeerTube without
+     federation (open source, video in our own S3 storage, private videos with
+     short-lived tokens, automatic captions with Whisper), or Bunny Stream
+     (European, run for us). Both are to be tried before one is chosen, above
+     all whether private playback carries `enrolled` and how good the
+     Norwegian captions are; NB-Whisper from the National Library is the
+     fallback for those. It will be another provider in the same block, so
+     the lessons written until then need no change.
+   - **Video that identifies patients** does not belong in Historia, whatever
+     the provider: only material with consent, or anonymised. The authors'
+     guidance should say so.
 5. **Certificates.** Issued by Eventuras from a reported completion, or by
    Historia.
 6. **A forum.** A discussion attached to a course or a lesson, in its own

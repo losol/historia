@@ -8,6 +8,7 @@ import { InstructionBlock } from '@/blocks/InstructionBlock/Component';
 import { InstructionSectionBlock } from '@/blocks/InstructionSection/Component';
 import { ProductsBlock } from '@/blocks/Product';
 import { ResourcesBlock } from '@/blocks/ResourcesBlock/Component';
+import { VideoBlock } from '@/blocks/Video/Component';
 
 // biome-ignore lint/suspicious/noExplicitAny: block registry holds components with differing prop types
 const blockComponents: Record<string, React.FC<any>> = {
@@ -20,6 +21,7 @@ const blockComponents: Record<string, React.FC<any>> = {
   instructionSection: InstructionSectionBlock,
   products: ProductsBlock,
   resources: ResourcesBlock,
+  video: VideoBlock,
 };
 
 // Define the type for block keys

@@ -1594,7 +1594,7 @@ export interface Course {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ContentBlock | ImageBlock)[] | null;
+  story?: (ContentBlock | ImageBlock | VideoBlock)[] | null;
   syllabus?: CourseSyllabus;
   /**
    * Who can read the lessons. The course page and its list of lessons are public either way. Enrolment does not exist yet, so the lessons of an enrolled course are closed to everyone on the site until it does.
@@ -1643,6 +1643,23 @@ export interface Course {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock".
+ */
+export interface VideoBlock {
+  /**
+   * The address of the video on YouTube or Vimeo, as you copy it from the browser or the Share button. A start time in the link is kept.
+   */
+  url: string;
+  /**
+   * What the video shows, in a few words. Shown before it is played, and read by screen readers.
+   */
+  title?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'video';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lessons".
  */
 export interface Lesson {
@@ -1658,7 +1675,7 @@ export interface Lesson {
   title: string;
   lead?: string | null;
   image?: Image;
-  story?: (ContentBlock | ImageBlock)[] | null;
+  story?: (ContentBlock | ImageBlock | VideoBlock)[] | null;
   courses?: {
     docs?: (string | Course)[];
     hasNextPage?: boolean;
@@ -3166,6 +3183,7 @@ export interface CoursesSelect<T extends boolean = true> {
     | {
         content?: T | ContentBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
       };
   syllabus?: T | CourseSyllabusSelect<T>;
   access?: T;
@@ -3193,6 +3211,16 @@ export interface CoursesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock_select".
+ */
+export interface VideoBlockSelect<T extends boolean = true> {
+  url?: T;
+  title?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3367,6 +3395,7 @@ export interface LessonsSelect<T extends boolean = true> {
     | {
         content?: T | ContentBlockSelect<T>;
         image?: T | ImageBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
       };
   courses?: T;
   publishedAt?: T;

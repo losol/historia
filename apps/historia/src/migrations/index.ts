@@ -33,6 +33,7 @@ import * as migration_20261031_195645_payload_3_91 from './20261031_195645_paylo
 import * as migration_20261115_200537_poster_front from './20261115_200537_poster_front';
 import * as migration_20261115_202548_courses_and_lessons from './20261115_202548_courses_and_lessons';
 import * as migration_20261120_175713_courses_in_search from './20261120_175713_courses_in_search';
+import * as migration_20261120_194626_video_block from './20261120_194626_video_block';
 
 export const migrations = [
   {
@@ -208,6 +209,11 @@ export const migrations = [
   {
     up: migration_20261120_175713_courses_in_search.up,
     down: migration_20261120_175713_courses_in_search.down,
-    name: '20261120_175713_courses_in_search'
+    name: '20261120_175713_courses_in_search',
+  },
+  {
+    up: migration_20261120_194626_video_block.up,
+    down: migration_20261120_194626_video_block.down,
+    name: '20261120_194626_video_block'
   },
 ];

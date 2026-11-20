@@ -5,6 +5,7 @@ import { siteEditors } from '@/access/siteRoleAccess';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
+import { Video } from '@/blocks/Video/config';
 import { config } from '@/fields/config';
 import { image } from '@/fields/image';
 import { lead } from '@/fields/lead';
@@ -18,9 +19,9 @@ import { lessonPreviewUrl } from './previewUrl';
 
 /**
  * One lesson. The content is the `story`; a video is a lesson whose story holds
- * a video block. A lesson does not point at a course: a course's `syllabus`
- * places it in a section and orders it, so the same lesson can be used in more
- * than one course. The slug is not unique, here as on the other content: two
+ * a video block (from YouTube or Vimeo for now; see blocks/Video). A lesson
+ * does not point at a course: a course's `syllabus` places it in a section and
+ * orders it, so the same lesson can be used in more than one course. The slug is not unique, here as on the other content: two
  * lessons on a website can share one. The course route has to find a lesson
  * through the course in the URL, among the lessons of its syllabus.
  *
@@ -73,7 +74,7 @@ export const Lessons: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          fields: [title, lead, image, storyField([Content, Image])],
+          fields: [title, lead, image, storyField([Content, Image, Video])],
         },
         {
           label: 'Used in',

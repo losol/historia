@@ -1,0 +1,96 @@
+/* 16:9, and taller when the text of the button does not fit, as on a phone. */
+.frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-lg, 0.75rem);
+  background: #14181c;
+}
+
+.frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Dark in both themes: it stands where the video will play. */
+.facade {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 40%, #2a333b 0%, #14181c 70%);
+  /* A box with an aspect ratio grows to fit its content only when it does not clip it. */
+  overflow: visible;
+}
+
+.facade:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.play {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+
+/* The triangle sits a little right of the middle, where the eye expects it. */
+.play svg {
+  margin-left: 0.2rem;
+}
+
+.facade:hover .play,
+.facade:focus-visible .play {
+  transform: scale(1.08);
+}
+
+@media (max-width: 30rem) {
+  .facade {
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .play {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play {
+    transition: none;
+  }
+}
+
+.title {
+  max-width: 36ch;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.notice {
+  max-width: 48ch;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  opacity: 0.8;
+}

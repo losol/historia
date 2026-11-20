@@ -6,6 +6,7 @@ import { siteScoped } from '@/access/siteScoped';
 import { accessOR } from '@/access/utils/accessOR';
 import { Content } from '@/blocks/Content/config';
 import { Image } from '@/blocks/Image/config';
+import { Video } from '@/blocks/Video/config';
 import { config } from '@/fields/config';
 import { contributors } from '@/fields/contributors';
 import { externalEvent } from '@/fields/externalEvent';
@@ -74,7 +75,7 @@ export const Courses: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          fields: [title, lead, image, storyField([Content, Image]), syllabus],
+          fields: [title, lead, image, storyField([Content, Image, Video]), syllabus],
         },
         {
           label: 'Details',
