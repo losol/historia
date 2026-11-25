@@ -13,6 +13,9 @@
 export type Contributors =
   | {
       person: string | Person;
+      /**
+       * What they did, shown under their name: "Tekst", "Foto", "Intervju".
+       */
       role?: string | null;
       id?: string | null;
     }[]
