@@ -1,5 +1,29 @@
 # @eventuras/historia
 
+## 0.34.0
+
+### Minor Changes
+
+- 2f27ee6: Courses on the site. A course has a page at `/no/c/kurs/{slug}--{id}` (`/en/c/courses/…`) with its story, its syllabus and a button to start, and each lesson has a page below it, with previous and next. Lessons that are not published are left out. A course for enrolled participants shows its page and syllabus, and keeps its lessons closed until enrolment exists. Courses and lessons can be previewed from the admin, courses are in the sitemap and the search index (with a migration), and `/no/c/kurs` lists them.
+- 5478f28: Courses and lessons in the admin, as two new collections with their migration. A small course is one document; a larger one has a syllabus of sections with lessons, made from the course page, and a lesson can be used in several courses. Published courses are in the API, lessons only for people with a role on the website. There are no course pages on the site yet: the routes, video and questions, enrolment and progress follow in the steps of ADR 0012.
+
+### Patch Changes
+
+- 77ceb1d: `@eventuras/fides-auth` 1.0.0-beta.11. A login with `openid` in the scope now sends a nonce, and the callback checks that the ID token carries it, so an ID token from another login is refused. The nonce is kept in a handshake cookie next to the PKCE verifier, and `OidcClient.exchangeCode` gets it with the verifier and state: a provider with a client of its own passes it on to fides-auth.
+- 970ce79: `@eventuras/fides-auth` 1.0.0-beta.9. Vipps login now checks that the userinfo answer is about the person the ID token names, as the default client already did, and refuses a redirect from the Vipps userinfo endpoint. `idTokenSubject` from `payload-oidc-auth` reads that person off a token response, for a provider with a client of its own.
+- e8f786c: `@eventuras/fides-auth` 1.0.0-beta.6, pinned to that version. Login through an identity provider now runs on its `createOidcClient`, one client per redirect URI so a provider is discovered once and not for every login. A provider on `http://localhost` works in development.
+  
+  `OidcClient`, the contract a provider with its own client implements, follows the new names: `createAuthorizationRequest`, `authorizationUrl` and `exchangeCode(callbackUrl, { codeVerifier, state })` replace `buildPKCEOptions`, `buildAuthorizationUrl` and `exchangeCodeForTokens`.
+  
+  The cart cookie is Historia's own again: fides-auth 1.0 only makes a session out of a login, so `@eventuras/fides-auth-next` is gone from the app. The cookie keeps its name, format and lifetime, and carts in browsers today still open. A cookie written from now on also expires inside, after the 30 days its browser keeps it.
+- a42e8ca: The admin no longer crashes when Chrome translates it. A new article lost its form as soon as a title was typed, with `Failed to execute 'removeChild'` in the console: translation replaces the page's text with elements of its own, and React fails at its next render. The admin now asks browsers not to translate it, and comes in Norwegian for a browser set to Norwegian, so there is nothing to translate. Each user can still pick English in their account.
+- 507201d: The byline under an article's lead shows its people: each with their picture, or their initials when there is none, their name, linked to their page, and what they did, from the contributor's role ("Tekst", "Foto"). The avatar is ratio-ui's `Avatar` (2.41), hidden from screen readers since the name is next to it. It was one line of names before, styled with a class the site's CSS did not have.
+- Updated dependencies [77ceb1d]
+- Updated dependencies [970ce79]
+- Updated dependencies [e8f786c]
+  - @eventuras/payload-oidc-auth@0.3.0
+  - @eventuras/payload-vipps-auth@0.3.5
+
 ## 0.33.0
 
 ### Minor Changes
