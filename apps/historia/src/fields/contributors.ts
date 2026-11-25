@@ -17,6 +17,9 @@ export const contributors: Field = {
       type: 'text',
       required: false,
       localized: true,
+      admin: {
+        description: 'What they did, shown under their name: "Tekst", "Foto", "Intervju".',
+      },
     },
   ],
 };
